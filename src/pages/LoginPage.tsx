@@ -90,6 +90,15 @@ export default function LoginPage() {
               <span className="font-medium text-foreground">Demo:</span> admin@atomise.ai / atomise2026
             </p>
           </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full border-border text-muted-foreground hover:text-foreground"
+            onClick={() => navigate('/dashboard')}
+          >
+            Skip Login (Preview Mode)
+          </Button>
         </div>
       </div>
     </div>
