@@ -46,7 +46,8 @@ export default function ContactsPage() {
   const addMutation = useMutation({
     mutationFn: async () => {
       const leadId = crypto.randomUUID();
-      const record = { ...form, lead_id: leadId, tags: form.tags.split(',').map(t => t.trim()).filter(Boolean) };
+      const { tags, ...rest } = form;
+      const record = { ...rest, lead_id: leadId };
       const { error } = await supabase.from('contacts').insert(record);
       if (error) throw error;
 
