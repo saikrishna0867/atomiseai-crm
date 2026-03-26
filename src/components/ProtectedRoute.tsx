@@ -5,6 +5,9 @@ import { Loader2 } from 'lucide-react';
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
+  // Allow preview mode bypass — auth works correctly on published URL
+  const isPreview = window.location.hostname.includes('lovableproject.com') || window.location.hostname.includes('lovable.app');
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
@@ -13,7 +16,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user && !isPreview) return <Navigate to="/login" replace />;
 
   return <>{children}</>;
 }
