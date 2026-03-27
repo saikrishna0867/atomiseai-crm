@@ -214,7 +214,7 @@ export default function DashboardPage() {
           {activities.length === 0 ? (
             <p className="text-sm text-muted-foreground">No recent activity</p>
           ) : activities.map((a) => (
-            <div key={a.id} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-[rgba(124,58,237,0.05)] transition-colors">
+            <div key={a.id} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-[rgba(124,58,237,0.05)] transition-colors my-[11px]">
               <div
                 className="w-3 h-3 rounded-full shrink-0"
                 style={{ background: EVENT_COLORS[a.event_type] || '#7c3aed' }}
