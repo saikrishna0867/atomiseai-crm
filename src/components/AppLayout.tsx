@@ -57,22 +57,32 @@ export default function AppLayout() {
         <div
           className={cn(
             'h-[72px] flex items-center border-b transition-all duration-300',
-            collapsed ? 'px-3 justify-center' : 'px-6 justify-between'
+            collapsed ? 'px-3 justify-between' : 'px-6 justify-between'
           )}
           style={{ borderColor: 'rgba(124,58,237,0.15)' }}
         >
-          {!collapsed && <AtomiseLogo />}
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-[rgba(124,58,237,0.1)] transition-colors"
-            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {collapsed ? (
-              <PanelLeftOpen className="w-[18px] h-[18px]" />
-            ) : (
+          <AtomiseLogo collapsed={collapsed} />
+          {!collapsed && (
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-[rgba(124,58,237,0.1)] transition-colors"
+              title="Collapse sidebar"
+            >
               <PanelLeftClose className="w-[18px] h-[18px]" />
-            )}
-          </button>
+            </button>
+          )}
+        </div>
+        {collapsed && (
+          <div className="flex justify-center py-2">
+            <button
+              onClick={() => setCollapsed(false)}
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-[rgba(124,58,237,0.1)] transition-colors"
+              title="Expand sidebar"
+            >
+              <PanelLeftOpen className="w-[18px] h-[18px]" />
+            </button>
+          </div>
+        )
         </div>
 
         {/* Main Nav */}
