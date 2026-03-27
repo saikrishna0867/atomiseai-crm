@@ -193,12 +193,6 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
               </div>
             )}
           </div>
-          <button
-            onClick={() => listRef.current?.scrollBy({ top: 120, behavior: 'smooth' })}
-            className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center bg-background/80 backdrop-blur border border-border/30 hover:bg-muted/30 transition-colors"
-          >
-            <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
-          </button>
         </div>
       </div>
     </>
