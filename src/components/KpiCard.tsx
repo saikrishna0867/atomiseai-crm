@@ -5,30 +5,40 @@ interface KpiCardProps {
   title: string;
   value: string | number;
   icon: LucideIcon;
-  color: 'purple' | 'green' | 'cyan' | 'orange' | 'red' | 'blue';
+  glowColor: string;
+  iconColor: string;
   trend?: string;
+  delay?: number;
 }
 
-const colorMap = {
-  purple: 'text-primary bg-primary/10',
-  green: 'text-accent-green bg-accent-green/10',
-  cyan: 'text-accent-cyan bg-accent-cyan/10',
-  orange: 'text-accent-orange bg-accent-orange/10',
-  red: 'text-accent-red bg-accent-red/10',
-  blue: 'text-blue-400 bg-blue-400/10',
-};
-
-export function KpiCard({ title, value, icon: Icon, color, trend }: KpiCardProps) {
+export function KpiCard({ title, value, icon: Icon, glowColor, iconColor, trend, delay = 0 }: KpiCardProps) {
   return (
-    <div className="glass-card-purple p-5 hover:purple-glow transition-all duration-200">
-      <div className="flex items-start justify-between">
+    <div
+      className="relative overflow-hidden rounded-2xl p-6 border animate-fade-up hover:translate-y-[-2px] transition-transform duration-200"
+      style={{
+        background: 'linear-gradient(135deg, hsl(240 24% 10%) 0%, hsl(240 18% 12%) 100%)',
+        borderColor: 'rgba(124,58,237,0.18)',
+        animationDelay: `${delay}ms`,
+      }}
+    >
+      {/* Corner glow */}
+      <div
+        className="absolute -top-5 -right-5 w-20 h-20 rounded-full opacity-40"
+        style={{ background: glowColor, filter: 'blur(20px)' }}
+      />
+
+      <div className="flex items-start justify-between relative z-10">
         <div>
-          <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{title}</p>
-          <p className="text-2xl font-display font-bold text-foreground mt-1">{value}</p>
-          {trend && <p className="text-xs text-accent-green mt-1">{trend}</p>}
+          <p className="text-xs text-muted-foreground font-medium uppercase tracking-[0.08em]">{title}</p>
+          <p className="text-4xl font-display font-bold text-foreground mt-3">{value}</p>
+          {trend && (
+            <p className="text-xs text-accent-green mt-2 flex items-center gap-1">
+              <span>▲</span> {trend}
+            </p>
+          )}
         </div>
-        <div className={cn('p-2.5 rounded-lg', colorMap[color])}>
-          <Icon className="w-5 h-5" />
+        <div className="p-2.5 rounded-xl" style={{ background: `${glowColor}15` }}>
+          <Icon className="w-5 h-5" style={{ color: iconColor }} />
         </div>
       </div>
     </div>
