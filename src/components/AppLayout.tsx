@@ -83,7 +83,6 @@ export default function AppLayout() {
             </button>
           </div>
         )
-        </div>
 
         {/* Main Nav */}
         <nav className="flex-1 py-3 overflow-y-auto">
