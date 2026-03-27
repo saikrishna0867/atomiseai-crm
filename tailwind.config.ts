@@ -12,8 +12,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Syne", "sans-serif"],
-        body: ["DM Sans", "sans-serif"],
+        sans: ["Manrope", "sans-serif"],
+        display: ["Manrope", "sans-serif"],
+        body: ["Manrope", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
       colors: {
