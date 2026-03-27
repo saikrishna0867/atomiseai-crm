@@ -63,7 +63,7 @@ export default function SettingsPage() {
           <TabsTrigger value="general" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">General</TabsTrigger>
           <TabsTrigger value="team" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">Team</TabsTrigger>
           <TabsTrigger value="integrations" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">Integrations</TabsTrigger>
-          <TabsTrigger value="notifications" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">Notifications</TabsTrigger>
+          
         </TabsList>
 
         <TabsContent value="general" className="glass-card-purple p-6 space-y-4">
