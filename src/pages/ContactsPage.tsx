@@ -46,6 +46,8 @@ export default function ContactsPage() {
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [addOpen, setAddOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [emailWarning, setEmailWarning] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState(false);
 
   useEffect(() => { document.title = 'Contacts | Atomise CRM'; }, []);
 

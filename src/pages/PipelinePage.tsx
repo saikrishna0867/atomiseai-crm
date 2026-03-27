@@ -216,7 +216,15 @@ export default function PipelinePage() {
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="bg-[#141420] border-[rgba(124,58,237,0.3)] rounded-[20px]">
           <DialogHeader><DialogTitle className="font-display">Add Deal — {addStage}</DialogTitle></DialogHeader>
-          <form onSubmit={e => { e.preventDefault(); addMutation.mutate(); }} className="space-y-3">
+          <form onSubmit={e => {
+            e.preventDefault();
+            const val = Number(form.deal_value);
+            if (!val || val <= 0) {
+              toast({ title: 'Validation Error', description: 'Deal Value (£) is required and must be greater than 0.', variant: 'destructive' });
+              return;
+            }
+            addMutation.mutate();
+          }} className="space-y-3">
             {[
               { key: 'contact_name', label: 'Contact Name', required: true },
               { key: 'contact_email', label: 'Contact Email', required: true, type: 'email' },
@@ -228,7 +236,15 @@ export default function PipelinePage() {
             ].map(f => (
               <div key={f.key} className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground font-medium">{f.label}{f.required && <span className="text-destructive"> *</span>}</Label>
-                <input value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))} required={f.required} type={f.type || 'text'} className="glass-input w-full" />
+                <input
+                  value={(form as any)[f.key]}
+                  onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
+                  required={f.required}
+                  type={f.type || 'text'}
+                  min={f.key === 'deal_value' ? '1' : undefined}
+                  step={f.key === 'deal_value' ? 'any' : undefined}
+                  className="glass-input w-full"
+                />
               </div>
             ))}
             <Button type="submit" className="w-full font-display rounded-xl h-11" disabled={addMutation.isPending}>{addMutation.isPending ? 'Adding...' : 'Add Deal'}</Button>
