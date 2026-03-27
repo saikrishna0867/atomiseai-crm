@@ -149,18 +149,18 @@ export default function DashboardPage() {
       <div className="glass-card-purple p-5">
         <h3 className="font-display font-semibold text-foreground mb-4">Recent Activity</h3>
         <div className="space-y-3">
-          {activities.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No recent activity</p>
-          ) : activities.map((a) => (
-            <div key={a.id} className="flex items-center gap-3 py-2 border-b border-border/50 last:border-0">
-              <StatusBadge type="status" value={a.activity_type} />
-              <span className="text-sm text-foreground flex-1">{a.description}</span>
-              <span className="text-xs text-muted-foreground font-mono">{a.contact_name}</span>
-              <span className="text-xs text-muted-foreground">
-                {a.created_at ? formatDistanceToNow(new Date(a.created_at), { addSuffix: true }) : ''}
-              </span>
-            </div>
-          ))}
+           {activities.length === 0 ? (
+             <p className="text-sm text-muted-foreground">No recent activity</p>
+           ) : activities.map((a) => (
+             <div key={a.id} className="flex items-center gap-3 py-2 border-b border-border/50 last:border-0">
+               <StatusBadge type="status" value={a.event_type} />
+               <span className="text-sm text-foreground flex-1">{a.description}</span>
+               <span className="text-xs text-muted-foreground font-mono">{a.performed_by}</span>
+               <span className="text-xs text-muted-foreground">
+                 {a.timestamp ? formatDistanceToNow(new Date(a.timestamp), { addSuffix: true }) : ''}
+               </span>
+             </div>
+           ))}
         </div>
       </div>
     </div>
