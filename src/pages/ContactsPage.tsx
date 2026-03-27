@@ -245,7 +245,17 @@ export default function ContactsPage() {
               </DialogHeader>
               <p className="text-[13px] text-muted-foreground mt-1">Fill in the details below — automation will trigger automatically</p>
             </div>
-            <form onSubmit={e => { e.preventDefault(); addMutation.mutate(); }} className="p-6 space-y-4">
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              // Check for duplicate email
+              const existing = contacts.find((c: any) => c.email?.toLowerCase() === form.email.toLowerCase());
+              if (existing && !pendingSubmit) {
+                setEmailWarning(true);
+                return;
+              }
+              setPendingSubmit(false);
+              addMutation.mutate();
+            }} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground font-medium">Full Name <span className="text-destructive">*</span></Label>
