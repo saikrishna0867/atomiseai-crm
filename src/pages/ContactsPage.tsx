@@ -63,9 +63,10 @@ export default function ContactsPage() {
           source: form.source, company: form.company,
         }),
         supabase.from('activity_log').insert({
-          lead_id: leadId, contact_name: form.name,
-          activity_type: 'Contact Created', description: 'New contact added to CRM',
-          performed_by: form.assigned_rep,
+          lead_id: leadId,
+          event_type: 'lead_assigned',
+          description: 'New contact added to CRM',
+          performed_by: 'System',
         }),
       ]);
     },
