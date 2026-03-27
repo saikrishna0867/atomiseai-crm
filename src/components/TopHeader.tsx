@@ -44,7 +44,7 @@ export function TopHeader({ title, subtitle, userInitial }: TopHeaderProps) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search..."
-          className="glass-input w-full !pl-10 pr-3 py-2 text-sm rounded-[10px]"
+          className="glass-input w-full !pl-10 pr-3 text-sm rounded-[10px]"
         />
       </div>
 
