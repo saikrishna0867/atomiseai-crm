@@ -30,7 +30,7 @@ export default function ContactDetailPage() {
   const { data: activities = [] } = useQuery({
     queryKey: ['activities', leadId],
     queryFn: async () => {
-      const { data } = await supabase.from('activity_log').select('*').eq('lead_id', leadId).order('created_at', { ascending: false });
+      const { data } = await supabase.from('activity_log').select('*').eq('lead_id', leadId).order('timestamp', { ascending: false });
       return data || [];
     },
   });
