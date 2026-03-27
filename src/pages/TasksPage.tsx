@@ -66,7 +66,17 @@ export default function TasksPage() {
     return (statusFilter === 'all' || t.status === statusFilter) && (priorityFilter === 'all' || t.priority === priorityFilter);
   });
 
-  const isOverdue = (t: any) => t.due_date && t.status !== 'Completed' && isPast(parseISO(t.due_date));
+  const getDateStatus = (t: any) => {
+    if (!t.due_date || t.status === 'Completed') return { isOverdue: false, isDueToday: false };
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDate = new Date(t.due_date);
+    dueDate.setHours(0, 0, 0, 0);
+    return {
+      isOverdue: dueDate < today,
+      isDueToday: dueDate.toDateString() === today.toDateString(),
+    };
+  };
 
   if (isLoading) {
     return <div className="p-6 space-y-4">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="skeleton-shimmer h-20 rounded-xl" />)}</div>;
