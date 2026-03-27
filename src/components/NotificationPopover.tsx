@@ -110,7 +110,7 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
 
         {/* Filter Chips — px-5 to match, consistent chip sizing */}
         <div
-          className="flex items-center gap-2 overflow-x-auto border-b my-[2px] py-[24px] px-[17px]"
+          className="flex items-center gap-2 overflow-x-auto border-b my-[2px] py-[24px] px-[17px] mb-[12px]"
           style={{ borderColor: 'rgba(124,58,237,0.08)' }}
         >
           {eventTypes.map((type: string) => (
