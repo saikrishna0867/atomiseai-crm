@@ -48,7 +48,7 @@ export default function AISummariesPage() {
   });
 
   // Build a map: lead_id -> latest summary meta
-  const summaryMap = new Map<string, { sentiment: string; generated_at: string; contact_name: string }>();
+  const summaryMap = new Map<string, { deal_health: string; generated_at: string; contact_name: string }>();
   allSummaries.forEach((s: any) => {
     if (!summaryMap.has(s.lead_id)) summaryMap.set(s.lead_id, s);
   });
