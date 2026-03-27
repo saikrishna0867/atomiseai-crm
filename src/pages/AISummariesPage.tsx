@@ -1,38 +1,32 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { webhooks } from '@/lib/webhooks';
 import { EmptyState } from '@/components/EmptyState';
-import { Button } from '@/components/ui/button';
+import { StatusBadge } from '@/components/StatusBadge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { Sparkles, Loader2, Search } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
-const SENTIMENT_CONFIG: Record<string, { emoji: string; label: string; cls: string }> = {
-  Positive: { emoji: '😊', label: 'Positive', cls: 'bg-[#34d39926] text-[#34d399] border-[#34d39930]' },
-  Neutral: { emoji: '😐', label: 'Neutral', cls: 'bg-[#fbbf2426] text-[#fbbf24] border-[#fbbf2430]' },
-  'Needs Attention': { emoji: '⚠️', label: 'Needs Attention', cls: 'bg-[#f8717126] text-[#f87171] border-[#f8717130]' },
+const SENTIMENT_CONFIG: Record<string, { emoji: string; label: string; bg: string; text: string; border: string; dot: string }> = {
+  Positive: { emoji: '😊', label: 'Positive', bg: 'rgba(52,211,153,0.15)', text: '#34d399', border: 'rgba(52,211,153,0.3)', dot: '#34d399' },
+  Neutral: { emoji: '😐', label: 'Neutral', bg: 'rgba(251,191,36,0.15)', text: '#fbbf24', border: 'rgba(251,191,36,0.3)', dot: '#fbbf24' },
+  'Needs Attention': { emoji: '⚠️', label: 'Needs Attention', bg: 'rgba(248,113,113,0.15)', text: '#f87171', border: 'rgba(248,113,113,0.3)', dot: '#f87171' },
 };
 
 export default function AISummariesPage() {
   const { toast } = useToast();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [searchQ, setSearchQ] = useState('');
+  const [summary, setSummary] = useState<any>(null);
+  const [loadingSummary, setLoadingSummary] = useState(false);
 
   useEffect(() => { document.title = 'AI Summaries | Atomise CRM'; }, []);
-
-  const { data: summaries = [], refetch: refetchSummaries } = useQuery({
-    queryKey: ['ai_summaries'],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('ai_summaries').select('*').order('generated_at', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    },
-  });
 
   const { data: contacts = [] } = useQuery({
     queryKey: ['contacts-for-ai'],
@@ -42,8 +36,48 @@ export default function AISummariesPage() {
     },
   });
 
-  const selectedSummary = summaries.find((s: any) => s.lead_id === selectedLeadId);
-  const filteredSummaries = summaries.filter((s: any) => !searchQ || s.contact_name?.toLowerCase().includes(searchQ.toLowerCase()));
+  // Fetch all summaries to know which contacts have one + sentiment dot
+  const { data: allSummaries = [] } = useQuery({
+    queryKey: ['ai_summaries_index'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('ai_summaries').select('lead_id, sentiment, generated_at, contact_name').order('generated_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Build a map: lead_id -> latest summary meta
+  const summaryMap = new Map<string, { sentiment: string; generated_at: string; contact_name: string }>();
+  allSummaries.forEach((s: any) => {
+    if (!summaryMap.has(s.lead_id)) summaryMap.set(s.lead_id, s);
+  });
+
+  // Fetch full summary when selectedLeadId changes
+  const fetchSummary = async (leadId: string) => {
+    setLoadingSummary(true);
+    setSummary(null);
+    try {
+      const { data, error } = await supabase
+        .from('ai_summaries')
+        .select('*')
+        .eq('lead_id', leadId)
+        .order('generated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      setSummary(data);
+    } catch (e: any) {
+      console.error('[AI Summary fetch]', e);
+      toast({ title: 'Error', description: e.message, variant: 'destructive' });
+    } finally {
+      setLoadingSummary(false);
+    }
+  };
+
+  const handleSelectContact = (leadId: string) => {
+    setSelectedLeadId(leadId);
+    fetchSummary(leadId);
+  };
 
   const handleGenerate = async (leadId: string) => {
     setGenerating(true);
@@ -51,17 +85,42 @@ export default function AISummariesPage() {
       await webhooks.generateSummary({ leadId, repEmail: user?.email || '' });
       toast({ title: '🤖 AI is analyzing contact history...' });
       await new Promise(r => setTimeout(r, 8000));
-      await refetchSummaries();
+      await queryClient.invalidateQueries({ queryKey: ['ai_summaries_index'] });
+      await fetchSummary(leadId);
       setSelectedLeadId(leadId);
       toast({ title: 'AI Summary generated ✅' });
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      console.error('[AI Generate]', e);
+      toast({ title: 'Error', description: e.message, variant: 'destructive' });
     } finally {
       setGenerating(false);
     }
   };
 
-  const sent = SENTIMENT_CONFIG[selectedSummary?.sentiment] || SENTIMENT_CONFIG.Neutral;
+  const handleGenerateFromDropdown = (leadId: string) => {
+    setSelectedLeadId(leadId);
+    handleGenerate(leadId);
+  };
+
+  // Build left panel list: contacts that have summaries + all contacts for search
+  const contactsWithMeta = contacts.map((c: any) => ({
+    ...c,
+    hasSummary: summaryMap.has(c.lead_id),
+    sentiment: summaryMap.get(c.lead_id)?.sentiment,
+    generatedAt: summaryMap.get(c.lead_id)?.generated_at,
+  }));
+
+  // Show contacts with summaries first, then others
+  const sorted = [...contactsWithMeta].sort((a, b) => {
+    if (a.hasSummary && !b.hasSummary) return -1;
+    if (!a.hasSummary && b.hasSummary) return 1;
+    return 0;
+  });
+
+  const filtered = sorted.filter(c => !searchQ || c.name?.toLowerCase().includes(searchQ.toLowerCase()));
+
+  const selectedContact = contacts.find((c: any) => c.lead_id === selectedLeadId);
+  const sent = summary ? (SENTIMENT_CONFIG[summary.sentiment] || SENTIMENT_CONFIG.Neutral) : null;
 
   return (
     <div className="p-6 flex gap-6 h-[calc(100vh-64px)]">
@@ -70,7 +129,7 @@ export default function AISummariesPage() {
         {/* Generate Section */}
         <div className="p-4 border-b" style={{ borderColor: 'rgba(124,58,237,0.15)' }}>
           <h3 className="font-display font-semibold text-foreground text-sm mb-3">Generate New Summary</h3>
-          <Select onValueChange={(v) => handleGenerate(v)}>
+          <Select onValueChange={handleGenerateFromDropdown}>
             <SelectTrigger className="glass-input text-sm" disabled={generating}>
               <SelectValue placeholder="Select contact..." />
             </SelectTrigger>
@@ -79,9 +138,17 @@ export default function AISummariesPage() {
             </SelectContent>
           </Select>
           {generating && (
-            <div className="mt-3 flex items-center gap-2 text-sm text-purple-bright">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Analyzing...</span>
+            <div className="mt-3 space-y-2">
+              <div className="flex items-center gap-2 text-sm text-primary">
+                <Sparkles className="w-4 h-4 animate-spin" />
+                <span>🤖 AI is analyzing contact history...</span>
+              </div>
+              <div className="flex gap-1">
+                <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+              </div>
+              <p className="text-[11px] text-muted-foreground">This takes about 8 seconds...</p>
             </div>
           )}
         </div>
@@ -89,42 +156,69 @@ export default function AISummariesPage() {
         {/* Search */}
         <div className="px-4 pt-3 pb-2">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder="Search..." className="glass-input w-full pl-8 py-1.5 text-xs rounded-lg" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+            <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder="Search contacts..." className="glass-input w-full !pl-8 py-1.5 text-xs rounded-lg" />
           </div>
         </div>
 
-        {/* Summary List */}
+        {/* Contact List */}
         <div className="flex-1 overflow-y-auto px-2 pb-2">
-          {filteredSummaries.length === 0 ? (
-            <p className="text-xs text-muted-foreground text-center py-6">No summaries yet</p>
-          ) : filteredSummaries.map((s: any) => {
-            const sc = SENTIMENT_CONFIG[s.sentiment] || SENTIMENT_CONFIG.Neutral;
-            const isActive = selectedLeadId === s.lead_id;
+          {filtered.length === 0 ? (
+            <p className="text-xs text-muted-foreground text-center py-6">No contacts found</p>
+          ) : filtered.map((c: any) => {
+            const isActive = selectedLeadId === c.lead_id;
+            const sentDot = c.sentiment ? SENTIMENT_CONFIG[c.sentiment]?.dot : undefined;
             return (
               <button
-                key={s.id}
-                onClick={() => setSelectedLeadId(s.lead_id)}
+                key={c.lead_id}
+                onClick={() => handleSelectContact(c.lead_id)}
                 className={`w-full text-left p-3 rounded-xl mb-1 transition-all duration-150 ${isActive ? 'bg-[rgba(124,58,237,0.18)] border border-primary/30' : 'hover:bg-[rgba(124,58,237,0.06)] border border-transparent'}`}
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-foreground">{s.contact_name}</span>
-                  <div className="w-2 h-2 rounded-full" style={{ background: sc.cls.includes('#34d399') ? '#34d399' : sc.cls.includes('#fbbf24') ? '#fbbf24' : '#f87171' }} />
+                  <span className="text-sm font-medium text-foreground">{c.name}</span>
+                  {sentDot && <div className="w-2 h-2 rounded-full shrink-0" style={{ background: sentDot }} />}
+                  {!c.hasSummary && <span className="text-[10px] text-muted-foreground/50 ml-auto">No summary</span>}
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {s.generated_at ? formatDistanceToNow(new Date(s.generated_at), { addSuffix: true }) : ''}
-                </p>
+                {c.generatedAt && (
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {formatDistanceToNow(new Date(c.generatedAt), { addSuffix: true })}
+                  </p>
+                )}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Right Panel — Summary Display */}
+      {/* Right Panel */}
       <div className="flex-1 min-w-0">
-        {!selectedSummary ? (
+        {!selectedLeadId ? (
           <EmptyState icon={Sparkles} title="Select a contact" description="Choose a contact from the left panel or generate a new summary." />
+        ) : loadingSummary ? (
+          <div className="space-y-4 p-7">
+            <div className="skeleton-shimmer h-8 w-48 rounded-lg" />
+            <div className="skeleton-shimmer h-4 w-32 rounded-lg" />
+            <div className="skeleton-shimmer h-40 rounded-xl mt-6" />
+            <div className="skeleton-shimmer h-24 rounded-xl" />
+          </div>
+        ) : !summary ? (
+          /* No summary exists for this contact */
+          <div className="flex flex-col items-center justify-center h-full gap-4">
+            <Sparkles className="w-12 h-12 text-primary/40" />
+            <h3 className="font-display text-lg font-semibold text-foreground">No summary for {selectedContact?.name || 'this contact'}</h3>
+            <p className="text-sm text-muted-foreground">Generate an AI-powered summary to get insights and next actions.</p>
+            <button
+              onClick={() => handleGenerate(selectedLeadId)}
+              disabled={generating}
+              className="flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-display font-semibold text-white disabled:opacity-50 transition-all duration-200"
+              style={{ background: 'linear-gradient(135deg, #7c3aed, #4c1d95)', boxShadow: '0 4px 20px rgba(124,58,237,0.4)' }}
+            >
+              {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+              {generating ? 'AI is analyzing...' : '🤖 Generate AI Summary'}
+            </button>
+          </div>
         ) : (
+          /* Summary exists — display it */
           <div
             className="rounded-[20px] p-7 h-full overflow-y-auto"
             style={{
@@ -135,30 +229,38 @@ export default function AISummariesPage() {
             {/* Header */}
             <div className="flex items-start justify-between mb-6">
               <div>
-                <h2 className="font-display text-[22px] font-bold text-foreground">{selectedSummary.contact_name}</h2>
+                <div className="flex items-center gap-3">
+                  <h2 className="font-display text-[22px] font-bold text-foreground">{summary.contact_name}</h2>
+                  {selectedContact?.pipeline_stage && <StatusBadge type="stage" value={selectedContact.pipeline_stage} />}
+                </div>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Generated {selectedSummary.generated_at ? formatDistanceToNow(new Date(selectedSummary.generated_at), { addSuffix: true }) : ''}
+                  Generated {summary.generated_at ? formatDistanceToNow(new Date(summary.generated_at), { addSuffix: true }) : ''}
                 </p>
               </div>
-              <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border ${sent.cls}`}>
-                {sent.emoji} {sent.label}
-              </span>
+              {sent && (
+                <span
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border"
+                  style={{ background: sent.bg, color: sent.text, borderColor: sent.border }}
+                >
+                  {sent.emoji} {sent.label}
+                </span>
+              )}
             </div>
 
             {/* AI Summary */}
             <div className="mb-6">
               <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground mb-3">AI Summary</p>
               <div className="border-l-[3px] border-primary pl-4 py-2 rounded-r-lg" style={{ background: 'rgba(124,58,237,0.04)' }}>
-                <p className="text-[15px] text-muted-foreground leading-[1.7]">{selectedSummary.summary}</p>
+                <p className="text-[15px] text-muted-foreground leading-[1.7]">{summary.summary}</p>
               </div>
             </div>
 
             {/* Next Action */}
-            {selectedSummary.next_action && (
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.1em] text-accent-amber mb-3">Recommended Next Action</p>
+            {summary.next_action && (
+              <div className="mb-6">
+                <p className="text-[11px] uppercase tracking-[0.1em] mb-3" style={{ color: '#fbbf24' }}>Recommended Next Action</p>
                 <div
-                  className="rounded-lg p-4 border-l-[3px]"
+                  className="rounded-lg p-4"
                   style={{
                     background: 'rgba(251,191,36,0.08)',
                     border: '1px solid rgba(251,191,36,0.2)',
@@ -166,21 +268,18 @@ export default function AISummariesPage() {
                     color: '#fbbf24',
                   }}
                 >
-                  {selectedSummary.next_action}
+                  {summary.next_action}
                 </div>
               </div>
             )}
 
-            {/* Generate New */}
+            {/* Regenerate */}
             <div className="mt-8">
               <button
-                onClick={() => handleGenerate(selectedSummary.lead_id)}
+                onClick={() => handleGenerate(summary.lead_id)}
                 disabled={generating}
                 className="flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-display font-semibold text-white disabled:opacity-50 transition-all duration-200"
-                style={{
-                  background: 'linear-gradient(135deg, #7c3aed, #4c1d95)',
-                  boxShadow: '0 4px 20px rgba(124,58,237,0.4)',
-                }}
+                style={{ background: 'linear-gradient(135deg, #7c3aed, #4c1d95)', boxShadow: '0 4px 20px rgba(124,58,237,0.4)' }}
               >
                 {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                 {generating ? 'AI is analyzing...' : '🤖 Generate AI Summary'}
