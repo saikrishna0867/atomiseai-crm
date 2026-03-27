@@ -147,13 +147,7 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
 
         {/* Notification List with scroll arrows */}
         <div className="relative flex-1 min-h-0">
-          <button
-            onClick={() => listRef.current?.scrollBy({ top: -120, behavior: 'smooth' })}
-            className="absolute top-1 left-1/2 -translate-x-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center bg-background/80 backdrop-blur border border-border/30 hover:bg-muted/30 transition-colors"
-          >
-            <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
-          </button>
-          <div ref={listRef} className="h-full overflow-y-auto px-3 py-2 pt-8 pb-8">
+          <div ref={listRef} className="h-full overflow-y-auto px-3 py-2">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
