@@ -8,9 +8,11 @@ interface ConfirmDialogProps {
   description: string;
   onConfirm: () => void;
   loading?: boolean;
+  confirmLabel?: string;
+  confirmVariant?: 'destructive' | 'default';
 }
 
-export function ConfirmDialog({ open, onOpenChange, title, description, onConfirm, loading }: ConfirmDialogProps) {
+export function ConfirmDialog({ open, onOpenChange, title, description, onConfirm, loading, confirmLabel, confirmVariant = 'destructive' }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-card border-border">
@@ -20,8 +22,8 @@ export function ConfirmDialog({ open, onOpenChange, title, description, onConfir
         <p className="text-sm text-muted-foreground">{description}</p>
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button variant="destructive" onClick={onConfirm} disabled={loading}>
-            {loading ? 'Deleting...' : 'Delete'}
+          <Button variant={confirmVariant} onClick={onConfirm} disabled={loading}>
+            {loading ? 'Processing...' : (confirmLabel || 'Delete')}
           </Button>
         </DialogFooter>
       </DialogContent>

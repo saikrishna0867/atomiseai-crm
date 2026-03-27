@@ -46,6 +46,8 @@ export default function ContactsPage() {
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [addOpen, setAddOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [emailWarning, setEmailWarning] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState(false);
 
   useEffect(() => { document.title = 'Contacts | Atomise CRM'; }, []);
 
@@ -243,7 +245,17 @@ export default function ContactsPage() {
               </DialogHeader>
               <p className="text-[13px] text-muted-foreground mt-1">Fill in the details below — automation will trigger automatically</p>
             </div>
-            <form onSubmit={e => { e.preventDefault(); addMutation.mutate(); }} className="p-6 space-y-4">
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              // Check for duplicate email
+              const existing = contacts.find((c: any) => c.email?.toLowerCase() === form.email.toLowerCase());
+              if (existing && !pendingSubmit) {
+                setEmailWarning(true);
+                return;
+              }
+              setPendingSubmit(false);
+              addMutation.mutate();
+            }} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground font-medium">Full Name <span className="text-destructive">*</span></Label>
@@ -322,6 +334,20 @@ export default function ContactsPage() {
         description="This action cannot be undone."
         onConfirm={() => deleteId && deleteMutation.mutate(deleteId)}
         loading={deleteMutation.isPending}
+      />
+
+      <ConfirmDialog
+        open={emailWarning}
+        onOpenChange={(open) => { setEmailWarning(open); if (!open) setPendingSubmit(false); }}
+        title="Duplicate Email Detected"
+        description="A contact with this email already exists. Are you sure you want to add another?"
+        confirmLabel="Continue"
+        confirmVariant="default"
+        onConfirm={() => {
+          setEmailWarning(false);
+          setPendingSubmit(true);
+          setTimeout(() => addMutation.mutate(), 0);
+        }}
       />
     </div>
   );
