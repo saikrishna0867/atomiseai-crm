@@ -38,7 +38,7 @@ export default function AppLayout() {
   const basePath = '/' + location.pathname.split('/')[1];
   const meta = pageMeta[basePath] || { title: 'Atomise CRM', subtitle: '' };
 
-  const initial = user?.email?.charAt(0).toUpperCase() || 'U';
+  const initial = user?.email?.charAt(0).toUpperCase() || 'S';
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -99,7 +99,7 @@ export default function AppLayout() {
             {!collapsed && (
               <>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-foreground truncate leading-tight">{user?.email?.split('@')[0] || 'User'}</p>
+                  <p className="text-sm font-bold text-foreground truncate leading-tight">{user?.email?.split('@')[0] || 'Sai Krishna'}</p>
                   <p className="text-[10px] text-muted-foreground truncate mt-0.5">{user?.email || ''}</p>
                   <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-primary/20 text-purple-bright mt-1">
                     Admin
