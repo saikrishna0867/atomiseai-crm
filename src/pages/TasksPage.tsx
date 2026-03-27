@@ -165,11 +165,14 @@ export default function TasksPage() {
               ))}
             </tr></thead>
             <tbody>
-              {filtered.map((t: any) => (
+              {filtered.map((t: any) => {
+                const { isOverdue, isDueToday } = getDateStatus(t);
+                return (
                 <tr key={t.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(124,58,237,0.05)] transition-colors">
                   <td className="px-4 py-3 font-medium text-foreground">
                     <div className="flex items-center gap-2">
-                      {isOverdue(t) && <AlertCircle className="w-3.5 h-3.5 text-destructive shrink-0" />}
+                      {isOverdue && <AlertCircle className="w-3.5 h-3.5 text-destructive shrink-0" />}
+                      {isDueToday && <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
                       {t.title}
                     </div>
                   </td>
@@ -181,10 +184,11 @@ export default function TasksPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`text-xs ${isOverdue(t) ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
+                    <span className={`text-xs ${isOverdue ? 'text-destructive font-medium' : isDueToday ? 'text-amber-400 font-medium' : 'text-muted-foreground'}`}>
                       {t.due_date ? format(parseISO(t.due_date), 'MMM d, yyyy') : '—'}
                     </span>
-                    {isOverdue(t) && <span className="text-[10px] bg-destructive/20 text-destructive px-1.5 py-0.5 rounded ml-2">Overdue</span>}
+                    {isOverdue && <span className="text-[10px] bg-destructive/20 text-destructive px-1.5 py-0.5 rounded ml-2">Overdue</span>}
+                    {isDueToday && <span className="text-[10px] bg-amber-400/20 text-amber-400 px-1.5 py-0.5 rounded ml-2">Due Today</span>}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground text-xs">{t.assigned_to}</td>
                   <td className="px-4 py-3">
@@ -194,7 +198,8 @@ export default function TasksPage() {
                     </Select>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
