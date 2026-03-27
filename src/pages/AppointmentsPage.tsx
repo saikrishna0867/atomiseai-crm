@@ -1,17 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { webhooks } from '@/lib/webhooks';
 import { StatusBadge } from '@/components/StatusBadge';
-import { LoadingSpinner, EmptyState } from '@/components/EmptyState';
+import { EmptyState } from '@/components/EmptyState';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { CalendarDays, Plus, List, Calendar as CalIcon } from 'lucide-react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths } from 'date-fns';
 
 const APPT_TYPES = ['Discovery Call', 'Demo', 'Follow-Up Call', 'Proposal Review', 'Onboarding'];
 const DURATIONS = ['15', '30', '45', '60'];
@@ -23,6 +22,8 @@ export default function AppointmentsPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+
+  useEffect(() => { document.title = 'Appointments | Atomise CRM'; }, []);
 
   const [form, setForm] = useState({
     contact_name: '', contact_email: '', lead_id: '', appointment_type: 'Discovery Call',
@@ -68,8 +69,7 @@ export default function AppointmentsPage() {
           duration: form.duration, meetingLink: form.meeting_link, notes: form.notes,
         }),
         supabase.from('activity_log').insert({
-          lead_id: form.lead_id,
-          event_type: 'appointment_booked',
+          lead_id: form.lead_id, event_type: 'appointment_booked',
           description: `Appointment scheduled for ${form.appointment_date}`,
           performed_by: form.rep_name,
         }),
@@ -78,7 +78,7 @@ export default function AppointmentsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
       setAddOpen(false);
-      toast({ title: 'Appointment booked — confirmation emails sent ✅' });
+      toast({ title: '📅 Appointment booked — confirmation emails sent to both parties ✅' });
     },
     onError: (e: any) => { console.error('[Appointments]', e); toast({ title: 'Error', description: e.message, variant: 'destructive' }); },
   });
@@ -91,25 +91,20 @@ export default function AppointmentsPage() {
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
-
-  // Pad start of month
   const startDay = monthStart.getDay();
   const paddedDays = Array(startDay).fill(null).concat(daysInMonth);
 
   const getApptForDate = (date: Date) => appointments.filter((a: any) => a.appointment_date && isSameDay(new Date(a.appointment_date), date));
   const selectedAppts = selectedDate ? getApptForDate(selectedDate) : [];
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) return <div className="p-6"><div className="skeleton-shimmer h-96 rounded-2xl" /></div>;
 
   return (
     <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-display font-bold text-foreground">Appointments</h1>
-        <div className="flex gap-2">
-          <Button variant={view === 'calendar' ? 'default' : 'outline'} size="sm" onClick={() => setView('calendar')} className="gap-1 border-border"><CalIcon className="w-4 h-4" /> Calendar</Button>
-          <Button variant={view === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setView('list')} className="gap-1 border-border"><List className="w-4 h-4" /> List</Button>
-          <Button onClick={() => setAddOpen(true)} className="gap-2"><Plus className="w-4 h-4" /> Book Appointment</Button>
-        </div>
+      <div className="flex items-center justify-end gap-2">
+        <Button variant={view === 'calendar' ? 'default' : 'outline'} size="sm" onClick={() => setView('calendar')} className="gap-1 border-border rounded-lg"><CalIcon className="w-4 h-4" /> Calendar</Button>
+        <Button variant={view === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setView('list')} className="gap-1 border-border rounded-lg"><List className="w-4 h-4" /> List</Button>
+        <Button onClick={() => setAddOpen(true)} className="gap-2 font-display text-sm rounded-xl"><Plus className="w-4 h-4" /> Book Appointment</Button>
       </div>
 
       {view === 'calendar' ? (
@@ -133,11 +128,14 @@ export default function AppointmentsPage() {
                   <button
                     key={day.toISOString()}
                     onClick={() => setSelectedDate(day)}
-                    className={`p-2 rounded-lg text-sm transition-colors relative ${isSelected ? 'bg-primary text-primary-foreground' : isToday ? 'bg-primary/10 text-primary' : 'hover:bg-muted text-foreground'}`}
+                    className={`min-h-[80px] p-2 rounded-lg text-sm transition-all relative border ${isSelected ? 'bg-primary/20 border-primary/40 text-primary' : isToday ? 'bg-primary/5 border-primary/10 text-primary' : 'border-[rgba(124,58,237,0.08)] hover:bg-[rgba(124,58,237,0.06)] text-foreground'}`}
                   >
-                    {format(day, 'd')}
+                    <span className="absolute top-2 left-2">{format(day, 'd')}</span>
                     {appts.length > 0 && (
-                      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-primary" />
+                      <div className="absolute bottom-2 left-2 right-2">
+                        <span className="text-[10px] text-primary truncate block">{appts[0]?.appointment_type?.substring(0, 8)}...</span>
+                        {appts.length > 1 && <span className="text-[10px] text-muted-foreground">+{appts.length - 1} more</span>}
+                      </div>
                     )}
                   </button>
                 );
@@ -167,21 +165,21 @@ export default function AppointmentsPage() {
         appointments.length === 0 ? (
           <EmptyState icon={CalendarDays} title="No appointments" description="Book your first appointment." action={<Button onClick={() => setAddOpen(true)}><Plus className="w-4 h-4 mr-2" /> Book Appointment</Button>} />
         ) : (
-          <div className="glass-card-purple overflow-hidden">
+          <div className="glass-card-purple overflow-hidden rounded-2xl">
             <table className="w-full text-sm">
-              <thead><tr className="border-b border-border/50">
+              <thead><tr style={{ background: 'rgba(124,58,237,0.08)', borderBottom: '1px solid rgba(124,58,237,0.15)' }}>
                 {['Contact', 'Type', 'Date', 'Time', 'Rep', 'Link', 'Status'].map(h => (
-                  <th key={h} className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase">{h}</th>
+                  <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{h}</th>
                 ))}
               </tr></thead>
               <tbody>
                 {appointments.map((a: any) => (
-                  <tr key={a.id} className="border-b border-border/30 hover:bg-muted/30">
+                  <tr key={a.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(124,58,237,0.05)]">
                     <td className="px-4 py-3 text-foreground">{a.contact_name}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{a.appointment_type}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{a.appointment_date}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{a.appointment_time}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{a.rep_name}</td>
+                    <td className="px-4 py-3 text-muted-foreground text-xs">{a.appointment_type}</td>
+                    <td className="px-4 py-3 text-muted-foreground text-xs">{a.appointment_date}</td>
+                    <td className="px-4 py-3 text-muted-foreground text-xs">{a.appointment_time}</td>
+                    <td className="px-4 py-3 text-muted-foreground text-xs">{a.rep_name}</td>
                     <td className="px-4 py-3">{a.meeting_link && <a href={a.meeting_link} target="_blank" className="text-primary text-xs hover:underline">Join</a>}</td>
                     <td className="px-4 py-3"><StatusBadge type="status" value={a.status || 'Scheduled'} /></td>
                   </tr>
@@ -192,45 +190,44 @@ export default function AppointmentsPage() {
         )
       )}
 
-      {/* Book Modal */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="bg-card border-border max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-[#141420] border-[rgba(124,58,237,0.3)] rounded-[20px] max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle className="font-display">Book Appointment</DialogTitle></DialogHeader>
           <form onSubmit={e => { e.preventDefault(); addMutation.mutate(); }} className="space-y-3">
-            <div className="space-y-1">
-              <Label className="text-foreground text-xs">Select Contact *</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Select Contact *</Label>
               <Select value={form.lead_id} onValueChange={selectContact}>
-                <SelectTrigger className="bg-secondary border-border text-foreground"><SelectValue placeholder="Select contact..." /></SelectTrigger>
+                <SelectTrigger className="glass-input"><SelectValue placeholder="Select contact..." /></SelectTrigger>
                 <SelectContent className="bg-card border-border max-h-48">
                   {contacts.map((c: any) => <SelectItem key={c.lead_id} value={c.lead_id}>{c.name} ({c.email})</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1">
-              <Label className="text-foreground text-xs">Type *</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Type *</Label>
               <Select value={form.appointment_type} onValueChange={v => setForm(p => ({ ...p, appointment_type: v }))}>
-                <SelectTrigger className="bg-secondary border-border text-foreground"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="glass-input"><SelectValue /></SelectTrigger>
                 <SelectContent className="bg-card border-border">{APPT_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1"><Label className="text-foreground text-xs">Date *</Label><Input type="date" value={form.appointment_date} onChange={e => setForm(p => ({ ...p, appointment_date: e.target.value }))} required className="bg-secondary border-border text-foreground" /></div>
-              <div className="space-y-1"><Label className="text-foreground text-xs">Time *</Label><Input type="time" value={form.appointment_time} onChange={e => setForm(p => ({ ...p, appointment_time: e.target.value }))} required className="bg-secondary border-border text-foreground" /></div>
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Date *</Label><input type="date" value={form.appointment_date} onChange={e => setForm(p => ({ ...p, appointment_date: e.target.value }))} required className="glass-input w-full" /></div>
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Time *</Label><input type="time" value={form.appointment_time} onChange={e => setForm(p => ({ ...p, appointment_time: e.target.value }))} required className="glass-input w-full" /></div>
             </div>
-            <div className="space-y-1">
-              <Label className="text-foreground text-xs">Duration</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Duration</Label>
               <Select value={form.duration} onValueChange={v => setForm(p => ({ ...p, duration: v }))}>
-                <SelectTrigger className="bg-secondary border-border text-foreground"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="glass-input"><SelectValue /></SelectTrigger>
                 <SelectContent className="bg-card border-border">{DURATIONS.map(d => <SelectItem key={d} value={d}>{d} min</SelectItem>)}</SelectContent>
               </Select>
             </div>
-            <div className="space-y-1"><Label className="text-foreground text-xs">Meeting Link</Label><Input value={form.meeting_link} onChange={e => setForm(p => ({ ...p, meeting_link: e.target.value }))} placeholder="https://..." className="bg-secondary border-border text-foreground" /></div>
+            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Meeting Link</Label><input value={form.meeting_link} onChange={e => setForm(p => ({ ...p, meeting_link: e.target.value }))} placeholder="https://..." className="glass-input w-full" /></div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1"><Label className="text-foreground text-xs">Rep Name *</Label><Input value={form.rep_name} onChange={e => setForm(p => ({ ...p, rep_name: e.target.value }))} required className="bg-secondary border-border text-foreground" /></div>
-              <div className="space-y-1"><Label className="text-foreground text-xs">Rep Email *</Label><Input type="email" value={form.rep_email} onChange={e => setForm(p => ({ ...p, rep_email: e.target.value }))} required className="bg-secondary border-border text-foreground" /></div>
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Rep Name *</Label><input value={form.rep_name} onChange={e => setForm(p => ({ ...p, rep_name: e.target.value }))} required className="glass-input w-full" /></div>
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Rep Email *</Label><input type="email" value={form.rep_email} onChange={e => setForm(p => ({ ...p, rep_email: e.target.value }))} required className="glass-input w-full" /></div>
             </div>
-            <div className="space-y-1"><Label className="text-foreground text-xs">Notes</Label><Input value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} className="bg-secondary border-border text-foreground" /></div>
-            <Button type="submit" className="w-full" disabled={addMutation.isPending}>{addMutation.isPending ? 'Booking...' : 'Book Appointment'}</Button>
+            <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Notes</Label><input value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} className="glass-input w-full" /></div>
+            <Button type="submit" className="w-full font-display rounded-xl h-11" disabled={addMutation.isPending}>{addMutation.isPending ? 'Booking...' : 'Book Appointment'}</Button>
           </form>
         </DialogContent>
       </Dialog>

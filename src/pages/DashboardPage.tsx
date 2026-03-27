@@ -1,13 +1,37 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { KpiCard } from '@/components/KpiCard';
-import { StatusBadge } from '@/components/StatusBadge';
-import { LoadingSpinner } from '@/components/EmptyState';
 import { Users, DollarSign, Trophy, TrendingDown, TrendingUp, ListTodo, Plus, CalendarDays } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { formatDistanceToNow } from 'date-fns';
+
+const EVENT_COLORS: Record<string, string> = {
+  lead_assigned: '#22d3ee',
+  stage_change: '#fbbf24',
+  campaign_email_sent: '#7c3aed',
+  campaign_launched: '#7c3aed',
+  appointment_booked: '#34d399',
+  drip_email_sent: '#60a5fa',
+  ai_summary_generated: '#f472b6',
+};
+
+function SkeletonDashboard() {
+  return (
+    <div className="p-6 space-y-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="skeleton-shimmer h-32 rounded-2xl" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        <div className="lg:col-span-3 skeleton-shimmer h-72 rounded-2xl" />
+        <div className="lg:col-span-2 skeleton-shimmer h-72 rounded-2xl" />
+      </div>
+    </div>
+  );
+}
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -16,6 +40,8 @@ export default function DashboardPage() {
   const [stageData, setStageData] = useState<any[]>([]);
   const [dealStatusData, setDealStatusData] = useState<any[]>([]);
   const [activities, setActivities] = useState<any[]>([]);
+
+  useEffect(() => { document.title = 'Dashboard | Atomise CRM'; }, []);
 
   const fetchData = async () => {
     try {
@@ -45,19 +71,15 @@ export default function DashboardPage() {
         openTasks,
       });
 
-      // Stage distribution — always show all 6 stages
       const allStages = ['Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'];
       const stageCounts: Record<string, number> = {};
       allStages.forEach(s => { stageCounts[s] = 0; });
       contacts.forEach(c => {
         const s = c.pipeline_stage || 'Lead';
-        if (stageCounts[s] !== undefined) {
-          stageCounts[s]++;
-        }
+        if (stageCounts[s] !== undefined) stageCounts[s]++;
       });
       setStageData(allStages.map(name => ({ name, value: stageCounts[name] })));
 
-      // Deal status breakdown
       const inProgress = deals.filter(d => d.stage !== 'Closed Won' && d.stage !== 'Closed Lost').length;
       setDealStatusData([
         { name: 'Won', value: won },
@@ -79,54 +101,61 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, []);
 
-  if (loading) return <LoadingSpinner text="Loading dashboard..." />;
+  if (loading) return <SkeletonDashboard />;
 
-  const PIE_COLORS = ['#10b981', '#ef4444', '#8b5cf6'];
+  const PIE_COLORS = ['#34d399', '#f87171', '#7c3aed'];
+  const totalDeals = dealStatusData.reduce((s, d) => s + d.value, 0);
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-display font-bold text-foreground">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Welcome back to Atomise CRM</p>
-        </div>
-      </div>
-
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        <KpiCard title="Total Contacts" value={stats.contacts} icon={Users} color="blue" />
-        <KpiCard title="Pipeline Value" value={`£${stats.pipelineValue.toLocaleString()}`} icon={DollarSign} color="green" />
-        <KpiCard title="Deals Won" value={stats.won} icon={Trophy} color="green" />
-        <KpiCard title="Deals Lost" value={stats.lost} icon={TrendingDown} color="red" />
-        <KpiCard title="Conversion Rate" value={`${stats.convRate}%`} icon={TrendingUp} color="cyan" />
-        <KpiCard title="Open Tasks" value={stats.openTasks} icon={ListTodo} color="orange" />
+        <KpiCard title="Total Contacts" value={stats.contacts.toLocaleString()} icon={Users} glowColor="#22d3ee" iconColor="#22d3ee" delay={0} />
+        <KpiCard title="Pipeline Value" value={`£${stats.pipelineValue.toLocaleString()}`} icon={DollarSign} glowColor="#34d399" iconColor="#34d399" delay={80} />
+        <KpiCard title="Deals Won" value={stats.won.toLocaleString()} icon={Trophy} glowColor="#7c3aed" iconColor="#7c3aed" delay={160} />
+        <KpiCard title="Deals Lost" value={stats.lost.toLocaleString()} icon={TrendingDown} glowColor="#f87171" iconColor="#f87171" delay={240} />
+        <KpiCard title="Conversion Rate" value={`${stats.convRate}%`} icon={TrendingUp} glowColor="#fbbf24" iconColor="#fbbf24" delay={320} />
+        <KpiCard title="Open Tasks" value={stats.openTasks.toLocaleString()} icon={ListTodo} glowColor="#60a5fa" iconColor="#60a5fa" delay={400} />
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        <div className="lg:col-span-3 glass-card-purple p-5">
-          <h3 className="font-display font-semibold text-foreground mb-4">Contacts by Stage</h3>
+        <div className="lg:col-span-3 glass-card-purple p-6 animate-fade-up" style={{ animationDelay: '300ms' }}>
+          <h3 className="font-display font-semibold text-foreground mb-4">Pipeline Overview</h3>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={stageData}>
-              <XAxis dataKey="name" tick={{ fill: '#a0a0c0', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#a0a0c0', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: '#16161f', border: '1px solid #2a2a3d', borderRadius: 8, color: '#f0f0ff' }} />
+              <XAxis dataKey="name" tick={{ fill: '#9b9bc0', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: '#9b9bc0', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <Tooltip
+                contentStyle={{
+                  background: 'rgba(20,20,32,0.95)',
+                  border: '1px solid rgba(124,58,237,0.3)',
+                  borderRadius: 12,
+                  color: '#f1f0ff',
+                  backdropFilter: 'blur(12px)',
+                }}
+              />
               <Bar dataKey="value" fill="#7c3aed" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
-        <div className="lg:col-span-2 glass-card-purple p-5">
+        <div className="lg:col-span-2 glass-card-purple p-6 animate-fade-up" style={{ animationDelay: '400ms' }}>
           <h3 className="font-display font-semibold text-foreground mb-4">Deal Status</h3>
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie data={dealStatusData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} dataKey="value" stroke="none">
                 {dealStatusData.map((_, i) => (
-                  <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                  <Cell key={i} fill={PIE_COLORS[i]} />
                 ))}
               </Pie>
-              <Tooltip contentStyle={{ background: '#16161f', border: '1px solid #2a2a3d', borderRadius: 8, color: '#f0f0ff' }} />
+              <Tooltip contentStyle={{ background: 'rgba(20,20,32,0.95)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: 12, color: '#f1f0ff' }} />
             </PieChart>
           </ResponsiveContainer>
+          {/* Center total */}
+          <div className="text-center -mt-[148px] mb-[108px]">
+            <p className="text-2xl font-display font-bold text-foreground">{totalDeals}</p>
+            <p className="text-xs text-muted-foreground">Total Deals</p>
+          </div>
           <div className="flex justify-center gap-4 mt-2">
             {dealStatusData.map((d, i) => (
               <div key={d.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -139,28 +168,64 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="flex gap-3">
-        <Button onClick={() => navigate('/contacts')} className="gap-2"><Plus className="w-4 h-4" /> Add Contact</Button>
-        <Button onClick={() => navigate('/pipeline')} variant="outline" className="gap-2 border-border text-foreground hover:bg-muted"><Plus className="w-4 h-4" /> New Deal</Button>
-        <Button onClick={() => navigate('/appointments')} variant="outline" className="gap-2 border-border text-foreground hover:bg-muted"><CalendarDays className="w-4 h-4" /> Schedule Appointment</Button>
+      <div className="flex gap-3 animate-fade-up" style={{ animationDelay: '500ms' }}>
+        <Button
+          onClick={() => navigate('/contacts')}
+          className="gap-2 font-display text-sm rounded-xl px-5 py-2.5 shadow-[0_4px_20px_rgba(124,58,237,0.4)] hover:shadow-[0_8px_24px_rgba(124,58,237,0.5)] hover:translate-y-[-1px] transition-all duration-200"
+        >
+          <Plus className="w-4 h-4" /> Add Contact
+        </Button>
+        <Button
+          onClick={() => navigate('/pipeline')}
+          variant="outline"
+          className="gap-2 border-[rgba(124,58,237,0.3)] text-purple-bright hover:bg-[rgba(124,58,237,0.08)] rounded-xl px-5 py-2.5 transition-all duration-200"
+        >
+          <Plus className="w-4 h-4" /> New Deal
+        </Button>
+        <Button
+          onClick={() => navigate('/appointments')}
+          variant="ghost"
+          className="gap-2 text-muted-foreground hover:text-foreground border border-border-subtle rounded-xl px-5 py-2.5 transition-all duration-200"
+        >
+          <CalendarDays className="w-4 h-4" /> Schedule Appointment
+        </Button>
       </div>
 
       {/* Activity Feed */}
-      <div className="glass-card-purple p-5">
+      <div className="glass-card-purple p-6 animate-slide-in" style={{ animationDelay: '600ms' }}>
         <h3 className="font-display font-semibold text-foreground mb-4">Recent Activity</h3>
-        <div className="space-y-3">
-           {activities.length === 0 ? (
-             <p className="text-sm text-muted-foreground">No recent activity</p>
-           ) : activities.map((a) => (
-             <div key={a.id} className="flex items-center gap-3 py-2 border-b border-border/50 last:border-0">
-               <StatusBadge type="status" value={a.event_type} />
-               <span className="text-sm text-foreground flex-1">{a.description}</span>
-               <span className="text-xs text-muted-foreground font-mono">{a.performed_by}</span>
-               <span className="text-xs text-muted-foreground">
-                 {a.timestamp ? formatDistanceToNow(new Date(a.timestamp), { addSuffix: true }) : ''}
-               </span>
-             </div>
-           ))}
+        <div className="space-y-1">
+          {activities.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No recent activity</p>
+          ) : activities.map((a) => (
+            <div key={a.id} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-[rgba(124,58,237,0.05)] transition-colors">
+              <div
+                className="w-3 h-3 rounded-full shrink-0"
+                style={{ background: EVENT_COLORS[a.event_type] || '#7c3aed' }}
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border"
+                    style={{
+                      background: `${EVENT_COLORS[a.event_type] || '#7c3aed'}15`,
+                      color: EVENT_COLORS[a.event_type] || '#7c3aed',
+                      borderColor: `${EVENT_COLORS[a.event_type] || '#7c3aed'}30`,
+                    }}
+                  >
+                    {a.event_type?.replace(/_/g, ' ')}
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-0.5 truncate">{a.description}</p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-xs text-muted-foreground">{a.performed_by}</p>
+                <p className="text-[11px] text-muted-foreground/60">
+                  {a.timestamp ? formatDistanceToNow(new Date(a.timestamp), { addSuffix: true }) : ''}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
