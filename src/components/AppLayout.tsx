@@ -82,7 +82,7 @@ export default function AppLayout() {
               <PanelLeftOpen className="w-[18px] h-[18px]" />
             </button>
           </div>
-        )
+        )}
 
         {/* Main Nav */}
         <nav className="flex-1 py-3 overflow-y-auto">
