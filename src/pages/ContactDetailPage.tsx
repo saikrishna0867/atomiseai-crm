@@ -72,7 +72,7 @@ export default function ContactDetailPage() {
   const generateSummary = async () => {
     setAiLoading(true);
     try {
-      await webhooks.generateSummary({ leadId, repEmail: user?.email || '' });
+      await webhooks.generateSummary({ leadId, repEmail: user?.email || 'admin@atomise.ai' });
       toast({ title: '🤖 AI is analyzing...' });
       setTimeout(async () => {
         await refetchSummary();
