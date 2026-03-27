@@ -12,6 +12,7 @@ async function callWebhook(path: string, data: Record<string, unknown>) {
     if (!res.ok) throw new Error(`Webhook ${path} failed: ${res.status}`);
     return await res.json().catch(() => ({}));
   } catch (err: any) {
+    console.error(`[Webhook Error] ${path}:`, err);
     toast({ title: 'Automation Error', description: err.message, variant: 'destructive' });
     throw err;
   }
