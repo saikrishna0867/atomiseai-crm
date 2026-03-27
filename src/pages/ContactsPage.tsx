@@ -161,8 +161,9 @@ export default function ContactsPage() {
                     <td className="px-4 py-3 text-muted-foreground text-xs">{c.created_at ? format(new Date(c.created_at), 'MMM d, yyyy') : ''}</td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1">
-                        <button onClick={() => navigate(`/contacts/${c.lead_id || c.id}`)} className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"><Eye className="w-3.5 h-3.5" /></button>
-                        <button onClick={() => setDeleteId(c.id)} className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                        <button title="View" onClick={() => navigate(`/contacts/${c.lead_id || c.id}`)} className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"><Eye className="w-3.5 h-3.5" /></button>
+                        <button title="Edit" onClick={() => navigate(`/contacts/${c.lead_id || c.id}?edit=true`)} className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"><Edit className="w-3.5 h-3.5" /></button>
+                        <button title="Delete" onClick={() => setDeleteId(c.id)} className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                       </div>
                     </td>
                   </tr>
