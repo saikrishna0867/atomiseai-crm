@@ -159,7 +159,7 @@ export default function AISummariesPage() {
         <div className="px-4 pt-3 pb-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
-            <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder="Search contacts..." className="glass-input w-full !pl-8 py-1.5 text-xs rounded-lg" />
+            <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder="Search contacts..." className="glass-input w-full !pl-8 text-sm rounded-[10px]" />
           </div>
         </div>
 
