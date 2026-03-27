@@ -38,7 +38,7 @@ export default function AppLayout() {
   const basePath = '/' + location.pathname.split('/')[1];
   const meta = pageMeta[basePath] || { title: 'Atomise CRM', subtitle: '' };
 
-  const initial = user?.email?.charAt(0).toUpperCase() || 'U';
+  const initial = user?.email?.charAt(0).toUpperCase() || 'S';
 
   return (
     <div className="flex min-h-screen bg-background">
