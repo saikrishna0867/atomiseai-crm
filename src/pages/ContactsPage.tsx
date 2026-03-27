@@ -28,13 +28,13 @@ const STAGE_STYLES: Record<string, string> = {
   'Proposal': 'bg-[#3d1e00] text-[#fb923c] border-[#ea580022]',
   'Negotiation': 'bg-[#3d0a0a] text-[#f87171] border-[#dc262622]',
   'Closed Won': 'bg-[#0d3320] text-[#34d399] border-[#05966922]',
-  'Closed Lost': 'bg-[#1f1f1f] text-[#9ca3af] border-[#37415122]',
+  'Closed Lost': 'bg-[#1f1f1f] text-[#9ca3af] border-[#37415122]'
 };
 
 const PRIORITY_DOT: Record<string, string> = {
   'High': '#f87171',
   'Medium': '#fbbf24',
-  'Low': '#34d399',
+  'Low': '#34d399'
 };
 
 export default function ContactsPage() {
@@ -50,11 +50,11 @@ export default function ContactsPage() {
   const [emailWarning, setEmailWarning] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(false);
 
-  useEffect(() => { document.title = 'Contacts | Atomise CRM'; }, []);
+  useEffect(() => {document.title = 'Contacts | Atomise CRM';}, []);
 
   const [form, setForm] = useState({
     name: '', email: '', phone: '', company: '', source: 'Website Form',
-    pipeline_stage: 'Lead', assigned_rep: '', assigned_rep_email: '', notes: '', tags: '', priority: 'Medium',
+    pipeline_stage: 'Lead', assigned_rep: '', assigned_rep_email: '', notes: '', tags: '', priority: 'Medium'
   });
 
   const { data: contacts = [], isLoading } = useQuery({
@@ -63,7 +63,7 @@ export default function ContactsPage() {
       const { data, error } = await supabase.from('contacts').select('*').order('created_at', { ascending: false });
       if (error) throw error;
       return data;
-    },
+    }
   });
 
   const addMutation = useMutation({
@@ -75,21 +75,21 @@ export default function ContactsPage() {
       if (error) throw error;
 
       await Promise.allSettled([
-        webhooks.newLead({
-          name: form.name, email: form.email, phone: form.phone, company: form.company,
-          source: form.source, assignedRep: form.assigned_rep, assignedRepEmail: form.assigned_rep_email,
-          pipelineStage: form.pipeline_stage, notes: form.notes,
-        }),
-        webhooks.startDrip({
-          leadId, contactName: form.name, contactEmail: form.email,
-          assignedRep: form.assigned_rep, assignedRepEmail: form.assigned_rep_email,
-          source: form.source, company: form.company,
-        }),
-        supabase.from('activity_log').insert({
-          lead_id: leadId, event_type: 'lead_assigned',
-          description: 'Contact added to CRM', performed_by: 'System (n8n)',
-        }),
-      ]);
+      webhooks.newLead({
+        name: form.name, email: form.email, phone: form.phone, company: form.company,
+        source: form.source, assignedRep: form.assigned_rep, assignedRepEmail: form.assigned_rep_email,
+        pipelineStage: form.pipeline_stage, notes: form.notes
+      }),
+      webhooks.startDrip({
+        leadId, contactName: form.name, contactEmail: form.email,
+        assignedRep: form.assigned_rep, assignedRepEmail: form.assigned_rep_email,
+        source: form.source, company: form.company
+      }),
+      supabase.from('activity_log').insert({
+        lead_id: leadId, event_type: 'lead_assigned',
+        description: 'Contact added to CRM', performed_by: 'System (n8n)'
+      })]
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
@@ -97,7 +97,7 @@ export default function ContactsPage() {
       setForm({ name: '', email: '', phone: '', company: '', source: 'Website Form', pipeline_stage: 'Lead', assigned_rep: '', assigned_rep_email: '', notes: '', tags: '', priority: 'Medium' });
       toast({ title: '✅ Contact added! Automation triggered — drip sequence started.' });
     },
-    onError: (e: any) => { console.error('[Contacts]', e); toast({ title: 'Error', description: e.message, variant: 'destructive' }); },
+    onError: (e: any) => {console.error('[Contacts]', e);toast({ title: 'Error', description: e.message, variant: 'destructive' });}
   });
 
   const deleteMutation = useMutation({
@@ -109,11 +109,11 @@ export default function ContactsPage() {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
       setDeleteId(null);
       toast({ title: 'Contact deleted' });
-    },
+    }
   });
 
   const filtered = contacts.filter((c: any) => {
-    const matchSearch = !search || [c.name, c.email, c.company].some(f => f?.toLowerCase().includes(search.toLowerCase()));
+    const matchSearch = !search || [c.name, c.email, c.company].some((f) => f?.toLowerCase().includes(search.toLowerCase()));
     const matchStage = stageFilter === 'all' || c.pipeline_stage === stageFilter;
     const matchSource = sourceFilter === 'all' || c.source === sourceFilter;
     const matchPriority = priorityFilter === 'all' || c.priority === priorityFilter;
@@ -126,8 +126,8 @@ export default function ContactsPage() {
         <div className="skeleton-shimmer h-10 w-48 rounded-xl" />
         <div className="skeleton-shimmer h-12 rounded-xl" />
         <div className="skeleton-shimmer h-96 rounded-2xl" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -136,21 +136,21 @@ export default function ContactsPage() {
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px] max-w-[320px]">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search contacts..." className="glass-input w-full pl-11 pr-3 text-sm rounded-[10px] px-[36px]" />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search contacts..." className="glass-input w-full pl-11 pr-3 text-sm rounded-[10px] px-[36px]" />
         </div>
         {[
-          { value: stageFilter, onChange: setStageFilter, options: STAGES, label: 'Stage', width: 'w-40' },
-          { value: sourceFilter, onChange: setSourceFilter, options: SOURCES, label: 'Source', width: 'w-36' },
-          { value: priorityFilter, onChange: setPriorityFilter, options: PRIORITIES, label: 'Priority', width: 'w-32' },
-        ].map(f => (
-          <Select key={f.label} value={f.value} onValueChange={f.onChange}>
+        { value: stageFilter, onChange: setStageFilter, options: STAGES, label: 'Stage', width: 'w-40' },
+        { value: sourceFilter, onChange: setSourceFilter, options: SOURCES, label: 'Source', width: 'w-36' },
+        { value: priorityFilter, onChange: setPriorityFilter, options: PRIORITIES, label: 'Priority', width: 'w-32' }].
+        map((f) =>
+        <Select key={f.label} value={f.value} onValueChange={f.onChange}>
             <SelectTrigger className={`${f.width} glass-input text-sm`}><SelectValue placeholder={f.label} /></SelectTrigger>
             <SelectContent className="bg-card border-border">
               <SelectItem value="all">All {f.label === 'Priority' ? 'Priorities' : `${f.label}s`}</SelectItem>
-              {f.options.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+              {f.options.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
             </SelectContent>
           </Select>
-        ))}
+        )}
         <div className="flex-1" />
         <Button onClick={() => setAddOpen(true)} className="gap-2 font-display text-sm rounded-xl px-5 shadow-[0_4px_20px_rgba(124,58,237,0.4)] hover:shadow-[0_8px_24px_rgba(124,58,237,0.5)] hover:translate-y-[-1px] transition-all duration-200">
           <Plus className="w-4 h-4" /> Add Contact
@@ -158,23 +158,23 @@ export default function ContactsPage() {
       </div>
 
       {/* Table */}
-      {filtered.length === 0 ? (
-        <EmptyState icon={Users} title="No contacts yet" description="Add your first contact to get started." action={<Button onClick={() => setAddOpen(true)} className="gap-2"><Plus className="w-4 h-4" /> Add Contact</Button>} />
-      ) : (
-        <div className="rounded-2xl border overflow-hidden" style={{ borderColor: 'rgba(124,58,237,0.18)', background: 'hsl(240 24% 10%)' }}>
+      {filtered.length === 0 ?
+      <EmptyState icon={Users} title="No contacts yet" description="Add your first contact to get started." action={<Button onClick={() => setAddOpen(true)} className="gap-2"><Plus className="w-4 h-4" /> Add Contact</Button>} /> :
+
+      <div className="rounded-2xl border overflow-hidden" style={{ borderColor: 'rgba(124,58,237,0.18)', background: 'hsl(240 24% 10%)' }}>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr style={{ background: 'rgba(124,58,237,0.08)', borderBottom: '1px solid rgba(124,58,237,0.15)' }}>
                   <th className="w-10 px-4 py-3"><Checkbox className="border-muted-foreground/40 pointer-events-none" checked={false} /></th>
-                  {['Name', 'Phone', 'Company', 'Stage', 'Priority', 'Rep', 'Source', 'Created', 'Actions'].map(h => (
-                    <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{h}</th>
-                  ))}
+                  {['Name', 'Phone', 'Company', 'Stage', 'Priority', 'Rep', 'Source', 'Created', 'Actions'].map((h) =>
+                <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{h}</th>
+                )}
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((c: any) => (
-                  <tr key={c.id} className="h-[60px] border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(124,58,237,0.05)] transition-[background] duration-150">
+                {filtered.map((c: any) =>
+              <tr key={c.id} className="h-[60px] border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(124,58,237,0.05)] transition-[background] duration-150">
                     <td className="px-4 py-3"><Checkbox className="border-muted-foreground/40 data-[state=checked]:bg-primary data-[state=checked]:border-primary" /></td>
                     <td className="px-4 py-3 min-w-[200px]">
                       <div className="flex items-center gap-3">
@@ -222,12 +222,12 @@ export default function ContactsPage() {
                       </DropdownMenu>
                     </td>
                   </tr>
-                ))}
+              )}
               </tbody>
             </table>
           </div>
         </div>
-      )}
+      }
 
       {/* Add Contact Modal */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
@@ -237,9 +237,9 @@ export default function ContactsPage() {
             style={{
               background: '#141420',
               border: '1px solid rgba(124,58,237,0.3)',
-              boxShadow: '0 24px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(124,58,237,0.15)',
-            }}
-          >
+              boxShadow: '0 24px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(124,58,237,0.15)'
+            }}>
+            
             <div className="p-6 border-b" style={{ borderColor: 'rgba(124,58,237,0.15)' }}>
               <DialogHeader>
                 <DialogTitle className="font-display text-xl font-bold text-foreground">Add New Contact</DialogTitle>
@@ -260,67 +260,67 @@ export default function ContactsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground font-medium">Full Name <span className="text-destructive">*</span></Label>
-                  <input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} required className="glass-input w-full" />
+                  <input value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} required className="glass-input w-full" />
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground font-medium">Email Address <span className="text-destructive">*</span></Label>
-                  <input type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} required className="glass-input w-full" />
+                  <input type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} required className="glass-input w-full" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground font-medium">Phone</Label>
-                  <input value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} className="glass-input w-full" />
+                  <input value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} className="glass-input w-full" />
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground font-medium">Company</Label>
-                  <input value={form.company} onChange={e => setForm(p => ({ ...p, company: e.target.value }))} className="glass-input w-full" />
+                  <input value={form.company} onChange={(e) => setForm((p) => ({ ...p, company: e.target.value }))} className="glass-input w-full" />
                 </div>
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground font-medium">Lead Source</Label>
-                <Select value={form.source} onValueChange={v => setForm(p => ({ ...p, source: v }))}>
+                <Select value={form.source} onValueChange={(v) => setForm((p) => ({ ...p, source: v }))}>
                   <SelectTrigger className="glass-input"><SelectValue /></SelectTrigger>
-                  <SelectContent className="bg-card border-border">{SOURCES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                  <SelectContent className="bg-card border-border">{SOURCES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground font-medium">Pipeline Stage</Label>
-                  <Select value={form.pipeline_stage} onValueChange={v => setForm(p => ({ ...p, pipeline_stage: v }))}>
+                  <Select value={form.pipeline_stage} onValueChange={(v) => setForm((p) => ({ ...p, pipeline_stage: v }))}>
                     <SelectTrigger className="glass-input"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-card border-border">{STAGES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                    <SelectContent className="bg-card border-border">{STAGES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground font-medium">Assigned Rep <span className="text-destructive">*</span></Label>
-                  <input value={form.assigned_rep} onChange={e => setForm(p => ({ ...p, assigned_rep: e.target.value }))} required className="glass-input w-full" />
+                  <input value={form.assigned_rep} onChange={(e) => setForm((p) => ({ ...p, assigned_rep: e.target.value }))} required className="glass-input w-full" />
                 </div>
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground font-medium">Assigned Rep Email <span className="text-destructive">*</span></Label>
-                <input type="email" value={form.assigned_rep_email} onChange={e => setForm(p => ({ ...p, assigned_rep_email: e.target.value }))} required className="glass-input w-full" />
+                <input type="email" value={form.assigned_rep_email} onChange={(e) => setForm((p) => ({ ...p, assigned_rep_email: e.target.value }))} required className="glass-input w-full" />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground font-medium">Tags (comma-separated)</Label>
-                <input value={form.tags} onChange={e => setForm(p => ({ ...p, tags: e.target.value }))} className="glass-input w-full" />
+                <input value={form.tags} onChange={(e) => setForm((p) => ({ ...p, tags: e.target.value }))} className="glass-input w-full" />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground font-medium">Notes</Label>
-                <textarea value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} rows={3} className="glass-input w-full resize-none" />
+                <textarea value={form.notes} onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))} rows={3} className="glass-input w-full resize-none" />
               </div>
               <div className="flex gap-3 pt-2">
                 <Button type="button" variant="ghost" onClick={() => setAddOpen(false)} className="text-muted-foreground">Cancel</Button>
                 <Button
                   type="submit"
                   className="flex-1 font-display text-[15px] rounded-xl h-12 shadow-[0_4px_20px_rgba(124,58,237,0.4)] bg-gradient-to-r from-primary to-[#4c1d95] hover:shadow-[0_8px_24px_rgba(124,58,237,0.5)] transition-all duration-200"
-                  disabled={addMutation.isPending}
-                >
-                  {addMutation.isPending ? (
-                    <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving & triggering automation...</>
-                  ) : (
-                    'Add Contact + Trigger Automation ⚡'
-                  )}
+                  disabled={addMutation.isPending}>
+                  
+                  {addMutation.isPending ?
+                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving & triggering automation...</> :
+
+                  'Add Contact + Trigger Automation ⚡'
+                  }
                 </Button>
               </div>
             </form>
@@ -334,12 +334,12 @@ export default function ContactsPage() {
         title="Delete Contact?"
         description="This action cannot be undone."
         onConfirm={() => deleteId && deleteMutation.mutate(deleteId)}
-        loading={deleteMutation.isPending}
-      />
+        loading={deleteMutation.isPending} />
+      
 
       <ConfirmDialog
         open={emailWarning}
-        onOpenChange={(open) => { setEmailWarning(open); if (!open) setPendingSubmit(false); }}
+        onOpenChange={(open) => {setEmailWarning(open);if (!open) setPendingSubmit(false);}}
         title="Duplicate Email Detected"
         description="A contact with this email already exists. Are you sure you want to add another?"
         confirmLabel="Continue"
@@ -348,8 +348,8 @@ export default function ContactsPage() {
           setEmailWarning(false);
           setPendingSubmit(true);
           setTimeout(() => addMutation.mutate(), 0);
-        }}
-      />
-    </div>
-  );
+        }} />
+      
+    </div>);
+
 }
