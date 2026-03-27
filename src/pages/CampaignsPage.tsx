@@ -131,8 +131,8 @@ export default function CampaignsPage() {
       ) : (
         <div className="glass-card-purple overflow-hidden rounded-2xl">
           <table className="w-full text-sm">
-            <thead><tr style={{ background: 'rgba(124,58,237,0.08)', borderBottom: '1px solid rgba(124,58,237,0.15)' }}>
-              {['Name', 'Target Stage', 'Status', 'Contacts', 'Launched', 'Actions'].map(h => (
+           <thead><tr style={{ background: 'rgba(124,58,237,0.08)', borderBottom: '1px solid rgba(124,58,237,0.15)' }}>
+              {['Name', 'Target Stage', 'Status', 'Contacts', 'Launched', 'Launched By', 'Actions'].map(h => (
                 <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{h}</th>
               ))}
             </tr></thead>
@@ -141,15 +141,23 @@ export default function CampaignsPage() {
                 <tr key={c.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(124,58,237,0.05)]">
                   <td className="px-4 py-3 font-medium text-foreground">{c.campaign_name}</td>
                   <td className="px-4 py-3"><StatusBadge type="stage" value={c.target_stage} /></td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${getStatusStyle(c.status)}`}>
-                      {(c.status === 'Active' || c.status === 'Sending') && <span className="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse" />}
-                      {c.status || 'Draft'}
-                    </span>
-                  </td>
+                  <td className="px-4 py-3">{getStatusBadge(c.status)}</td>
                   <td className="px-4 py-3 text-muted-foreground">{c.contacts_targeted || 0}</td>
                   <td className="px-4 py-3 text-muted-foreground text-xs">{c.launched_at ? format(new Date(c.launched_at), 'd MMM yyyy') : '—'}</td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground">{c.rep_name}</td>
+                  <td className="px-4 py-3 text-muted-foreground text-xs">{c.rep_name || '—'}</td>
+                  <td className="px-4 py-3">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="p-1.5 rounded-lg hover:bg-[rgba(124,58,237,0.1)] transition-colors">
+                          <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-card border-border">
+                        <DropdownMenuItem className="gap-2 text-xs"><Eye className="w-3.5 h-3.5" /> View</DropdownMenuItem>
+                        <DropdownMenuItem className="gap-2 text-xs text-red-400" onClick={() => deleteMutation.mutate(c.id)}><Trash2 className="w-3.5 h-3.5" /> Delete</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </td>
                 </tr>
               ))}
             </tbody>
