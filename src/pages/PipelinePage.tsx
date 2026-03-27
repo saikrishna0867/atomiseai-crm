@@ -129,17 +129,18 @@ export default function PipelinePage() {
     );
 
     try {
-      await supabase.from('pipeline_deals').update({ stage: newStage }).eq('id', deal.id);
-      await supabase.from('contacts').update({ pipeline_stage: newStage }).eq('email', deal.contact_email);
+      await supabase.from('pipeline_deals').update({ stage: newStage }).eq('lead_id', deal.lead_id);
+      await supabase.from('contacts').update({ pipeline_stage: newStage }).eq('lead_id', deal.lead_id);
 
       await Promise.allSettled([
         webhooks.stageChange({
           leadId: deal.lead_id, contactEmail: deal.contact_email, contactName: deal.contact_name,
-          oldStage, newStage, assignedRep: deal.assigned_rep, assignedRepEmail: '', dealValue: deal.deal_value,
+          oldStage, newStage, assignedRep: deal.assigned_rep, assignedRepEmail: deal.assigned_rep_email || '', dealValue: deal.deal_value,
         }),
         supabase.from('activity_log').insert({
-          lead_id: deal.lead_id, contact_name: deal.contact_name,
-          activity_type: 'Stage Changed', description: `Deal moved from ${oldStage} to ${newStage}`,
+          lead_id: deal.lead_id,
+          event_type: 'stage_change',
+          description: `Deal moved from ${oldStage} to ${newStage}`,
           performed_by: deal.assigned_rep,
         }),
       ]);
