@@ -166,7 +166,7 @@ export default function ContactsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr style={{ background: 'rgba(124,58,237,0.08)', borderBottom: '1px solid rgba(124,58,237,0.15)' }}>
-                  <th className="w-10 px-4 py-3"><input type="checkbox" className="rounded" /></th>
+                  <th className="w-10 px-4 py-3"><Checkbox className="border-muted-foreground/40 data-[state=checked]:bg-primary data-[state=checked]:border-primary" /></th>
                   {['Name', 'Phone', 'Company', 'Stage', 'Priority', 'Rep', 'Source', 'Created', 'Actions'].map(h => (
                     <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{h}</th>
                   ))}
