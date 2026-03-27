@@ -23,7 +23,7 @@ export default function DashboardPage() {
         supabase.from('contacts').select('pipeline_stage'),
         supabase.from('pipeline_deals').select('deal_value, stage'),
         supabase.from('tasks').select('status'),
-        supabase.from('activity_log').select('*').order('created_at', { ascending: false }).limit(10),
+        supabase.from('activity_log').select('id, lead_id, event_type, description, performed_by, timestamp').order('timestamp', { ascending: false }).limit(10),
       ]);
 
       const contacts = contactsRes.data || [];
@@ -149,18 +149,18 @@ export default function DashboardPage() {
       <div className="glass-card-purple p-5">
         <h3 className="font-display font-semibold text-foreground mb-4">Recent Activity</h3>
         <div className="space-y-3">
-          {activities.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No recent activity</p>
-          ) : activities.map((a) => (
-            <div key={a.id} className="flex items-center gap-3 py-2 border-b border-border/50 last:border-0">
-              <StatusBadge type="status" value={a.activity_type} />
-              <span className="text-sm text-foreground flex-1">{a.description}</span>
-              <span className="text-xs text-muted-foreground font-mono">{a.contact_name}</span>
-              <span className="text-xs text-muted-foreground">
-                {a.created_at ? formatDistanceToNow(new Date(a.created_at), { addSuffix: true }) : ''}
-              </span>
-            </div>
-          ))}
+           {activities.length === 0 ? (
+             <p className="text-sm text-muted-foreground">No recent activity</p>
+           ) : activities.map((a) => (
+             <div key={a.id} className="flex items-center gap-3 py-2 border-b border-border/50 last:border-0">
+               <StatusBadge type="status" value={a.event_type} />
+               <span className="text-sm text-foreground flex-1">{a.description}</span>
+               <span className="text-xs text-muted-foreground font-mono">{a.performed_by}</span>
+               <span className="text-xs text-muted-foreground">
+                 {a.timestamp ? formatDistanceToNow(new Date(a.timestamp), { addSuffix: true }) : ''}
+               </span>
+             </div>
+           ))}
         </div>
       </div>
     </div>
