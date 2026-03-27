@@ -57,7 +57,7 @@ export default function AppLayout() {
         <div
           className={cn(
             'border-b transition-all duration-300 flex items-center',
-            collapsed ? 'gap-1.5 px-3 py-3 justify-center' : 'h-[72px] px-6 justify-between'
+            collapsed ? 'gap-2.5 px-3 py-4 justify-center' : 'h-[72px] px-6 justify-between'
           )}
           style={{ borderColor: 'rgba(124,58,237,0.15)' }}
         >
