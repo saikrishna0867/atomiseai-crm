@@ -121,10 +121,9 @@ export default function TasksPage() {
                 <span className="text-xs text-muted-foreground">{filtered.filter((t: any) => t.status === status).length} tasks</span>
               </div>
               <div className="p-3 space-y-2 max-h-[60vh] overflow-y-auto">
-                {filtered.filter((t: any) => t.status === status).map((t: any) => (
-                  {(() => {
-                    const { isOverdue, isDueToday } = getDateStatus(t);
-                    return (
+                {filtered.filter((t: any) => t.status === status).map((t: any) => {
+                  const { isOverdue, isDueToday } = getDateStatus(t);
+                  return (
                     <div
                       key={t.id}
                       className="rounded-xl p-3.5 border mb-2"
@@ -138,20 +137,21 @@ export default function TasksPage() {
                         {isOverdue && <span className="text-xs bg-destructive/20 text-destructive px-1.5 py-0.5 rounded font-medium">⚠️ Overdue</span>}
                         {isDueToday && <span className="text-xs bg-amber-400/20 text-amber-400 px-1.5 py-0.5 rounded font-medium">📅 Due Today</span>}
                       </div>
-                    <p className="text-sm font-medium text-foreground mt-1">{t.title}</p>
-                    {t.contact_name && <p className="text-xs text-purple-bright mt-1">{t.contact_name}</p>}
-                    <div className="flex items-center justify-between mt-2">
-                      <span className={`text-xs ${isOverdue(t) ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
-                        {t.due_date ? format(parseISO(t.due_date), 'MMM d') : '—'}
-                      </span>
-                      <span className="text-xs text-muted-foreground">{t.assigned_to}</span>
+                      <p className="text-sm font-medium text-foreground mt-1">{t.title}</p>
+                      {t.contact_name && <p className="text-xs text-purple-bright mt-1">{t.contact_name}</p>}
+                      <div className="flex items-center justify-between mt-2">
+                        <span className={`text-xs ${isOverdue ? 'text-destructive font-medium' : isDueToday ? 'text-amber-400 font-medium' : 'text-muted-foreground'}`}>
+                          {t.due_date ? format(parseISO(t.due_date), 'MMM d') : '—'}
+                        </span>
+                        <span className="text-xs text-muted-foreground">{t.assigned_to}</span>
+                      </div>
+                      <Select value={t.status} onValueChange={v => updateStatus.mutate({ id: t.id, status: v })}>
+                        <SelectTrigger className="h-7 text-xs mt-2 glass-input"><SelectValue /></SelectTrigger>
+                        <SelectContent className="bg-card border-border">{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                      </Select>
                     </div>
-                    <Select value={t.status} onValueChange={v => updateStatus.mutate({ id: t.id, status: v })}>
-                      <SelectTrigger className="h-7 text-xs mt-2 glass-input"><SelectValue /></SelectTrigger>
-                      <SelectContent className="bg-card border-border">{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ))}
