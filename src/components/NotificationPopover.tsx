@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { Bell, UserPlus, ArrowRightLeft, Calendar, Mail, Sparkles, ClipboardList, X, ChevronLeft, ChevronRight, ChevronUp, ChevronDown } from 'lucide-react';
