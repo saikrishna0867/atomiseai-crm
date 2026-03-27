@@ -341,6 +341,8 @@ export default function ContactsPage() {
         onOpenChange={(open) => { setEmailWarning(open); if (!open) setPendingSubmit(false); }}
         title="Duplicate Email Detected"
         description="A contact with this email already exists. Are you sure you want to add another?"
+        confirmLabel="Continue"
+        confirmVariant="default"
         onConfirm={() => {
           setEmailWarning(false);
           setPendingSubmit(true);
