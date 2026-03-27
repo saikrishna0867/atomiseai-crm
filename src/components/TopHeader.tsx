@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Search, Bell } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { NotificationPopover } from '@/components/NotificationPopover';
 
 interface TopHeaderProps {
   title: string;
@@ -11,6 +12,7 @@ interface TopHeaderProps {
 
 export function TopHeader({ title, subtitle, userInitial }: TopHeaderProps) {
   const [search, setSearch] = useState('');
+  const [notifOpen, setNotifOpen] = useState(false);
 
   const { data: taskCount = 0 } = useQuery({
     queryKey: ['unread-tasks-count'],
@@ -47,14 +49,20 @@ export function TopHeader({ title, subtitle, userInitial }: TopHeaderProps) {
       </div>
 
       {/* Notification Bell */}
-      <button className="relative p-2 rounded-lg hover:bg-[rgba(124,58,237,0.08)] transition-colors">
-        <Bell className="w-5 h-5 text-muted-foreground" />
-        {taskCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 min-w-[18px] flex items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
-            {taskCount > 99 ? '99+' : taskCount}
-          </span>
-        )}
-      </button>
+      <div className="relative">
+        <button
+          onClick={() => setNotifOpen(!notifOpen)}
+          className="relative p-2 rounded-lg hover:bg-[rgba(124,58,237,0.08)] transition-colors"
+        >
+          <Bell className="w-5 h-5 text-muted-foreground" />
+          {taskCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 min-w-[18px] flex items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+              {taskCount > 99 ? '99+' : taskCount}
+            </span>
+          )}
+        </button>
+        <NotificationPopover open={notifOpen} onClose={() => setNotifOpen(false)} taskCount={taskCount} />
+      </div>
 
       {/* User Avatar */}
       <div
