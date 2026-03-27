@@ -28,6 +28,7 @@ interface NotificationPopoverProps {
 
 export function NotificationPopover({ open, onClose, taskCount }: NotificationPopoverProps) {
   const [filter, setFilter] = useState<string>('all');
+  const chipsRef = useRef<HTMLDivElement>(null);
 
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ['notifications'],
