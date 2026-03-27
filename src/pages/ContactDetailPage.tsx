@@ -67,6 +67,7 @@ export default function ContactDetailPage() {
       setTimeout(async () => {
         await refetchSummary();
         setAiLoading(false);
+        toast({ title: 'AI Summary generated ✅' });
       }, 8000);
     } catch {
       setAiLoading(false);
