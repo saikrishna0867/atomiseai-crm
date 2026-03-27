@@ -128,15 +128,9 @@ export default function DashboardPage() {
               <YAxis tick={{ fill: '#9b9bc0', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
                 cursor={{ fill: 'rgba(124,58,237,0.08)' }}
-                contentStyle={{
-                  background: 'rgba(20,20,32,0.95)',
-                  border: '1px solid rgba(124,58,237,0.3)',
-                  borderRadius: 12,
-                  color: '#f1f0ff',
-                  backdropFilter: 'blur(12px)',
-                }}
                 content={({ active, payload, label }) => {
-                  if (!active || !payload?.length || payload[0]?.value === 0) return null;
+                  if (!active || !payload?.length) return null;
+                  const val = payload[0]?.value as number;
                   return (
                     <div style={{
                       background: 'rgba(20,20,32,0.95)',
@@ -144,10 +138,15 @@ export default function DashboardPage() {
                       borderRadius: 12,
                       color: '#f1f0ff',
                       backdropFilter: 'blur(12px)',
-                      padding: '8px 12px',
+                      padding: '10px 14px',
+                      minWidth: 100,
                     }}>
-                      <p style={{ fontSize: 12, marginBottom: 2 }}>{label}</p>
-                      <p style={{ fontSize: 13, fontWeight: 600 }}>{payload[0].value}</p>
+                      <p style={{ fontSize: 12, color: '#9b9bc0', marginBottom: 4 }}>{label}</p>
+                      {val > 0 ? (
+                        <p style={{ fontSize: 15, fontWeight: 700 }}>{val} lead{val !== 1 ? 's' : ''}</p>
+                      ) : (
+                        <p style={{ fontSize: 12, color: '#9b9bc0', fontStyle: 'italic' }}>No leads yet</p>
+                      )}
                     </div>
                   );
                 }}
