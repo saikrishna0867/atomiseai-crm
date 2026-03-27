@@ -183,6 +183,7 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
               </div>
             )}
           </div>
+          </ScrollArea>
         </div>
       </div>
     </>
