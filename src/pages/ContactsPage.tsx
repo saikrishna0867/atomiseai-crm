@@ -145,7 +145,7 @@ export default function ContactsPage() {
           <Select key={f.label} value={f.value} onValueChange={f.onChange}>
             <SelectTrigger className={`${f.width} glass-input text-sm`}><SelectValue placeholder={f.label} /></SelectTrigger>
             <SelectContent className="bg-card border-border">
-              <SelectItem value="all">All {f.label}s</SelectItem>
+              <SelectItem value="all">All {f.label === 'Priority' ? 'Priorities' : `${f.label}s`}</SelectItem>
               {f.options.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
             </SelectContent>
           </Select>
