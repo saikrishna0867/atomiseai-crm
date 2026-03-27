@@ -99,7 +99,7 @@ export default function PipelinePage() {
       setForm({ contact_name: '', contact_email: '', company: '', deal_value: '', assigned_rep: '', notes: '' });
       toast({ title: 'Deal created ✅' });
     },
-    onError: (e: any) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
+    onError: (e: any) => { console.error('[Pipeline]', e); toast({ title: 'Error', description: e.message, variant: 'destructive' }); },
   });
 
   const deleteMutation = useMutation({
