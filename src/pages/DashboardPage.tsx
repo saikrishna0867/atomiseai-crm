@@ -123,9 +123,9 @@ export default function DashboardPage() {
         <div className="lg:col-span-3 glass-card-purple p-6 animate-fade-up" style={{ animationDelay: '300ms' }}>
           <h3 className="font-display font-semibold text-foreground mb-4">Pipeline Overview</h3>
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={stageData}>
-              <XAxis dataKey="name" tick={{ fill: '#9b9bc0', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#9b9bc0', fontSize: 11 }} axisLine={false} tickLine={false} />
+            <BarChart data={stageData} barCategoryGap="20%">
+              <XAxis dataKey="name" tick={{ fill: '#9b9bc0', fontSize: 11 }} axisLine={false} tickLine={false} interval={0} />
+              <YAxis tick={{ fill: '#9b9bc0', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
                 contentStyle={{
                   background: 'rgba(20,20,32,0.95)',
@@ -135,7 +135,7 @@ export default function DashboardPage() {
                   backdropFilter: 'blur(12px)',
                 }}
               />
-              <Bar dataKey="value" fill="#7c3aed" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="value" fill="#7c3aed" radius={[6, 6, 0, 0]} maxBarSize={40} />
             </BarChart>
           </ResponsiveContainer>
         </div>
