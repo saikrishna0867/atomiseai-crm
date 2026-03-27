@@ -74,7 +74,8 @@ export default function AppLayout() {
               {initial}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-foreground truncate">{user?.email || 'User'}</p>
+              <p className="text-xs font-medium text-foreground truncate">{user?.email?.split('@')[0] || 'User'}</p>
+              <p className="text-[10px] text-muted-foreground truncate">{user?.email || ''}</p>
               <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/20 text-purple-bright mt-0.5">
                 Admin
               </span>
