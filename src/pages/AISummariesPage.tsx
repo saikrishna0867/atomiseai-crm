@@ -10,10 +10,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { Sparkles, Loader2, Search } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
-const SENTIMENT_CONFIG: Record<string, { emoji: string; label: string; bg: string; text: string; border: string; dot: string }> = {
-  Positive: { emoji: '😊', label: 'Positive', bg: 'rgba(52,211,153,0.15)', text: '#34d399', border: 'rgba(52,211,153,0.3)', dot: '#34d399' },
-  Neutral: { emoji: '😐', label: 'Neutral', bg: 'rgba(251,191,36,0.15)', text: '#fbbf24', border: 'rgba(251,191,36,0.3)', dot: '#fbbf24' },
-  'Needs Attention': { emoji: '⚠️', label: 'Needs Attention', bg: 'rgba(248,113,113,0.15)', text: '#f87171', border: 'rgba(248,113,113,0.3)', dot: '#f87171' },
+const HEALTH_CONFIG: Record<string, { emoji: string; label: string; bg: string; text: string; border: string; dot: string }> = {
+  Hot: { emoji: '🔥', label: 'Hot', bg: 'rgba(52,211,153,0.15)', text: '#34d399', border: 'rgba(52,211,153,0.3)', dot: '#34d399' },
+  Warm: { emoji: '😊', label: 'Warm', bg: 'rgba(251,191,36,0.15)', text: '#fbbf24', border: 'rgba(251,191,36,0.3)', dot: '#fbbf24' },
+  Cold: { emoji: '❄️', label: 'Cold', bg: 'rgba(96,165,250,0.15)', text: '#60a5fa', border: 'rgba(96,165,250,0.3)', dot: '#60a5fa' },
+  Unknown: { emoji: '⚪', label: 'Unknown', bg: 'rgba(148,163,184,0.15)', text: '#94a3b8', border: 'rgba(148,163,184,0.3)', dot: '#94a3b8' },
 };
 
 export default function AISummariesPage() {
@@ -40,14 +41,14 @@ export default function AISummariesPage() {
   const { data: allSummaries = [] } = useQuery({
     queryKey: ['ai_summaries_index'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('ai_summaries').select('lead_id, sentiment, generated_at, contact_name').order('generated_at', { ascending: false });
+      const { data, error } = await supabase.from('ai_summaries').select('lead_id, deal_health, generated_at, contact_name').order('generated_at', { ascending: false });
       if (error) throw error;
       return data || [];
     },
   });
 
   // Build a map: lead_id -> latest summary meta
-  const summaryMap = new Map<string, { sentiment: string; generated_at: string; contact_name: string }>();
+  const summaryMap = new Map<string, { deal_health: string; generated_at: string; contact_name: string }>();
   allSummaries.forEach((s: any) => {
     if (!summaryMap.has(s.lead_id)) summaryMap.set(s.lead_id, s);
   });
@@ -106,7 +107,7 @@ export default function AISummariesPage() {
   const contactsWithMeta = contacts.map((c: any) => ({
     ...c,
     hasSummary: summaryMap.has(c.lead_id),
-    sentiment: summaryMap.get(c.lead_id)?.sentiment,
+    deal_health: summaryMap.get(c.lead_id)?.deal_health,
     generatedAt: summaryMap.get(c.lead_id)?.generated_at,
   }));
 
@@ -120,7 +121,7 @@ export default function AISummariesPage() {
   const filtered = sorted.filter(c => !searchQ || c.name?.toLowerCase().includes(searchQ.toLowerCase()));
 
   const selectedContact = contacts.find((c: any) => c.lead_id === selectedLeadId);
-  const sent = summary ? (SENTIMENT_CONFIG[summary.sentiment] || SENTIMENT_CONFIG.Neutral) : null;
+  const sent = summary ? (HEALTH_CONFIG[summary.deal_health] || HEALTH_CONFIG.Unknown) : null;
 
   return (
     <div className="p-6 flex gap-6 h-[calc(100vh-64px)]">
@@ -167,7 +168,7 @@ export default function AISummariesPage() {
             <p className="text-xs text-muted-foreground text-center py-6">No contacts found</p>
           ) : filtered.map((c: any) => {
             const isActive = selectedLeadId === c.lead_id;
-            const sentDot = c.sentiment ? SENTIMENT_CONFIG[c.sentiment]?.dot : undefined;
+            const sentDot = c.deal_health ? HEALTH_CONFIG[c.deal_health]?.dot : undefined;
             return (
               <button
                 key={c.lead_id}
@@ -251,7 +252,7 @@ export default function AISummariesPage() {
             <div className="mb-6">
               <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground mb-3">AI Summary</p>
               <div className="border-l-[3px] border-primary pl-4 py-2 rounded-r-lg" style={{ background: 'rgba(124,58,237,0.04)' }}>
-                <p className="text-[15px] text-muted-foreground leading-[1.7]">{summary.summary}</p>
+                <p className="text-[15px] text-muted-foreground leading-[1.7]">{summary.summary_text}</p>
               </div>
             </div>
 
