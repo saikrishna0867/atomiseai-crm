@@ -335,6 +335,18 @@ export default function ContactsPage() {
         onConfirm={() => deleteId && deleteMutation.mutate(deleteId)}
         loading={deleteMutation.isPending}
       />
+
+      <ConfirmDialog
+        open={emailWarning}
+        onOpenChange={(open) => { setEmailWarning(open); if (!open) setPendingSubmit(false); }}
+        title="Duplicate Email Detected"
+        description="A contact with this email already exists. Are you sure you want to add another?"
+        onConfirm={() => {
+          setEmailWarning(false);
+          setPendingSubmit(true);
+          setTimeout(() => addMutation.mutate(), 0);
+        }}
+      />
     </div>
   );
 }
