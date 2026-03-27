@@ -56,8 +56,8 @@ export default function AppLayout() {
         {/* Logo + Toggle */}
         <div
           className={cn(
-            'border-b transition-all duration-300 flex',
-            collapsed ? 'flex-col items-center gap-2 px-3 py-3' : 'h-[72px] items-center px-6 justify-between'
+            'border-b transition-all duration-300 flex items-center',
+            collapsed ? 'gap-1.5 px-3 py-3 justify-center' : 'h-[72px] px-6 justify-between'
           )}
           style={{ borderColor: 'rgba(124,58,237,0.15)' }}
         >
