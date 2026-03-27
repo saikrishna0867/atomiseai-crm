@@ -90,11 +90,33 @@ export default function CampaignsPage() {
     .replace(/\{\{repName\}\}/g, form.rep_name || 'Your Rep')
     .replace(/\{\{leadId\}\}/g, 'LD-001');
 
-  const getStatusStyle = (status: string) => {
-    if (status === 'Active' || status === 'Sending') return 'bg-accent-green/10 text-accent-green';
-    if (status === 'Sent') return 'bg-accent-green/10 text-accent-green';
-    return 'bg-muted text-muted-foreground';
+  const getStatusBadge = (status: string) => {
+    const s = (status || 'draft').toLowerCase();
+    if (s === 'completed' || s === 'sent') return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-accent-green/10 text-accent-green">
+        <CheckCircle className="w-3 h-3" /> Completed
+      </span>
+    );
+    if (s === 'running' || s === 'active' || s === 'sending') return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-400/10 text-amber-400">
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" /> Running
+      </span>
+    );
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+        Draft
+      </span>
+    );
   };
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('campaigns').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['campaigns'] }); toast({ title: 'Campaign deleted' }); },
+    onError: (e: any) => { console.error('[Campaigns]', e); toast({ title: 'Error', description: e.message, variant: 'destructive' }); },
+  });
 
   if (isLoading) return <div className="p-6"><div className="skeleton-shimmer h-96 rounded-2xl" /></div>;
 
