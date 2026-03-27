@@ -19,7 +19,7 @@ const HEALTH_CONFIG: Record<string, { emoji: string; label: string; bg: string; 
 
 export default function AISummariesPage() {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const queryClient = useQueryClient();
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -83,7 +83,8 @@ export default function AISummariesPage() {
   const handleGenerate = async (leadId: string) => {
     setGenerating(true);
     try {
-      await webhooks.generateSummary({ leadId, repEmail: user?.email || '' });
+      const repEmail = user?.email || session?.user?.email || 'admin@atomise.ai';
+      await webhooks.generateSummary({ leadId, repEmail });
       toast({ title: '🤖 AI is analyzing contact history...' });
       await new Promise(r => setTimeout(r, 8000));
       await queryClient.invalidateQueries({ queryKey: ['ai_summaries_index'] });
