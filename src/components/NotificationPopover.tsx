@@ -110,14 +110,14 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
 
         {/* Filter Chips — px-5 to match, consistent chip sizing */}
         <div
-          className="flex items-center gap-1.5 px-5 py-3 overflow-x-auto border-b"
+          className="flex items-center gap-2 px-5 py-3 overflow-x-auto border-b"
           style={{ borderColor: 'rgba(124,58,237,0.08)' }}
         >
           {eventTypes.map((type: string) => (
             <button
               key={type}
               onClick={() => setFilter(type)}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all ${
                 filter === type
                   ? 'bg-primary/20 text-primary'
                   : 'text-muted-foreground hover:bg-muted/15'
