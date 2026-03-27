@@ -121,7 +121,7 @@ export default function AISummariesPage() {
   const filtered = sorted.filter(c => !searchQ || c.name?.toLowerCase().includes(searchQ.toLowerCase()));
 
   const selectedContact = contacts.find((c: any) => c.lead_id === selectedLeadId);
-  const sent = summary ? (SENTIMENT_CONFIG[summary.sentiment] || SENTIMENT_CONFIG.Neutral) : null;
+  const sent = summary ? (HEALTH_CONFIG[summary.deal_health] || HEALTH_CONFIG.Unknown) : null;
 
   return (
     <div className="p-6 flex gap-6 h-[calc(100vh-64px)]">
