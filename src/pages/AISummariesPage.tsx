@@ -168,7 +168,7 @@ export default function AISummariesPage() {
             <p className="text-xs text-muted-foreground text-center py-6">No contacts found</p>
           ) : filtered.map((c: any) => {
             const isActive = selectedLeadId === c.lead_id;
-            const sentDot = c.sentiment ? SENTIMENT_CONFIG[c.sentiment]?.dot : undefined;
+            const sentDot = c.deal_health ? HEALTH_CONFIG[c.deal_health]?.dot : undefined;
             return (
               <button
                 key={c.lead_id}
