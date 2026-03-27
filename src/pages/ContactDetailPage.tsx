@@ -30,7 +30,7 @@ export default function ContactDetailPage() {
   const { data: activities = [] } = useQuery({
     queryKey: ['activities', leadId],
     queryFn: async () => {
-      const { data } = await supabase.from('activity_log').select('*').eq('lead_id', leadId).order('created_at', { ascending: false });
+      const { data } = await supabase.from('activity_log').select('*').eq('lead_id', leadId).order('timestamp', { ascending: false });
       return data || [];
     },
   });
@@ -67,6 +67,7 @@ export default function ContactDetailPage() {
       setTimeout(async () => {
         await refetchSummary();
         setAiLoading(false);
+        toast({ title: 'AI Summary generated ✅' });
       }, 8000);
     } catch {
       setAiLoading(false);
@@ -122,7 +123,7 @@ export default function ContactDetailPage() {
               <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
               <div>
                 <p className="text-sm text-foreground">{a.description}</p>
-                <p className="text-xs text-muted-foreground">{a.activity_type} • {a.created_at ? formatDistanceToNow(new Date(a.created_at), { addSuffix: true }) : ''}</p>
+                <p className="text-xs text-muted-foreground">{a.event_type} • {a.timestamp ? formatDistanceToNow(new Date(a.timestamp), { addSuffix: true }) : ''}</p>
               </div>
             </div>
           ))}
