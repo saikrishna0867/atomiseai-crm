@@ -83,7 +83,8 @@ export default function AISummariesPage() {
   const handleGenerate = async (leadId: string) => {
     setGenerating(true);
     try {
-      await webhooks.generateSummary({ leadId, repEmail: user?.email || '' });
+      const repEmail = user?.email || session?.user?.email || 'admin@atomise.ai';
+      await webhooks.generateSummary({ leadId, repEmail });
       toast({ title: '🤖 AI is analyzing contact history...' });
       await new Promise(r => setTimeout(r, 8000));
       await queryClient.invalidateQueries({ queryKey: ['ai_summaries_index'] });
