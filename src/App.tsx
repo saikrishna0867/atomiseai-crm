@@ -26,6 +26,7 @@ const _forceRebuild = 1;
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
+      <AppSettingsProvider>
       <TooltipProvider>
         <Toaster />
         <BrowserRouter>
