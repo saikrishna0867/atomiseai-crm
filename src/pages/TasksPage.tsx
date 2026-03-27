@@ -66,7 +66,17 @@ export default function TasksPage() {
     return (statusFilter === 'all' || t.status === statusFilter) && (priorityFilter === 'all' || t.priority === priorityFilter);
   });
 
-  const isOverdue = (t: any) => t.due_date && t.status !== 'Completed' && isPast(parseISO(t.due_date));
+  const getDateStatus = (t: any) => {
+    if (!t.due_date || t.status === 'Completed') return { isOverdue: false, isDueToday: false };
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDate = new Date(t.due_date);
+    dueDate.setHours(0, 0, 0, 0);
+    return {
+      isOverdue: dueDate < today,
+      isDueToday: dueDate.toDateString() === today.toDateString(),
+    };
+  };
 
   if (isLoading) {
     return <div className="p-6 space-y-4">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="skeleton-shimmer h-20 rounded-xl" />)}</div>;
@@ -111,33 +121,37 @@ export default function TasksPage() {
                 <span className="text-xs text-muted-foreground">{filtered.filter((t: any) => t.status === status).length} tasks</span>
               </div>
               <div className="p-3 space-y-2 max-h-[60vh] overflow-y-auto">
-                {filtered.filter((t: any) => t.status === status).map((t: any) => (
-                  <div
-                    key={t.id}
-                    className="rounded-xl p-3.5 border mb-2"
-                    style={{
-                      background: 'hsl(240 24% 10%)',
-                      borderColor: 'rgba(124,58,237,0.15)',
-                      borderLeft: `3px solid ${PRIORITY_BORDER[t.priority] || '#fbbf24'}`,
-                    }}
-                  >
-                    <div className="flex items-start gap-2">
-                      {isOverdue(t) && <span className="text-xs bg-destructive/20 text-destructive px-1.5 py-0.5 rounded font-medium">⚠️ Overdue</span>}
+                {filtered.filter((t: any) => t.status === status).map((t: any) => {
+                  const { isOverdue, isDueToday } = getDateStatus(t);
+                  return (
+                    <div
+                      key={t.id}
+                      className="rounded-xl p-3.5 border mb-2"
+                      style={{
+                        background: 'hsl(240 24% 10%)',
+                        borderColor: 'rgba(124,58,237,0.15)',
+                        borderLeft: `3px solid ${PRIORITY_BORDER[t.priority] || '#fbbf24'}`,
+                      }}
+                    >
+                      <div className="flex items-start gap-2">
+                        {isOverdue && <span className="text-xs bg-destructive/20 text-destructive px-1.5 py-0.5 rounded font-medium">⚠️ Overdue</span>}
+                        {isDueToday && <span className="text-xs bg-amber-400/20 text-amber-400 px-1.5 py-0.5 rounded font-medium">📅 Due Today</span>}
+                      </div>
+                      <p className="text-sm font-medium text-foreground mt-1">{t.title}</p>
+                      {t.contact_name && <p className="text-xs text-purple-bright mt-1">{t.contact_name}</p>}
+                      <div className="flex items-center justify-between mt-2">
+                        <span className={`text-xs ${isOverdue ? 'text-destructive font-medium' : isDueToday ? 'text-amber-400 font-medium' : 'text-muted-foreground'}`}>
+                          {t.due_date ? format(parseISO(t.due_date), 'MMM d') : '—'}
+                        </span>
+                        <span className="text-xs text-muted-foreground">{t.assigned_to}</span>
+                      </div>
+                      <Select value={t.status} onValueChange={v => updateStatus.mutate({ id: t.id, status: v })}>
+                        <SelectTrigger className="h-7 text-xs mt-2 glass-input"><SelectValue /></SelectTrigger>
+                        <SelectContent className="bg-card border-border">{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                      </Select>
                     </div>
-                    <p className="text-sm font-medium text-foreground mt-1">{t.title}</p>
-                    {t.contact_name && <p className="text-xs text-purple-bright mt-1">{t.contact_name}</p>}
-                    <div className="flex items-center justify-between mt-2">
-                      <span className={`text-xs ${isOverdue(t) ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
-                        {t.due_date ? format(parseISO(t.due_date), 'MMM d') : '—'}
-                      </span>
-                      <span className="text-xs text-muted-foreground">{t.assigned_to}</span>
-                    </div>
-                    <Select value={t.status} onValueChange={v => updateStatus.mutate({ id: t.id, status: v })}>
-                      <SelectTrigger className="h-7 text-xs mt-2 glass-input"><SelectValue /></SelectTrigger>
-                      <SelectContent className="bg-card border-border">{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ))}
@@ -151,11 +165,14 @@ export default function TasksPage() {
               ))}
             </tr></thead>
             <tbody>
-              {filtered.map((t: any) => (
+              {filtered.map((t: any) => {
+                const { isOverdue, isDueToday } = getDateStatus(t);
+                return (
                 <tr key={t.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(124,58,237,0.05)] transition-colors">
                   <td className="px-4 py-3 font-medium text-foreground">
                     <div className="flex items-center gap-2">
-                      {isOverdue(t) && <AlertCircle className="w-3.5 h-3.5 text-destructive shrink-0" />}
+                      {isOverdue && <AlertCircle className="w-3.5 h-3.5 text-destructive shrink-0" />}
+                      {isDueToday && <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
                       {t.title}
                     </div>
                   </td>
@@ -167,10 +184,11 @@ export default function TasksPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`text-xs ${isOverdue(t) ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
+                    <span className={`text-xs ${isOverdue ? 'text-destructive font-medium' : isDueToday ? 'text-amber-400 font-medium' : 'text-muted-foreground'}`}>
                       {t.due_date ? format(parseISO(t.due_date), 'MMM d, yyyy') : '—'}
                     </span>
-                    {isOverdue(t) && <span className="text-[10px] bg-destructive/20 text-destructive px-1.5 py-0.5 rounded ml-2">Overdue</span>}
+                    {isOverdue && <span className="text-[10px] bg-destructive/20 text-destructive px-1.5 py-0.5 rounded ml-2">Overdue</span>}
+                    {isDueToday && <span className="text-[10px] bg-amber-400/20 text-amber-400 px-1.5 py-0.5 rounded ml-2">Due Today</span>}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground text-xs">{t.assigned_to}</td>
                   <td className="px-4 py-3">
@@ -180,7 +198,8 @@ export default function TasksPage() {
                     </Select>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
