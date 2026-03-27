@@ -8,8 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
-import { Mail, Plus, Rocket, Eye } from 'lucide-react';
+import { Mail, Plus, Rocket, Eye, MoreHorizontal, Trash2, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 const TARGET_STAGES = ['Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won', 'All'];
@@ -89,11 +90,33 @@ export default function CampaignsPage() {
     .replace(/\{\{repName\}\}/g, form.rep_name || 'Your Rep')
     .replace(/\{\{leadId\}\}/g, 'LD-001');
 
-  const getStatusStyle = (status: string) => {
-    if (status === 'Active' || status === 'Sending') return 'bg-accent-green/10 text-accent-green';
-    if (status === 'Sent') return 'bg-accent-green/10 text-accent-green';
-    return 'bg-muted text-muted-foreground';
+  const getStatusBadge = (status: string) => {
+    const s = (status || 'draft').toLowerCase();
+    if (s === 'completed' || s === 'sent') return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-accent-green/10 text-accent-green">
+        <CheckCircle className="w-3 h-3" /> Completed
+      </span>
+    );
+    if (s === 'running' || s === 'active' || s === 'sending') return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-400/10 text-amber-400">
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" /> Running
+      </span>
+    );
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+        Draft
+      </span>
+    );
   };
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('campaigns').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['campaigns'] }); toast({ title: 'Campaign deleted' }); },
+    onError: (e: any) => { console.error('[Campaigns]', e); toast({ title: 'Error', description: e.message, variant: 'destructive' }); },
+  });
 
   if (isLoading) return <div className="p-6"><div className="skeleton-shimmer h-96 rounded-2xl" /></div>;
 
@@ -108,8 +131,8 @@ export default function CampaignsPage() {
       ) : (
         <div className="glass-card-purple overflow-hidden rounded-2xl">
           <table className="w-full text-sm">
-            <thead><tr style={{ background: 'rgba(124,58,237,0.08)', borderBottom: '1px solid rgba(124,58,237,0.15)' }}>
-              {['Name', 'Target Stage', 'Status', 'Contacts', 'Launched', 'Actions'].map(h => (
+           <thead><tr style={{ background: 'rgba(124,58,237,0.08)', borderBottom: '1px solid rgba(124,58,237,0.15)' }}>
+              {['Name', 'Target Stage', 'Status', 'Contacts', 'Launched', 'Launched By', 'Actions'].map(h => (
                 <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{h}</th>
               ))}
             </tr></thead>
@@ -118,15 +141,23 @@ export default function CampaignsPage() {
                 <tr key={c.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(124,58,237,0.05)]">
                   <td className="px-4 py-3 font-medium text-foreground">{c.campaign_name}</td>
                   <td className="px-4 py-3"><StatusBadge type="stage" value={c.target_stage} /></td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${getStatusStyle(c.status)}`}>
-                      {(c.status === 'Active' || c.status === 'Sending') && <span className="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse" />}
-                      {c.status || 'Draft'}
-                    </span>
-                  </td>
+                  <td className="px-4 py-3">{getStatusBadge(c.status)}</td>
                   <td className="px-4 py-3 text-muted-foreground">{c.contacts_targeted || 0}</td>
                   <td className="px-4 py-3 text-muted-foreground text-xs">{c.launched_at ? format(new Date(c.launched_at), 'd MMM yyyy') : '—'}</td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground">{c.rep_name}</td>
+                  <td className="px-4 py-3 text-muted-foreground text-xs">{c.rep_name || '—'}</td>
+                  <td className="px-4 py-3">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="p-1.5 rounded-lg hover:bg-[rgba(124,58,237,0.1)] transition-colors">
+                          <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-card border-border">
+                        <DropdownMenuItem className="gap-2 text-xs"><Eye className="w-3.5 h-3.5" /> View</DropdownMenuItem>
+                        <DropdownMenuItem className="gap-2 text-xs text-red-400" onClick={() => deleteMutation.mutate(c.id)}><Trash2 className="w-3.5 h-3.5" /> Delete</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </td>
                 </tr>
               ))}
             </tbody>
