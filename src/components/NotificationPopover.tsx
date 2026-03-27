@@ -135,8 +135,8 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
         </div>
 
         {/* Notification List with scroll arrows */}
-        <div className="relative flex-1 min-h-0">
-          <ScrollArea className="h-full">
+        <div className="relative flex-1 min-h-0 overflow-hidden">
+          <ScrollArea className="h-full [&>[data-radix-scroll-area-viewport]]:max-h-[380px]">
           <div className="px-3 py-2">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
