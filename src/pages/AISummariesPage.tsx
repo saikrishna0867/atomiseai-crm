@@ -107,7 +107,7 @@ export default function AISummariesPage() {
   const contactsWithMeta = contacts.map((c: any) => ({
     ...c,
     hasSummary: summaryMap.has(c.lead_id),
-    sentiment: summaryMap.get(c.lead_id)?.sentiment,
+    deal_health: summaryMap.get(c.lead_id)?.deal_health,
     generatedAt: summaryMap.get(c.lead_id)?.generated_at,
   }));
 
