@@ -76,7 +76,7 @@ export default function ContactsPage() {
       setForm({ name: '', email: '', phone: '', company: '', source: 'Website Form', pipeline_stage: 'Lead', assigned_rep: '', assigned_rep_email: '', notes: '', tags: '', priority: 'Medium' });
       toast({ title: 'Contact added & automation triggered ✅' });
     },
-    onError: (e: any) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
+    onError: (e: any) => { console.error('[Contacts]', e); toast({ title: 'Error', description: e.message, variant: 'destructive' }); },
   });
 
   const deleteMutation = useMutation({

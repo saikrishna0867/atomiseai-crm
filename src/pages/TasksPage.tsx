@@ -43,7 +43,7 @@ export default function TasksPage() {
       setForm({ title: '', description: '', contact_name: '', assigned_to: '', due_date: '', priority: 'Medium', status: 'Pending', lead_id: '' });
       toast({ title: 'Task created ✅' });
     },
-    onError: (e: any) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
+    onError: (e: any) => { console.error('[Tasks]', e); toast({ title: 'Error', description: e.message, variant: 'destructive' }); },
   });
 
   const updateStatus = useMutation({

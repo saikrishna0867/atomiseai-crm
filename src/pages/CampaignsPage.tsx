@@ -63,7 +63,7 @@ export default function CampaignsPage() {
       setForm({ campaign_name: '', target_stage: 'Lead', email_subject: '', email_body: '', rep_name: '', rep_email: '' });
       toast({ title: 'Campaign launched — emails sending now 🚀' });
     },
-    onError: (e: any) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
+    onError: (e: any) => { console.error('[Campaigns]', e); toast({ title: 'Error', description: e.message, variant: 'destructive' }); },
   });
 
   const insertToken = (token: string) => {

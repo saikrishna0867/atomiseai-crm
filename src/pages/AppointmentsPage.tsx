@@ -80,7 +80,7 @@ export default function AppointmentsPage() {
       setAddOpen(false);
       toast({ title: 'Appointment booked — confirmation emails sent ✅' });
     },
-    onError: (e: any) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
+    onError: (e: any) => { console.error('[Appointments]', e); toast({ title: 'Error', description: e.message, variant: 'destructive' }); },
   });
 
   const selectContact = (leadId: string) => {
