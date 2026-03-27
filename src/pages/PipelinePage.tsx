@@ -174,7 +174,7 @@ export default function PipelinePage() {
       await Promise.allSettled([
         webhooks.stageChange({
           leadId: deal.lead_id, contactEmail: deal.contact_email, contactName: deal.contact_name,
-          oldStage, newStage, assignedRep: deal.assigned_rep, assignedRepEmail: deal.assigned_rep_email || '', dealValue: deal.deal_value,
+          oldStage, newStage, assignedRep: deal.assigned_rep || 'Admin', assignedRepEmail: deal.assigned_rep_email || 'admin@atomise.ai', dealValue: deal.deal_value,
         }),
         supabase.from('activity_log').insert({
           lead_id: deal.lead_id, event_type: 'stage_change',
