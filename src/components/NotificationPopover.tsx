@@ -108,25 +108,39 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
           </div>
         )}
 
-        {/* Filter Chips — px-5 to match, consistent chip sizing */}
-        <div
-          className="flex items-center gap-2 overflow-x-auto border-b my-[2px] py-[24px] px-[17px] mb-[12px]"
-          style={{ borderColor: 'rgba(124,58,237,0.08)' }}
-        >
-          {eventTypes.map((type: string) => (
-            <button
-              key={type}
-              onClick={() => setFilter(type)}
-              className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all ${
-                filter === type
-                  ? 'bg-primary/20 text-primary'
-                  : 'text-muted-foreground hover:bg-muted/15'
-              }`}
-              style={filter !== type ? { background: 'rgba(255,255,255,0.03)' } : undefined}
-            >
-              {type === 'all' ? 'All' : type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
-            </button>
-          ))}
+        {/* Filter Chips with arrows */}
+        <div className="relative border-b my-[2px] mb-[12px]" style={{ borderColor: 'rgba(124,58,237,0.08)' }}>
+          <button
+            onClick={() => chipsRef.current?.scrollBy({ left: -120, behavior: 'smooth' })}
+            className="absolute left-1 top-1/2 -translate-y-1/2 z-10 w-6 h-6 rounded-full flex items-center justify-center bg-background/80 backdrop-blur border border-border/30 hover:bg-muted/30 transition-colors"
+          >
+            <ChevronLeft className="w-3.5 h-3.5 text-muted-foreground" />
+          </button>
+          <div
+            ref={chipsRef}
+            className="flex items-center gap-2 overflow-x-auto py-[24px] px-8 scrollbar-hide"
+          >
+            {eventTypes.map((type: string) => (
+              <button
+                key={type}
+                onClick={() => setFilter(type)}
+                className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all ${
+                  filter === type
+                    ? 'bg-primary/20 text-primary'
+                    : 'text-muted-foreground hover:bg-muted/15'
+                }`}
+                style={filter !== type ? { background: 'rgba(255,255,255,0.03)' } : undefined}
+              >
+                {type === 'all' ? 'All' : type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => chipsRef.current?.scrollBy({ left: 120, behavior: 'smooth' })}
+            className="absolute right-1 top-1/2 -translate-y-1/2 z-10 w-6 h-6 rounded-full flex items-center justify-center bg-background/80 backdrop-blur border border-border/30 hover:bg-muted/30 transition-colors"
+          >
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
+          </button>
         </div>
 
         {/* Notification List — px-3 outer + px-2 inner = aligned with header px-5 */}
