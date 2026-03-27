@@ -16,13 +16,13 @@ export function SidebarNavItem({ to, icon: Icon, label }: SidebarNavItemProps) {
     <RouterNavLink
       to={to}
       className={cn(
-        'flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
+        'flex items-center gap-3 h-11 px-4 mx-3 rounded-[10px] text-sm font-medium transition-all duration-[180ms] ease-out my-0.5',
         isActive
-          ? 'bg-primary/10 text-primary border-l-2 border-primary ml-0 purple-glow-sm'
-          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 border-l-2 border-transparent'
+          ? 'bg-[rgba(124,58,237,0.18)] text-foreground border-l-[3px] border-primary shadow-[inset_0_0_20px_rgba(124,58,237,0.1)]'
+          : 'text-muted-foreground hover:text-[#e0e0ff] hover:bg-[rgba(124,58,237,0.08)] border-l-[3px] border-transparent'
       )}
     >
-      <Icon className="w-4 h-4 shrink-0" />
+      <Icon className={cn('w-[18px] h-[18px] shrink-0 transition-colors duration-[180ms]', isActive ? 'text-purple-bright' : 'group-hover:text-purple-bright')} />
       <span>{label}</span>
     </RouterNavLink>
   );

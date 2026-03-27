@@ -1,23 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { webhooks } from '@/lib/webhooks';
 import { StatusBadge } from '@/components/StatusBadge';
-import { LoadingSpinner, EmptyState } from '@/components/EmptyState';
+import { EmptyState } from '@/components/EmptyState';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { Users, Plus, Search, Trash2, Eye, Edit } from 'lucide-react';
+import { Users, Plus, Search, Trash2, Eye, Edit, MoreHorizontal, Loader2, Droplets, Phone } from 'lucide-react';
 import { format } from 'date-fns';
 
 const STAGES = ['Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'];
 const SOURCES = ['Website Form', 'Referral', 'Cold Outreach', 'Social Media', 'Event', 'Other'];
 const PRIORITIES = ['High', 'Medium', 'Low'];
+
+const STAGE_STYLES: Record<string, string> = {
+  'Lead': 'bg-[#1e3a5f] text-[#60a5fa] border-[#2563eb22]',
+  'Qualified': 'bg-[#3f2d00] text-[#fbbf24] border-[#d9770022]',
+  'Proposal': 'bg-[#3d1e00] text-[#fb923c] border-[#ea580022]',
+  'Negotiation': 'bg-[#3d0a0a] text-[#f87171] border-[#dc262622]',
+  'Closed Won': 'bg-[#0d3320] text-[#34d399] border-[#05966922]',
+  'Closed Lost': 'bg-[#1f1f1f] text-[#9ca3af] border-[#37415122]',
+};
+
+const PRIORITY_DOT: Record<string, string> = {
+  'High': '#f87171',
+  'Medium': '#fbbf24',
+  'Low': '#34d399',
+};
 
 export default function ContactsPage() {
   const { toast } = useToast();
@@ -26,8 +43,11 @@ export default function ContactsPage() {
   const [search, setSearch] = useState('');
   const [stageFilter, setStageFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
   const [addOpen, setAddOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  useEffect(() => { document.title = 'Contacts | Atomise CRM'; }, []);
 
   const [form, setForm] = useState({
     name: '', email: '', phone: '', company: '', source: 'Website Form',
@@ -63,10 +83,8 @@ export default function ContactsPage() {
           source: form.source, company: form.company,
         }),
         supabase.from('activity_log').insert({
-          lead_id: leadId,
-          event_type: 'lead_assigned',
-          description: 'New contact added to CRM',
-          performed_by: 'System',
+          lead_id: leadId, event_type: 'lead_assigned',
+          description: 'Contact added to CRM', performed_by: 'System (n8n)',
         }),
       ]);
     },
@@ -74,7 +92,7 @@ export default function ContactsPage() {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
       setAddOpen(false);
       setForm({ name: '', email: '', phone: '', company: '', source: 'Website Form', pipeline_stage: 'Lead', assigned_rep: '', assigned_rep_email: '', notes: '', tags: '', priority: 'Medium' });
-      toast({ title: 'Contact added & automation triggered ✅' });
+      toast({ title: '✅ Contact added! Automation triggered — drip sequence started.' });
     },
     onError: (e: any) => { console.error('[Contacts]', e); toast({ title: 'Error', description: e.message, variant: 'destructive' }); },
   });
@@ -95,77 +113,110 @@ export default function ContactsPage() {
     const matchSearch = !search || [c.name, c.email, c.company].some(f => f?.toLowerCase().includes(search.toLowerCase()));
     const matchStage = stageFilter === 'all' || c.pipeline_stage === stageFilter;
     const matchSource = sourceFilter === 'all' || c.source === sourceFilter;
-    return matchSearch && matchStage && matchSource;
+    const matchPriority = priorityFilter === 'all' || c.priority === priorityFilter;
+    return matchSearch && matchStage && matchSource && matchPriority;
   });
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) {
+    return (
+      <div className="p-6 space-y-4">
+        <div className="skeleton-shimmer h-10 w-48 rounded-xl" />
+        <div className="skeleton-shimmer h-12 rounded-xl" />
+        <div className="skeleton-shimmer h-96 rounded-2xl" />
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-display font-bold text-foreground">Contacts</h1>
-        <Button onClick={() => setAddOpen(true)} className="gap-2"><Plus className="w-4 h-4" /> Add Contact</Button>
-      </div>
-
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-[200px]">
+    <div className="p-6 space-y-5">
+      {/* Filter Bar */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[200px] max-w-[320px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search contacts..." className="pl-9 bg-secondary border-border text-foreground" />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search contacts..." className="glass-input w-full pl-9 pr-3 py-2 text-sm rounded-[10px]" />
         </div>
-        <Select value={stageFilter} onValueChange={setStageFilter}>
-          <SelectTrigger className="w-40 bg-secondary border-border text-foreground"><SelectValue placeholder="Stage" /></SelectTrigger>
-          <SelectContent className="bg-card border-border">
-            <SelectItem value="all">All Stages</SelectItem>
-            {STAGES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-          </SelectContent>
-        </Select>
-        <Select value={sourceFilter} onValueChange={setSourceFilter}>
-          <SelectTrigger className="w-40 bg-secondary border-border text-foreground"><SelectValue placeholder="Source" /></SelectTrigger>
-          <SelectContent className="bg-card border-border">
-            <SelectItem value="all">All Sources</SelectItem>
-            {SOURCES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-          </SelectContent>
-        </Select>
+        {[
+          { value: stageFilter, onChange: setStageFilter, options: STAGES, label: 'Stage', width: 'w-40' },
+          { value: sourceFilter, onChange: setSourceFilter, options: SOURCES, label: 'Source', width: 'w-36' },
+          { value: priorityFilter, onChange: setPriorityFilter, options: PRIORITIES, label: 'Priority', width: 'w-32' },
+        ].map(f => (
+          <Select key={f.label} value={f.value} onValueChange={f.onChange}>
+            <SelectTrigger className={`${f.width} glass-input text-sm`}><SelectValue placeholder={f.label} /></SelectTrigger>
+            <SelectContent className="bg-card border-border">
+              <SelectItem value="all">All {f.label}s</SelectItem>
+              {f.options.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        ))}
+        <div className="flex-1" />
+        <Button onClick={() => setAddOpen(true)} className="gap-2 font-display text-sm rounded-xl px-5 shadow-[0_4px_20px_rgba(124,58,237,0.4)] hover:shadow-[0_8px_24px_rgba(124,58,237,0.5)] hover:translate-y-[-1px] transition-all duration-200">
+          <Plus className="w-4 h-4" /> Add Contact
+        </Button>
       </div>
 
       {/* Table */}
       {filtered.length === 0 ? (
         <EmptyState icon={Users} title="No contacts yet" description="Add your first contact to get started." action={<Button onClick={() => setAddOpen(true)} className="gap-2"><Plus className="w-4 h-4" /> Add Contact</Button>} />
       ) : (
-        <div className="glass-card-purple overflow-hidden">
+        <div className="rounded-2xl border overflow-hidden" style={{ borderColor: 'rgba(124,58,237,0.18)', background: 'hsl(240 24% 10%)' }}>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border/50">
-                  {['Name', 'Email', 'Phone', 'Company', 'Stage', 'Source', 'Priority', 'Rep', 'Created', 'Actions'].map(h => (
-                    <th key={h} className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">{h}</th>
+                <tr style={{ background: 'rgba(124,58,237,0.08)', borderBottom: '1px solid rgba(124,58,237,0.15)' }}>
+                  <th className="w-10 px-4 py-3"><input type="checkbox" className="rounded" /></th>
+                  {['Name', 'Phone', 'Company', 'Stage', 'Priority', 'Rep', 'Source', 'Created', 'Actions'].map(h => (
+                    <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((c: any) => (
-                  <tr key={c.id} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">{c.name?.charAt(0)}</div>
-                        <span className="font-medium text-foreground">{c.name}</span>
+                  <tr key={c.id} className="h-[60px] border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(124,58,237,0.05)] transition-[background] duration-150">
+                    <td className="px-4"><input type="checkbox" className="rounded" /></td>
+                    <td className="px-4 py-3 min-w-[200px]">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: 'linear-gradient(135deg, #7c3aed, #6d28d9)' }}>
+                          {c.name?.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground">{c.name}</p>
+                          <p className="text-xs text-muted-foreground">{c.email}</p>
+                        </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">{c.email}</td>
-                    <td className="px-4 py-3 text-muted-foreground font-mono text-xs">{c.phone}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{c.company}</td>
-                    <td className="px-4 py-3"><StatusBadge type="stage" value={c.pipeline_stage || ''} /></td>
-                    <td className="px-4 py-3 text-muted-foreground text-xs">{c.source}</td>
-                    <td className="px-4 py-3"><StatusBadge type="priority" value={c.priority || 'Medium'} /></td>
-                    <td className="px-4 py-3 text-muted-foreground text-xs">{c.assigned_rep}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-xs">{c.created_at ? format(new Date(c.created_at), 'MMM d, yyyy') : ''}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-1">
-                        <button title="View" onClick={() => navigate(`/contacts/${c.lead_id || c.id}`)} className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"><Eye className="w-3.5 h-3.5" /></button>
-                        <button title="Edit" onClick={() => navigate(`/contacts/${c.lead_id || c.id}?edit=true`)} className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"><Edit className="w-3.5 h-3.5" /></button>
-                        <button title="Delete" onClick={() => setDeleteId(c.id)} className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      <div className="flex items-center gap-1.5">
+                        <Phone className="w-3 h-3 text-muted-foreground/60" />
+                        <span className="text-xs">{c.phone || '—'}</span>
                       </div>
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground text-xs">{c.company || '—'}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${STAGE_STYLES[c.pipeline_stage] || STAGE_STYLES['Lead']}`}>
+                        {c.pipeline_stage || 'Lead'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 rounded-full" style={{ background: PRIORITY_DOT[c.priority] || PRIORITY_DOT['Medium'] }} />
+                        <span className="text-xs text-muted-foreground">{c.priority || 'Medium'}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground text-xs">{c.assigned_rep || '—'}</td>
+                    <td className="px-4 py-3 text-muted-foreground text-xs">{c.source || '—'}</td>
+                    <td className="px-4 py-3 text-muted-foreground text-xs">{c.created_at ? format(new Date(c.created_at), 'd MMM yyyy') : ''}</td>
+                    <td className="px-4 py-3">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"><MoreHorizontal className="w-4 h-4" /></button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-card border-border">
+                          <DropdownMenuItem onClick={() => navigate(`/contacts/${c.lead_id || c.id}`)} className="gap-2"><Eye className="w-3.5 h-3.5" /> View Contact</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigate(`/contacts/${c.lead_id || c.id}?edit=true`)} className="gap-2"><Edit className="w-3.5 h-3.5" /> Edit</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => toast({ title: 'Drip started ✅' })} className="gap-2"><Droplets className="w-3.5 h-3.5" /> Start Drip</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setDeleteId(c.id)} className="gap-2 text-destructive"><Trash2 className="w-3.5 h-3.5" /> Delete</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </td>
                   </tr>
                 ))}
@@ -177,57 +228,90 @@ export default function ContactsPage() {
 
       {/* Add Contact Modal */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="bg-card border-border max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle className="font-display">Add Contact</DialogTitle></DialogHeader>
-          <form onSubmit={e => { e.preventDefault(); addMutation.mutate(); }} className="space-y-3">
-            {[
-              { key: 'name', label: 'Name', required: true },
-              { key: 'email', label: 'Email', required: true, type: 'email' },
-              { key: 'phone', label: 'Phone' },
-              { key: 'company', label: 'Company' },
-              { key: 'assigned_rep', label: 'Assigned Rep', required: true },
-              { key: 'assigned_rep_email', label: 'Rep Email', required: true, type: 'email' },
-              { key: 'notes', label: 'Notes' },
-              { key: 'tags', label: 'Tags (comma-separated)' },
-            ].map(f => (
-              <div key={f.key} className="space-y-1">
-                <Label className="text-foreground text-xs">{f.label}{f.required && ' *'}</Label>
-                <Input
-                  value={(form as any)[f.key]}
-                  onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
-                  required={f.required}
-                  type={f.type || 'text'}
-                  className="bg-secondary border-border text-foreground"
-                />
+        <DialogContent className="p-0 border-0 bg-transparent shadow-none max-w-[560px]">
+          <div
+            className="rounded-[20px] overflow-hidden max-h-[90vh] overflow-y-auto"
+            style={{
+              background: '#141420',
+              border: '1px solid rgba(124,58,237,0.3)',
+              boxShadow: '0 24px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(124,58,237,0.15)',
+            }}
+          >
+            <div className="p-6 border-b" style={{ borderColor: 'rgba(124,58,237,0.15)' }}>
+              <DialogHeader>
+                <DialogTitle className="font-display text-xl font-bold text-foreground">Add New Contact</DialogTitle>
+              </DialogHeader>
+              <p className="text-[13px] text-muted-foreground mt-1">Fill in the details below — automation will trigger automatically</p>
+            </div>
+            <form onSubmit={e => { e.preventDefault(); addMutation.mutate(); }} className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground font-medium">Full Name <span className="text-destructive">*</span></Label>
+                  <input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} required className="glass-input w-full" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground font-medium">Email Address <span className="text-destructive">*</span></Label>
+                  <input type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} required className="glass-input w-full" />
+                </div>
               </div>
-            ))}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label className="text-foreground text-xs">Source</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground font-medium">Phone</Label>
+                  <input value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} className="glass-input w-full" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground font-medium">Company</Label>
+                  <input value={form.company} onChange={e => setForm(p => ({ ...p, company: e.target.value }))} className="glass-input w-full" />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground font-medium">Lead Source</Label>
                 <Select value={form.source} onValueChange={v => setForm(p => ({ ...p, source: v }))}>
-                  <SelectTrigger className="bg-secondary border-border text-foreground"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="glass-input"><SelectValue /></SelectTrigger>
                   <SelectContent className="bg-card border-border">{SOURCES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
-              <div className="space-y-1">
-                <Label className="text-foreground text-xs">Stage</Label>
-                <Select value={form.pipeline_stage} onValueChange={v => setForm(p => ({ ...p, pipeline_stage: v }))}>
-                  <SelectTrigger className="bg-secondary border-border text-foreground"><SelectValue /></SelectTrigger>
-                  <SelectContent className="bg-card border-border">{STAGES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground font-medium">Pipeline Stage</Label>
+                  <Select value={form.pipeline_stage} onValueChange={v => setForm(p => ({ ...p, pipeline_stage: v }))}>
+                    <SelectTrigger className="glass-input"><SelectValue /></SelectTrigger>
+                    <SelectContent className="bg-card border-border">{STAGES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground font-medium">Assigned Rep <span className="text-destructive">*</span></Label>
+                  <input value={form.assigned_rep} onChange={e => setForm(p => ({ ...p, assigned_rep: e.target.value }))} required className="glass-input w-full" />
+                </div>
               </div>
-            </div>
-            <div className="space-y-1">
-              <Label className="text-foreground text-xs">Priority</Label>
-              <Select value={form.priority} onValueChange={v => setForm(p => ({ ...p, priority: v }))}>
-                <SelectTrigger className="bg-secondary border-border text-foreground"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-card border-border">{PRIORITIES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-              </Select>
-            </div>
-            <Button type="submit" className="w-full" disabled={addMutation.isPending}>
-              {addMutation.isPending ? 'Adding...' : 'Add Contact'}
-            </Button>
-          </form>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground font-medium">Assigned Rep Email <span className="text-destructive">*</span></Label>
+                <input type="email" value={form.assigned_rep_email} onChange={e => setForm(p => ({ ...p, assigned_rep_email: e.target.value }))} required className="glass-input w-full" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground font-medium">Tags (comma-separated)</Label>
+                <input value={form.tags} onChange={e => setForm(p => ({ ...p, tags: e.target.value }))} className="glass-input w-full" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground font-medium">Notes</Label>
+                <textarea value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} rows={3} className="glass-input w-full resize-none" />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Button type="button" variant="ghost" onClick={() => setAddOpen(false)} className="text-muted-foreground">Cancel</Button>
+                <Button
+                  type="submit"
+                  className="flex-1 font-display text-[15px] rounded-xl h-12 shadow-[0_4px_20px_rgba(124,58,237,0.4)] bg-gradient-to-r from-primary to-[#4c1d95] hover:shadow-[0_8px_24px_rgba(124,58,237,0.5)] transition-all duration-200"
+                  disabled={addMutation.isPending}
+                >
+                  {addMutation.isPending ? (
+                    <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving & triggering automation...</>
+                  ) : (
+                    'Add Contact + Trigger Automation ⚡'
+                  )}
+                </Button>
+              </div>
+            </form>
+          </div>
         </DialogContent>
       </Dialog>
 

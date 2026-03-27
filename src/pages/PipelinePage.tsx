@@ -1,41 +1,70 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { webhooks } from '@/lib/webhooks';
-import { LoadingSpinner, EmptyState } from '@/components/EmptyState';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Columns3, Plus, Trash2 } from 'lucide-react';
+import { EmptyState } from '@/components/EmptyState';
+import { Columns3, Plus, Trash2, MoreHorizontal, Building2 } from 'lucide-react';
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, useSensor, useSensors, useDroppable, useDraggable } from '@dnd-kit/core';
+import { format } from 'date-fns';
 
 const STAGES = ['Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'];
 
-function DealCard({ deal, onDelete }: { deal: any; onDelete: () => void }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: deal.id,
-    data: { deal },
-  });
+const STAGE_COLORS: Record<string, string> = {
+  'Lead': '#60a5fa', 'Qualified': '#fbbf24', 'Proposal': '#fb923c',
+  'Negotiation': '#f87171', 'Closed Won': '#34d399', 'Closed Lost': '#9ca3af',
+};
 
-  const style = {
-    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
-    opacity: isDragging ? 0.5 : 1,
+function DealCard({ deal, onDelete }: { deal: any; onDelete: () => void }) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: deal.id, data: { deal } });
+
+  const style: React.CSSProperties = {
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)${isDragging ? ' rotate(2deg) scale(1.02)' : ''}` : undefined,
+    opacity: isDragging ? 0.85 : 1,
+    cursor: isDragging ? 'grabbing' : 'grab',
+    ...(isDragging ? { boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 0 2px rgba(124,58,237,0.5)', zIndex: 50 } : {}),
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="glass-card-purple p-3 space-y-2 cursor-grab active:cursor-grabbing hover:purple-glow-sm transition-all duration-200" {...attributes} {...listeners}>
-      <div className="flex items-start justify-between">
-        <span className="text-sm font-medium text-foreground">{deal.contact_name}</span>
-        <button onClick={(e) => { e.stopPropagation(); onDelete(); }} className="text-muted-foreground hover:text-destructive p-0.5">
-          <Trash2 className="w-3 h-3" />
-        </button>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="relative rounded-xl p-4 mb-2.5 border transition-all duration-200 hover:border-[rgba(124,58,237,0.4)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.4),0_0_0_1px_rgba(124,58,237,0.2)] hover:translate-y-[-2px]"
+      {...attributes}
+      {...listeners}
+    >
+      <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full" style={{ background: STAGE_COLORS[deal.stage] || '#7c3aed' }} />
+      <div className="pl-2">
+        <div className="flex items-start justify-between">
+          <span className="text-sm font-medium text-foreground">{deal.contact_name}</span>
+          <button onClick={(e) => { e.stopPropagation(); onDelete(); }} className="text-muted-foreground hover:text-destructive p-0.5 transition-colors">
+            <Trash2 className="w-3 h-3" />
+          </button>
+        </div>
+        {deal.company && (
+          <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><Building2 className="w-3 h-3" /> {deal.company}</p>
+        )}
+        {deal.deal_value && (
+          <p className="text-base font-display font-bold text-accent-green mt-2">£{Number(deal.deal_value).toLocaleString()}</p>
+        )}
+        <div className="flex items-center justify-between mt-2">
+          <div className="flex items-center gap-1.5">
+            {deal.assigned_rep && (
+              <>
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ background: 'linear-gradient(135deg, #7c3aed, #6d28d9)' }}>
+                  {deal.assigned_rep.charAt(0)}
+                </div>
+                <span className="text-xs text-muted-foreground">{deal.assigned_rep}</span>
+              </>
+            )}
+          </div>
+          {deal.created_at && <span className="text-[11px] text-muted-foreground/60">{format(new Date(deal.created_at), 'd MMM')}</span>}
+        </div>
       </div>
-      {deal.company && <p className="text-xs text-muted-foreground">{deal.company}</p>}
-      {deal.deal_value && <p className="text-sm font-semibold text-accent-green">£{Number(deal.deal_value).toLocaleString()}</p>}
-      {deal.assigned_rep && <p className="text-xs text-muted-foreground">Rep: {deal.assigned_rep}</p>}
     </div>
   );
 }
@@ -47,24 +76,33 @@ function StageColumn({ stage, deals, onAddDeal, onDeleteDeal }: { stage: string;
   return (
     <div
       ref={setNodeRef}
-      className={`flex flex-col w-72 shrink-0 rounded-xl border transition-colors ${isOver ? 'border-primary bg-primary/5' : 'border-border bg-secondary/50'}`}
+      className="flex flex-col w-[280px] shrink-0 rounded-2xl border transition-colors"
+      style={{
+        background: isOver ? 'rgba(124,58,237,0.06)' : 'rgba(14,14,22,0.6)',
+        borderColor: isOver ? 'rgba(124,58,237,0.35)' : 'rgba(124,58,237,0.12)',
+        maxHeight: 'calc(100vh - 180px)',
+      }}
     >
-      <div className="p-3 border-b border-border/50">
+      <div className="p-4 border-b" style={{ borderColor: 'rgba(124,58,237,0.1)' }}>
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-display font-semibold text-foreground">{stage}</h3>
-          <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">{deals.length}</span>
+          <h3 className="text-sm font-display font-bold" style={{ color: STAGE_COLORS[stage] }}>{stage}</h3>
+          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary text-[11px] font-bold text-white">{deals.length}</span>
         </div>
         <p className="text-xs text-accent-green mt-1">£{totalValue.toLocaleString()}</p>
       </div>
-      <div className="flex-1 p-2 space-y-2 overflow-y-auto max-h-[60vh]">
+      <div className="flex-1 p-3 space-y-0 overflow-y-auto">
         {deals.map(deal => (
           <DealCard key={deal.id} deal={deal} onDelete={() => onDeleteDeal(deal.id)} />
         ))}
       </div>
-      <div className="p-2">
-        <Button variant="ghost" size="sm" className="w-full text-muted-foreground hover:text-foreground text-xs" onClick={onAddDeal}>
-          <Plus className="w-3 h-3 mr-1" /> Add Deal
-        </Button>
+      <div className="p-3">
+        <button
+          onClick={onAddDeal}
+          className="w-full rounded-[10px] py-2.5 text-[13px] text-purple-bright/70 border border-dashed transition-all duration-200 hover:bg-[rgba(124,58,237,0.12)] hover:border-[rgba(124,58,237,0.4)] hover:text-purple-bright"
+          style={{ borderColor: 'rgba(124,58,237,0.25)', background: 'rgba(124,58,237,0.06)' }}
+        >
+          <Plus className="w-3.5 h-3.5 inline mr-1" /> Add Deal
+        </button>
       </div>
     </div>
   );
@@ -75,7 +113,9 @@ export default function PipelinePage() {
   const queryClient = useQueryClient();
   const [addOpen, setAddOpen] = useState(false);
   const [addStage, setAddStage] = useState('Lead');
-  const [form, setForm] = useState({ contact_name: '', contact_email: '', company: '', deal_value: '', assigned_rep: '', notes: '' });
+  const [form, setForm] = useState({ contact_name: '', contact_email: '', company: '', deal_value: '', assigned_rep: '', assigned_rep_email: '', notes: '' });
+
+  useEffect(() => { document.title = 'Pipeline | Atomise CRM'; }, []);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
@@ -96,7 +136,7 @@ export default function PipelinePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pipeline_deals'] });
       setAddOpen(false);
-      setForm({ contact_name: '', contact_email: '', company: '', deal_value: '', assigned_rep: '', notes: '' });
+      setForm({ contact_name: '', contact_email: '', company: '', deal_value: '', assigned_rep: '', assigned_rep_email: '', notes: '' });
       toast({ title: 'Deal created ✅' });
     },
     onError: (e: any) => { console.error('[Pipeline]', e); toast({ title: 'Error', description: e.message, variant: 'destructive' }); },
@@ -123,13 +163,12 @@ export default function PipelinePage() {
 
     const oldStage = deal.stage;
 
-    // Optimistic update
     queryClient.setQueryData(['pipeline_deals'], (old: any[]) =>
       old.map(d => d.id === deal.id ? { ...d, stage: newStage } : d)
     );
 
     try {
-      await supabase.from('pipeline_deals').update({ stage: newStage }).eq('lead_id', deal.lead_id);
+      await supabase.from('pipeline_deals').update({ stage: newStage }).eq('id', deal.id);
       await supabase.from('contacts').update({ pipeline_stage: newStage }).eq('lead_id', deal.lead_id);
 
       await Promise.allSettled([
@@ -138,10 +177,9 @@ export default function PipelinePage() {
           oldStage, newStage, assignedRep: deal.assigned_rep, assignedRepEmail: deal.assigned_rep_email || '', dealValue: deal.deal_value,
         }),
         supabase.from('activity_log').insert({
-          lead_id: deal.lead_id,
-          event_type: 'stage_change',
+          lead_id: deal.lead_id, event_type: 'stage_change',
           description: `Deal moved from ${oldStage} to ${newStage}`,
-          performed_by: deal.assigned_rep,
+          performed_by: deal.assigned_rep, timestamp: new Date().toISOString(),
         }),
       ]);
 
@@ -151,16 +189,18 @@ export default function PipelinePage() {
     }
   };
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) {
+    return (
+      <div className="p-6 flex gap-4 overflow-x-auto">
+        {Array.from({ length: 6 }).map((_, i) => <div key={i} className="skeleton-shimmer w-[280px] h-96 rounded-2xl shrink-0" />)}
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-display font-bold text-foreground">Pipeline</h1>
-      </div>
-
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <div className="flex gap-4 overflow-x-auto pb-4">
+        <div className="flex gap-4 overflow-x-auto pb-4" style={{ minHeight: 'calc(100vh - 160px)' }}>
           {STAGES.map(stage => (
             <StageColumn
               key={stage}
@@ -174,7 +214,7 @@ export default function PipelinePage() {
       </DndContext>
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="bg-card border-border">
+        <DialogContent className="bg-[#141420] border-[rgba(124,58,237,0.3)] rounded-[20px]">
           <DialogHeader><DialogTitle className="font-display">Add Deal — {addStage}</DialogTitle></DialogHeader>
           <form onSubmit={e => { e.preventDefault(); addMutation.mutate(); }} className="space-y-3">
             {[
@@ -183,14 +223,15 @@ export default function PipelinePage() {
               { key: 'company', label: 'Company' },
               { key: 'deal_value', label: 'Deal Value (£)', type: 'number', required: true },
               { key: 'assigned_rep', label: 'Assigned Rep', required: true },
+              { key: 'assigned_rep_email', label: 'Rep Email', type: 'email' },
               { key: 'notes', label: 'Notes' },
             ].map(f => (
-              <div key={f.key} className="space-y-1">
-                <Label className="text-foreground text-xs">{f.label}{f.required && ' *'}</Label>
-                <Input value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))} required={f.required} type={f.type || 'text'} className="bg-secondary border-border text-foreground" />
+              <div key={f.key} className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground font-medium">{f.label}{f.required && <span className="text-destructive"> *</span>}</Label>
+                <input value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))} required={f.required} type={f.type || 'text'} className="glass-input w-full" />
               </div>
             ))}
-            <Button type="submit" className="w-full" disabled={addMutation.isPending}>{addMutation.isPending ? 'Adding...' : 'Add Deal'}</Button>
+            <Button type="submit" className="w-full font-display rounded-xl h-11" disabled={addMutation.isPending}>{addMutation.isPending ? 'Adding...' : 'Add Deal'}</Button>
           </form>
         </DialogContent>
       </Dialog>
