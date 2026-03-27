@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { webhooks } from '@/lib/webhooks';
@@ -165,7 +166,7 @@ export default function ContactsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr style={{ background: 'rgba(124,58,237,0.08)', borderBottom: '1px solid rgba(124,58,237,0.15)' }}>
-                  <th className="w-10 px-4 py-3"><input type="checkbox" className="rounded" /></th>
+                  <th className="w-10 px-4 py-3"><Checkbox className="border-muted-foreground/40 data-[state=checked]:bg-primary data-[state=checked]:border-primary" /></th>
                   {['Name', 'Phone', 'Company', 'Stage', 'Priority', 'Rep', 'Source', 'Created', 'Actions'].map(h => (
                     <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{h}</th>
                   ))}
@@ -174,7 +175,7 @@ export default function ContactsPage() {
               <tbody>
                 {filtered.map((c: any) => (
                   <tr key={c.id} className="h-[60px] border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(124,58,237,0.05)] transition-[background] duration-150">
-                    <td className="px-4"><input type="checkbox" className="rounded" /></td>
+                    <td className="px-4 py-3"><Checkbox className="border-muted-foreground/40 data-[state=checked]:bg-primary data-[state=checked]:border-primary" /></td>
                     <td className="px-4 py-3 min-w-[200px]">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: 'linear-gradient(135deg, #7c3aed, #6d28d9)' }}>
