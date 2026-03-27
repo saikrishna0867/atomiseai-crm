@@ -10,10 +10,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { Sparkles, Loader2, Search } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
-const SENTIMENT_CONFIG: Record<string, { emoji: string; label: string; bg: string; text: string; border: string; dot: string }> = {
-  Positive: { emoji: '😊', label: 'Positive', bg: 'rgba(52,211,153,0.15)', text: '#34d399', border: 'rgba(52,211,153,0.3)', dot: '#34d399' },
-  Neutral: { emoji: '😐', label: 'Neutral', bg: 'rgba(251,191,36,0.15)', text: '#fbbf24', border: 'rgba(251,191,36,0.3)', dot: '#fbbf24' },
-  'Needs Attention': { emoji: '⚠️', label: 'Needs Attention', bg: 'rgba(248,113,113,0.15)', text: '#f87171', border: 'rgba(248,113,113,0.3)', dot: '#f87171' },
+const HEALTH_CONFIG: Record<string, { emoji: string; label: string; bg: string; text: string; border: string; dot: string }> = {
+  Hot: { emoji: '🔥', label: 'Hot', bg: 'rgba(52,211,153,0.15)', text: '#34d399', border: 'rgba(52,211,153,0.3)', dot: '#34d399' },
+  Warm: { emoji: '😊', label: 'Warm', bg: 'rgba(251,191,36,0.15)', text: '#fbbf24', border: 'rgba(251,191,36,0.3)', dot: '#fbbf24' },
+  Cold: { emoji: '❄️', label: 'Cold', bg: 'rgba(96,165,250,0.15)', text: '#60a5fa', border: 'rgba(96,165,250,0.3)', dot: '#60a5fa' },
+  Unknown: { emoji: '⚪', label: 'Unknown', bg: 'rgba(148,163,184,0.15)', text: '#94a3b8', border: 'rgba(148,163,184,0.3)', dot: '#94a3b8' },
 };
 
 export default function AISummariesPage() {
