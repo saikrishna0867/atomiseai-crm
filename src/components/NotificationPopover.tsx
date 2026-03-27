@@ -98,7 +98,7 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
         {/* Pending Tasks Banner — same px-5, consistent inner padding */}
         {taskCount > 0 && (
           <div
-            className="mx-5 mt-3 px-3 py-2.5 rounded-xl flex items-center gap-2.5"
+            className="mx-5 mt-3 px-3 py-2.5 rounded-xl flex items-center gap-2.5 my-[13px] mb-0"
             style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.12)' }}
           >
             <ClipboardList className="w-3.5 h-3.5 text-primary shrink-0" />
