@@ -145,57 +145,66 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
           </button>
         </div>
 
-        {/* Notification List — px-3 outer + px-2 inner = aligned with header px-5 */}
-        <div className="flex-1 overflow-y-auto px-3 py-2">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <Bell className="w-7 h-7 text-muted-foreground/25 mb-2" />
-              <p className="text-[13px] text-muted-foreground">No notifications yet</p>
-            </div>
-          ) : (
-            <div className="space-y-0.5">
-              {filtered.map((n: any) => {
-                const Icon = EVENT_ICONS[n.event_type] || ClipboardList;
-                const color = EVENT_COLORS[n.event_type] || '#a78bfa';
-                return (
-                  <div
-                    key={n.id}
-                    className="flex items-start gap-3 px-2 py-2.5 rounded-xl hover:bg-white/[0.03] transition-colors cursor-default"
-                  >
-                    {/* Icon — fixed 32x32, consistent with KPI card icons */}
+        {/* Notification List with scroll arrows */}
+        <div className="relative flex-1 min-h-0">
+          <button
+            onClick={() => listRef.current?.scrollBy({ top: -120, behavior: 'smooth' })}
+            className="absolute top-1 left-1/2 -translate-x-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center bg-background/80 backdrop-blur border border-border/30 hover:bg-muted/30 transition-colors"
+          >
+            <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
+          </button>
+          <div ref={listRef} className="h-full overflow-y-auto px-3 py-2 pt-8 pb-8">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Bell className="w-7 h-7 text-muted-foreground/25 mb-2" />
+                <p className="text-[13px] text-muted-foreground">No notifications yet</p>
+              </div>
+            ) : (
+              <div className="space-y-0.5">
+                {filtered.map((n: any) => {
+                  const Icon = EVENT_ICONS[n.event_type] || ClipboardList;
+                  const color = EVENT_COLORS[n.event_type] || '#a78bfa';
+                  return (
                     <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                      style={{ background: `${color}12` }}
+                      key={n.id}
+                      className="flex items-start gap-3 px-2 py-2.5 rounded-xl hover:bg-white/[0.03] transition-colors cursor-default"
                     >
-                      <Icon className="w-3.5 h-3.5" style={{ color }} />
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 min-w-0 pt-0.5">
-                      {/* Primary: description — 13px, foreground */}
-                      <p className="text-[13px] text-foreground leading-[1.4] line-clamp-2">{n.description}</p>
-                      {/* Secondary: timestamp + author — 11px, muted */}
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <span className="text-[11px] text-muted-foreground leading-none">
-                          {n.timestamp ? formatDistanceToNow(new Date(n.timestamp), { addSuffix: true }) : ''}
-                        </span>
-                        {n.performed_by && (
-                          <>
-                            <span className="text-muted-foreground/25 text-[11px]">·</span>
-                            <span className="text-[11px] text-muted-foreground/70 truncate max-w-[140px]">{n.performed_by}</span>
-                          </>
-                        )}
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ background: `${color}12` }}
+                      >
+                        <Icon className="w-3.5 h-3.5" style={{ color }} />
+                      </div>
+                      <div className="flex-1 min-w-0 pt-0.5">
+                        <p className="text-[13px] text-foreground leading-[1.4] line-clamp-2">{n.description}</p>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <span className="text-[11px] text-muted-foreground leading-none">
+                            {n.timestamp ? formatDistanceToNow(new Date(n.timestamp), { addSuffix: true }) : ''}
+                          </span>
+                          {n.performed_by && (
+                            <>
+                              <span className="text-muted-foreground/25 text-[11px]">·</span>
+                              <span className="text-[11px] text-muted-foreground/70 truncate max-w-[140px]">{n.performed_by}</span>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => listRef.current?.scrollBy({ top: 120, behavior: 'smooth' })}
+            className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center bg-background/80 backdrop-blur border border-border/30 hover:bg-muted/30 transition-colors"
+          >
+            <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+          </button>
         </div>
       </div>
     </>
