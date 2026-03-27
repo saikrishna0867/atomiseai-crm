@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -15,7 +16,7 @@ const teamMembers = [
 export default function SettingsPage() {
   const { toast } = useToast();
   const [companyName, setCompanyName] = useState('Atomise AI');
-  const [crmName, setCrmName] = useState('Atomise CRM');
+  const { crmName, setCrmName } = useAppSettings();
   const [testingN8n, setTestingN8n] = useState(false);
   const [testingSupabase, setTestingSupabase] = useState(false);
   const [n8nStatus, setN8nStatus] = useState<'idle' | 'connected' | 'error'>('idle');
