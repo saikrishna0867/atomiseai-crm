@@ -122,18 +122,22 @@ export default function TasksPage() {
               </div>
               <div className="p-3 space-y-2 max-h-[60vh] overflow-y-auto">
                 {filtered.filter((t: any) => t.status === status).map((t: any) => (
-                  <div
-                    key={t.id}
-                    className="rounded-xl p-3.5 border mb-2"
-                    style={{
-                      background: 'hsl(240 24% 10%)',
-                      borderColor: 'rgba(124,58,237,0.15)',
-                      borderLeft: `3px solid ${PRIORITY_BORDER[t.priority] || '#fbbf24'}`,
-                    }}
-                  >
-                    <div className="flex items-start gap-2">
-                      {isOverdue(t) && <span className="text-xs bg-destructive/20 text-destructive px-1.5 py-0.5 rounded font-medium">⚠️ Overdue</span>}
-                    </div>
+                  {(() => {
+                    const { isOverdue, isDueToday } = getDateStatus(t);
+                    return (
+                    <div
+                      key={t.id}
+                      className="rounded-xl p-3.5 border mb-2"
+                      style={{
+                        background: 'hsl(240 24% 10%)',
+                        borderColor: 'rgba(124,58,237,0.15)',
+                        borderLeft: `3px solid ${PRIORITY_BORDER[t.priority] || '#fbbf24'}`,
+                      }}
+                    >
+                      <div className="flex items-start gap-2">
+                        {isOverdue && <span className="text-xs bg-destructive/20 text-destructive px-1.5 py-0.5 rounded font-medium">⚠️ Overdue</span>}
+                        {isDueToday && <span className="text-xs bg-amber-400/20 text-amber-400 px-1.5 py-0.5 rounded font-medium">📅 Due Today</span>}
+                      </div>
                     <p className="text-sm font-medium text-foreground mt-1">{t.title}</p>
                     {t.contact_name && <p className="text-xs text-purple-bright mt-1">{t.contact_name}</p>}
                     <div className="flex items-center justify-between mt-2">
