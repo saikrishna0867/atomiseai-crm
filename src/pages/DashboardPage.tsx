@@ -23,7 +23,7 @@ export default function DashboardPage() {
         supabase.from('contacts').select('pipeline_stage'),
         supabase.from('pipeline_deals').select('deal_value, stage'),
         supabase.from('tasks').select('status'),
-        supabase.from('activity_log').select('*').order('created_at', { ascending: false }).limit(10),
+        supabase.from('activity_log').select('id, lead_id, event_type, description, performed_by, timestamp').order('timestamp', { ascending: false }).limit(10),
       ]);
 
       const contacts = contactsRes.data || [];
