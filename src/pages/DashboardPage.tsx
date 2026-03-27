@@ -45,13 +45,17 @@ export default function DashboardPage() {
         openTasks,
       });
 
-      // Stage distribution
+      // Stage distribution — always show all 6 stages
+      const allStages = ['Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'];
       const stageCounts: Record<string, number> = {};
+      allStages.forEach(s => { stageCounts[s] = 0; });
       contacts.forEach(c => {
-        const s = c.pipeline_stage || 'Unknown';
-        stageCounts[s] = (stageCounts[s] || 0) + 1;
+        const s = c.pipeline_stage || 'Lead';
+        if (stageCounts[s] !== undefined) {
+          stageCounts[s]++;
+        }
       });
-      setStageData(Object.entries(stageCounts).map(([name, value]) => ({ name, value })));
+      setStageData(allStages.map(name => ({ name, value: stageCounts[name] })));
 
       // Deal status breakdown
       const inProgress = deals.filter(d => d.stage !== 'Closed Won' && d.stage !== 'Closed Lost').length;
