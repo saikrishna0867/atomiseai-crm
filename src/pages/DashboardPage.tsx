@@ -232,7 +232,7 @@ export default function DashboardPage() {
                     {a.event_type?.replace(/_/g, ' ')}
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground mt-0.5 truncate">{a.description}</p>
+                <p className="text-sm mt-0.5 truncate py-[3px] font-light text-primary-foreground">{a.description}</p>
               </div>
               <div className="text-right shrink-0">
                 <p className="text-xs text-muted-foreground">{a.performed_by}</p>
