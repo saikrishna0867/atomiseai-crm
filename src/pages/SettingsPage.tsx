@@ -143,9 +143,6 @@ export default function SettingsPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="notifications" className="glass-card-purple p-6">
-          <p className="text-sm text-muted-foreground">Notification preferences coming soon.</p>
-        </TabsContent>
       </Tabs>
     </div>
   );
