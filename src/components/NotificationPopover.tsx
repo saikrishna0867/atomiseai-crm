@@ -112,15 +112,9 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
 
         {/* Filter Chips with arrows */}
         <div className="relative border-b my-[2px] mb-[12px]" style={{ borderColor: 'rgba(124,58,237,0.08)' }}>
-          <button
-            onClick={() => chipsRef.current?.scrollBy({ left: -120, behavior: 'smooth' })}
-            className="absolute left-1 top-1/2 -translate-y-1/2 z-10 w-6 h-6 rounded-full flex items-center justify-center bg-background/80 backdrop-blur border border-border/30 hover:bg-muted/30 transition-colors"
-          >
-            <ChevronLeft className="w-3.5 h-3.5 text-muted-foreground" />
-          </button>
           <div
             ref={chipsRef}
-            className="flex items-center gap-2 overflow-x-auto py-[24px] px-8 scrollbar-hide"
+            className="flex items-center gap-2 overflow-x-auto py-[24px] px-3 scrollbar-hide"
           >
             {eventTypes.map((type: string) => (
               <button
@@ -137,23 +131,11 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
               </button>
             ))}
           </div>
-          <button
-            onClick={() => chipsRef.current?.scrollBy({ left: 120, behavior: 'smooth' })}
-            className="absolute right-1 top-1/2 -translate-y-1/2 z-10 w-6 h-6 rounded-full flex items-center justify-center bg-background/80 backdrop-blur border border-border/30 hover:bg-muted/30 transition-colors"
-          >
-            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
-          </button>
         </div>
 
         {/* Notification List with scroll arrows */}
         <div className="relative flex-1 min-h-0">
-          <button
-            onClick={() => listRef.current?.scrollBy({ top: -120, behavior: 'smooth' })}
-            className="absolute top-1 left-1/2 -translate-x-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center bg-background/80 backdrop-blur border border-border/30 hover:bg-muted/30 transition-colors"
-          >
-            <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
-          </button>
-          <div ref={listRef} className="h-full overflow-y-auto px-3 py-2 pt-8 pb-8">
+          <div ref={listRef} className="h-full overflow-y-auto px-3 py-2">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
@@ -199,12 +181,6 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
               </div>
             )}
           </div>
-          <button
-            onClick={() => listRef.current?.scrollBy({ top: 120, behavior: 'smooth' })}
-            className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center bg-background/80 backdrop-blur border border-border/30 hover:bg-muted/30 transition-colors"
-          >
-            <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
-          </button>
         </div>
       </div>
     </>
