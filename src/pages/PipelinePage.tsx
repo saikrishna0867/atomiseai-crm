@@ -90,7 +90,7 @@ export default function PipelinePage() {
 
   const addMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from('pipeline_deals').insert({ ...form, stage: addStage, lead_id: crypto.randomUUID() });
+      const { error } = await supabase.from('pipeline_deals').insert({ ...form, deal_value: Number(form.deal_value) || 0, stage: addStage, lead_id: crypto.randomUUID() });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -180,7 +180,7 @@ export default function PipelinePage() {
               { key: 'contact_name', label: 'Contact Name', required: true },
               { key: 'contact_email', label: 'Contact Email', required: true, type: 'email' },
               { key: 'company', label: 'Company' },
-              { key: 'deal_value', label: 'Deal Value (£)', type: 'number' },
+              { key: 'deal_value', label: 'Deal Value (£)', type: 'number', required: true },
               { key: 'assigned_rep', label: 'Assigned Rep', required: true },
               { key: 'notes', label: 'Notes' },
             ].map(f => (
