@@ -90,7 +90,7 @@ export default function PipelinePage() {
 
   const addMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from('pipeline_deals').insert({ ...form, stage: addStage, lead_id: crypto.randomUUID() });
+      const { error } = await supabase.from('pipeline_deals').insert({ ...form, deal_value: Number(form.deal_value) || 0, stage: addStage, lead_id: crypto.randomUUID() });
       if (error) throw error;
     },
     onSuccess: () => {
