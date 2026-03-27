@@ -43,11 +43,19 @@ export default function CampaignsPage() {
       });
       if (error) throw error;
 
-      await webhooks.runCampaign({
-        campaignId, campaignName: form.campaign_name, targetStage: form.target_stage,
-        emailSubject: form.email_subject, emailBody: form.email_body,
-        repName: form.rep_name, repEmail: form.rep_email,
-      });
+      await Promise.allSettled([
+        webhooks.runCampaign({
+          campaignId, campaignName: form.campaign_name, targetStage: form.target_stage,
+          emailSubject: form.email_subject, emailBody: form.email_body,
+          repName: form.rep_name, repEmail: form.rep_email,
+        }),
+        supabase.from('activity_log').insert({
+          lead_id: campaignId,
+          event_type: 'campaign_launched',
+          description: `Campaign "${form.campaign_name}" launched targeting ${form.target_stage}`,
+          performed_by: form.rep_name,
+        }),
+      ]);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
