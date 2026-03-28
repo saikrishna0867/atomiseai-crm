@@ -1,46 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 240 47% 4%;
-    --foreground: 245 100% 97%;
+    --background: 230 54% 7%;
+    --foreground: 0 0% 100%;
 
-    --card: 240 24% 10%;
-    --card-foreground: 245 100% 97%;
+    --card: 235 55% 15%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 240 24% 10%;
-    --popover-foreground: 245 100% 97%;
+    --popover: 235 55% 11%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 263 70% 58%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 38 40% 61%;
+    --primary-foreground: 230 54% 7%;
 
-    --secondary: 240 24% 12%;
-    --secondary-foreground: 245 100% 97%;
+    --secondary: 235 55% 13%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 240 24% 14%;
-    --muted-foreground: 244 20% 55%;
+    --muted: 235 55% 16%;
+    --muted-foreground: 234 20% 58%;
 
-    --accent: 263 70% 58%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 38 40% 61%;
+    --accent-foreground: 230 54% 7%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 255 30% 18%;
-    --border-subtle: 255 30% 13%;
-    --input: 255 30% 18%;
-    --ring: 263 70% 58%;
+    --border: 38 40% 15%;
+    --border-subtle: 38 40% 10%;
+    --input: 38 40% 15%;
+    --ring: 38 40% 61%;
 
     --radius: 0.75rem;
 
-    --purple-primary: 263 70% 58%;
-    --purple-bright: 258 60% 66%;
-    --purple-glow: 258 90% 75%;
-    --purple-muted: 263 70% 35%;
+    --gold-primary: 38 40% 61%;
+    --gold-bright: 33 45% 67%;
+    --gold-highlight: 39 68% 70%;
+    --gold-muted: 38 40% 35%;
 
     --accent-cyan: 187 85% 53%;
     --accent-green: 160 68% 52%;
@@ -50,20 +48,20 @@
     --accent-pink: 330 70% 65%;
     --accent-amber: 43 96% 56%;
 
-    --bg-base: 240 47% 4%;
-    --bg-surface: 240 33% 8%;
-    --bg-card: 240 24% 10%;
-    --bg-elevated: 240 24% 14%;
-    --bg-hover: 240 24% 16%;
+    --bg-base: 230 54% 7%;
+    --bg-surface: 235 55% 11%;
+    --bg-card: 235 55% 15%;
+    --bg-elevated: 235 55% 20%;
+    --bg-hover: 235 55% 22%;
 
-    --sidebar-background: 240 40% 6%;
-    --sidebar-foreground: 244 20% 55%;
-    --sidebar-primary: 263 70% 58%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 263 70% 58%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 255 30% 13%;
-    --sidebar-ring: 263 70% 58%;
+    --sidebar-background: 230 54% 7%;
+    --sidebar-foreground: 234 20% 58%;
+    --sidebar-primary: 38 40% 61%;
+    --sidebar-primary-foreground: 230 54% 7%;
+    --sidebar-accent: 38 40% 61%;
+    --sidebar-accent-foreground: 230 54% 7%;
+    --sidebar-border: 38 40% 10%;
+    --sidebar-ring: 38 40% 61%;
   }
 }
 
@@ -87,40 +85,43 @@
   }
 
   .glass-card-purple {
-    background: linear-gradient(135deg, rgba(20,20,32,0.9) 0%, rgba(26,26,46,0.8) 100%);
+    background: linear-gradient(135deg, rgba(16,19,58,0.9) 0%, rgba(20,24,82,0.8) 100%);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(124, 58, 237, 0.15);
+    border: 1px solid rgba(201,169,110,0.15);
     border-radius: 16px;
   }
 
   .glass-input {
-    background: rgba(10, 10, 20, 0.8);
-    border: 1px solid rgba(124, 58, 237, 0.2);
+    background: rgba(7,9,30,0.8);
+    border: 1px solid rgba(201,169,110,0.20);
     border-radius: 10px;
     padding: 10px 14px;
-    color: var(--text-primary, #f1f0ff);
+    color: #ffffff;
     font-size: 14px;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
   .glass-input:focus {
-    border-color: #7c3aed;
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+    border-color: #c9a96e;
+    box-shadow: 0 0 0 3px rgba(201,169,110,0.12);
     outline: none;
   }
-
-  .purple-glow {
-    box-shadow: 0 0 24px rgba(124, 58, 237, 0.35);
+  .glass-input::placeholder {
+    color: #7a80b0;
   }
 
-  .purple-glow-sm {
-    box-shadow: 0 0 12px rgba(124, 58, 237, 0.25);
+  .gold-glow {
+    box-shadow: 0 0 24px rgba(201,169,110,0.30);
+  }
+
+  .gold-glow-sm {
+    box-shadow: 0 0 12px rgba(201,169,110,0.20);
   }
 
   .gradient-mesh {
     background: 
-      radial-gradient(ellipse at 20% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, rgba(6, 182, 212, 0.05) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+      radial-gradient(ellipse at 20% 50%, rgba(201,169,110,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(201,169,110,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 80%, rgba(201,169,110,0.05) 0%, transparent 50%);
   }
 
   .font-display {
@@ -156,9 +157,9 @@
   to { opacity: 1; transform: translateX(0); }
 }
 
-@keyframes pulse-purple {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
-  50% { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0); }
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201,169,110,0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(201,169,110,0); }
 }
 
 @keyframes shimmer {
@@ -168,8 +169,8 @@
 
 @keyframes float {
   0%, 100% { transform: translate(0, 0); }
-  33% { transform: translate(20px, -20px); }
-  66% { transform: translate(-10px, 10px); }
+  33% { transform: translate(16px, -16px); }
+  66% { transform: translate(-8px, 10px); }
 }
 
 @keyframes dotPulse {
@@ -190,7 +191,7 @@
 }
 
 .skeleton-shimmer {
-  background: linear-gradient(90deg, hsl(240 24% 10%) 25%, hsl(240 24% 14%) 50%, hsl(240 24% 10%) 75%);
+  background: linear-gradient(90deg, #10133a 25%, #141852 50%, #10133a 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 8px;
@@ -203,14 +204,23 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(240 40% 6%);
+  background: #07091e;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(255 30% 25%);
+  background: rgba(201,169,110,0.25);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(263 70% 58%);
+  background: #c9a96e;
+}
+
+/* Hide Lovable watermark */
+a[href*="lovable.dev"],
+[class*="lovable"],
+[id*="lovable"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }

@@ -27,9 +27,9 @@ export function TopHeader({ title, subtitle, userInitial }: TopHeaderProps) {
     <header
       className="h-16 flex items-center gap-4 px-6 sticky top-0 z-40 shrink-0 border-b"
       style={{
-        background: 'rgba(10,10,24,0.8)',
+        background: 'rgba(7,9,30,0.85)',
         backdropFilter: 'blur(12px)',
-        borderColor: 'rgba(124,58,237,0.1)',
+        borderColor: 'rgba(201,169,110,0.10)',
       }}
     >
       <div className="flex-1 min-w-0">
@@ -52,11 +52,11 @@ export function TopHeader({ title, subtitle, userInitial }: TopHeaderProps) {
       <div className="relative">
         <button
           onClick={() => setNotifOpen(!notifOpen)}
-          className="relative p-2 rounded-lg hover:bg-[rgba(124,58,237,0.08)] transition-colors"
+          className="relative p-2 rounded-lg hover:bg-[rgba(201,169,110,0.08)] transition-colors"
         >
           <Bell className="w-5 h-5 text-muted-foreground" />
           {taskCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
               {taskCount}
             </span>
           )}
@@ -66,8 +66,8 @@ export function TopHeader({ title, subtitle, userInitial }: TopHeaderProps) {
 
       {/* User Avatar */}
       <div
-        className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
-        style={{ background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}
+        className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+        style={{ background: '#10133a', border: '1px solid #c9a96e', color: '#c9a96e' }}
       >
         {userInitial}
       </div>
