@@ -113,7 +113,7 @@ export default function TasksPage() {
       {filtered.length === 0 ? (
         <EmptyState icon={CheckSquare} title="No tasks" description="Create a task to get started." action={<Button onClick={() => setAddOpen(true)} style={{ background: '#c9a96e', color: '#07091e' }}><Plus className="w-4 h-4 mr-2" /> Add Task</Button>} />
       ) : view === 'board' ? (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
           {STATUSES.map(status => (
             <div key={status} className="glass-card-purple rounded-2xl overflow-hidden">
               <div className="p-4 border-b" style={{ borderColor: 'rgba(201,169,110,0.10)' }}>
