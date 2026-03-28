@@ -100,7 +100,7 @@ export default function AppointmentsPage() {
   if (isLoading) return <div className="p-6"><div className="skeleton-shimmer h-96 rounded-2xl" /></div>;
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-4 md:p-6 space-y-4">
       <div className="flex items-center justify-end gap-2">
         <Button variant={view === 'calendar' ? 'default' : 'outline'} size="sm" onClick={() => setView('calendar')} className="gap-1 rounded-lg"><CalIcon className="w-4 h-4" /> Calendar</Button>
         <Button variant={view === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setView('list')} className="gap-1 rounded-lg"><List className="w-4 h-4" /> List</Button>
