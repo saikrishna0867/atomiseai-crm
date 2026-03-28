@@ -129,6 +129,9 @@ export default function DashboardPage() {
                 axisLine={false}
                 tickLine={false}
                 interval={0}
+                angle={0}
+                minTickGap={0}
+                tickMargin={8}
                 tick={({ x, y, payload }: any) => {
                   const abbrevMap: Record<string, string> = {
                     'Lead': 'Lead',
@@ -141,12 +144,12 @@ export default function DashboardPage() {
                   const isMobile = window.innerWidth < 640;
                   const label = isMobile ? (abbrevMap[payload.value] || payload.value) : payload.value;
                   return (
-                    <text x={x} y={y + 12} textAnchor="middle" fill="#7a80b0" fontSize={isMobile ? 9 : 11}>
+                    <text x={x} y={y + 14} textAnchor="middle" dominantBaseline="hanging" fill="#7a80b0" fontSize={isMobile ? 9 : 11} transform="">
                       {label}
                     </text>
                   );
                 }}
-                height={30}
+                height={28}
               />
               <YAxis tick={{ fill: '#7a80b0', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
