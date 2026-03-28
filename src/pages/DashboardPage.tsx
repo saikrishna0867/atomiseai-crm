@@ -120,11 +120,11 @@ export default function DashboardPage() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 md:gap-4">
-        <div className="lg:col-span-3 glass-card-purple p-6 animate-fade-up" style={{ animationDelay: '300ms' }}>
-          <h3 className="font-display font-semibold text-foreground mb-4">Pipeline Overview</h3>
-          <ResponsiveContainer width="100%" height={260}>
+        <div className="lg:col-span-3 glass-card-purple p-4 md:p-6 animate-fade-up" style={{ animationDelay: '300ms' }}>
+          <h3 className="font-display font-semibold text-foreground mb-3 md:mb-4 text-sm md:text-base">Pipeline Overview</h3>
+          <ResponsiveContainer width="100%" height={220}>
             <BarChart data={stageData} barCategoryGap="20%">
-              <XAxis dataKey="name" tick={{ fill: '#7a80b0', fontSize: 11 }} axisLine={false} tickLine={false} interval={0} />
+              <XAxis dataKey="name" tick={{ fill: '#7a80b0', fontSize: 10 }} axisLine={false} tickLine={false} interval={0} angle={-35} textAnchor="end" height={50} />
               <YAxis tick={{ fill: '#7a80b0', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
                 cursor={{ fill: 'rgba(201,169,110,0.08)' }}
@@ -155,11 +155,11 @@ export default function DashboardPage() {
             </BarChart>
           </ResponsiveContainer>
         </div>
-        <div className="lg:col-span-2 glass-card-purple p-6 animate-fade-up" style={{ animationDelay: '400ms' }}>
-          <h3 className="font-display font-semibold text-foreground mb-4">Deal Status</h3>
-          <ResponsiveContainer width="100%" height={220}>
+        <div className="lg:col-span-2 glass-card-purple p-4 md:p-6 animate-fade-up" style={{ animationDelay: '400ms' }}>
+          <h3 className="font-display font-semibold text-foreground mb-3 md:mb-4 text-sm md:text-base">Deal Status</h3>
+          <ResponsiveContainer width="100%" height={200}>
             <PieChart>
-              <Pie data={dealStatusData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} dataKey="value" stroke="none">
+              <Pie data={dealStatusData} cx="50%" cy="50%" innerRadius={50} outerRadius={75} dataKey="value" stroke="none">
                 {dealStatusData.map((_, i) => (
                   <Cell key={i} fill={PIE_COLORS[i]} />
                 ))}
@@ -167,11 +167,11 @@ export default function DashboardPage() {
               <Tooltip contentStyle={{ background: 'rgba(13,15,43,0.95)', border: '1px solid rgba(201,169,110,0.3)', borderRadius: 12, color: '#fff' }} />
             </PieChart>
           </ResponsiveContainer>
-          <div className="text-center -mt-[148px] mb-[108px]">
-            <p className="text-2xl font-display font-bold text-foreground">{totalDeals}</p>
-            <p className="text-xs text-muted-foreground">Total Deals</p>
+          <div className="text-center -mt-[130px] mb-[90px]">
+            <p className="text-xl md:text-2xl font-display font-bold text-foreground">{totalDeals}</p>
+            <p className="text-[10px] md:text-xs text-muted-foreground">Total Deals</p>
           </div>
-          <div className="flex justify-center gap-4 mt-2">
+          <div className="flex flex-wrap justify-center gap-3 md:gap-4 mt-2">
             {dealStatusData.map((d, i) => (
               <div key={d.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: PIE_COLORS[i] }} />
@@ -186,7 +186,7 @@ export default function DashboardPage() {
       <div className="flex flex-wrap gap-2 md:gap-3 animate-fade-up" style={{ animationDelay: '500ms' }}>
         <Button
           onClick={() => navigate('/contacts')}
-          className="gap-2 font-display text-sm rounded-xl px-5 py-2.5 transition-all duration-200"
+          className="gap-2 font-display text-xs md:text-sm rounded-xl px-3 md:px-5 py-2 md:py-2.5 transition-all duration-200"
           style={{ background: '#c9a96e', color: '#07091e', boxShadow: '0 4px 20px rgba(201,169,110,0.4)' }}
         >
           <Plus className="w-4 h-4" /> Add Contact
@@ -194,7 +194,7 @@ export default function DashboardPage() {
         <Button
           onClick={() => navigate('/pipeline')}
           variant="outline"
-          className="gap-2 text-[#c9a96e] hover:bg-[rgba(201,169,110,0.08)] rounded-xl px-5 py-2.5 transition-all duration-200"
+          className="gap-2 text-[#c9a96e] hover:bg-[rgba(201,169,110,0.08)] rounded-xl px-3 md:px-5 py-2 md:py-2.5 transition-all duration-200 text-xs md:text-sm"
           style={{ borderColor: 'rgba(201,169,110,0.40)' }}
         >
           <Plus className="w-4 h-4" /> New Deal
@@ -202,29 +202,29 @@ export default function DashboardPage() {
         <Button
           onClick={() => navigate('/appointments')}
           variant="ghost"
-          className="gap-2 text-muted-foreground hover:text-foreground rounded-xl px-5 py-2.5 transition-all duration-200"
+          className="gap-2 text-muted-foreground hover:text-foreground rounded-xl px-3 md:px-5 py-2 md:py-2.5 transition-all duration-200 text-xs md:text-sm"
           style={{ border: '1px solid rgba(201,169,110,0.15)' }}
         >
-          <CalendarDays className="w-4 h-4" /> Schedule Appointment
+          <CalendarDays className="w-4 h-4" /> <span className="hidden sm:inline">Schedule</span> Appt
         </Button>
       </div>
 
       {/* Activity Feed */}
-      <div className="glass-card-purple p-6 animate-slide-in" style={{ animationDelay: '600ms' }}>
-        <h3 className="font-display font-semibold text-foreground mb-4">Recent Activity</h3>
+      <div className="glass-card-purple p-4 md:p-6 animate-slide-in" style={{ animationDelay: '600ms' }}>
+        <h3 className="font-display font-semibold text-foreground mb-3 md:mb-4 text-sm md:text-base">Recent Activity</h3>
         <div className="space-y-1">
           {activities.length === 0 ? (
             <p className="text-sm text-muted-foreground">No recent activity</p>
           ) : activities.map((a) => (
-            <div key={a.id} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-[rgba(201,169,110,0.04)] transition-colors my-[11px]">
+            <div key={a.id} className="flex items-start sm:items-center gap-2.5 md:gap-3 py-2.5 md:py-3 px-2 md:px-3 rounded-lg hover:bg-[rgba(201,169,110,0.04)] transition-colors my-1 md:my-[11px]">
               <div
-                className="w-3 h-3 rounded-full shrink-0"
+                className="w-2.5 md:w-3 h-2.5 md:h-3 rounded-full shrink-0 mt-1.5 sm:mt-0"
                 style={{ background: EVENT_COLORS[a.event_type] || '#c9a96e' }}
               />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span
-                    className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border"
+                    className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] md:text-[10px] font-medium border"
                     style={{
                       background: `${EVENT_COLORS[a.event_type] || '#c9a96e'}15`,
                       color: EVENT_COLORS[a.event_type] || '#c9a96e',
@@ -234,7 +234,7 @@ export default function DashboardPage() {
                     {a.event_type?.replace(/_/g, ' ')}
                   </span>
                 </div>
-                <p className="text-sm mt-0.5 truncate py-[3px] font-light text-white">{a.description}</p>
+                <p className="text-xs md:text-sm mt-0.5 py-[2px] md:py-[3px] font-light text-white line-clamp-2 sm:truncate">{a.description}</p>
               </div>
               <div className="text-right shrink-0">
                 <p className="text-xs text-muted-foreground">{a.performed_by}</p>

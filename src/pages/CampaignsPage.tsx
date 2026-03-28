@@ -129,8 +129,8 @@ export default function CampaignsPage() {
       {campaigns.length === 0 ? (
         <EmptyState icon={Mail} title="No campaigns" description="Create and launch your first email campaign." action={<Button onClick={() => setAddOpen(true)} style={{ background: '#c9a96e', color: '#07091e' }}><Plus className="w-4 h-4 mr-2" /> Create Campaign</Button>} />
       ) : (
-        <div className="glass-card-purple overflow-hidden rounded-2xl">
-          <table className="w-full text-sm">
+        <div className="glass-card-purple overflow-hidden rounded-2xl overflow-x-auto">
+          <table className="w-full text-sm min-w-[700px]">
            <thead><tr style={{ background: 'rgba(201,169,110,0.08)', borderBottom: '1px solid rgba(201,169,110,0.15)' }}>
               {['Name', 'Target Stage', 'Status', 'Contacts', 'Launched', 'Launched By', 'Actions'].map(h => (
                 <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{h}</th>

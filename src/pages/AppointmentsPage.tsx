@@ -128,7 +128,7 @@ export default function AppointmentsPage() {
                   <button
                     key={day.toISOString()}
                     onClick={() => setSelectedDate(day)}
-                    className={`min-h-[80px] p-2 rounded-lg text-sm transition-all relative border ${isSelected ? 'border-[rgba(201,169,110,0.4)] text-[#c9a96e]' : isToday ? 'border-[rgba(201,169,110,0.15)] text-[#c9a96e]' : 'border-[rgba(201,169,110,0.08)] hover:bg-[rgba(201,169,110,0.04)] text-foreground'}`}
+                    className={`min-h-[48px] sm:min-h-[80px] p-1 sm:p-2 rounded-lg text-xs sm:text-sm transition-all relative border ${isSelected ? 'border-[rgba(201,169,110,0.4)] text-[#c9a96e]' : isToday ? 'border-[rgba(201,169,110,0.15)] text-[#c9a96e]' : 'border-[rgba(201,169,110,0.08)] hover:bg-[rgba(201,169,110,0.04)] text-foreground'}`}
                     style={isSelected ? { background: 'rgba(201,169,110,0.10)' } : isToday ? { background: 'rgba(201,169,110,0.05)' } : undefined}
                   >
                     <span className="absolute top-2 left-2">{format(day, 'd')}</span>
