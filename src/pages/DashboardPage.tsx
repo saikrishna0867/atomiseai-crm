@@ -120,11 +120,11 @@ export default function DashboardPage() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 md:gap-4">
-        <div className="lg:col-span-3 glass-card-purple p-6 animate-fade-up" style={{ animationDelay: '300ms' }}>
-          <h3 className="font-display font-semibold text-foreground mb-4">Pipeline Overview</h3>
-          <ResponsiveContainer width="100%" height={260}>
+        <div className="lg:col-span-3 glass-card-purple p-4 md:p-6 animate-fade-up" style={{ animationDelay: '300ms' }}>
+          <h3 className="font-display font-semibold text-foreground mb-3 md:mb-4 text-sm md:text-base">Pipeline Overview</h3>
+          <ResponsiveContainer width="100%" height={220}>
             <BarChart data={stageData} barCategoryGap="20%">
-              <XAxis dataKey="name" tick={{ fill: '#7a80b0', fontSize: 11 }} axisLine={false} tickLine={false} interval={0} />
+              <XAxis dataKey="name" tick={{ fill: '#7a80b0', fontSize: 10 }} axisLine={false} tickLine={false} interval={0} angle={-35} textAnchor="end" height={50} />
               <YAxis tick={{ fill: '#7a80b0', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
                 cursor={{ fill: 'rgba(201,169,110,0.08)' }}
