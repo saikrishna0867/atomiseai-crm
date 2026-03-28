@@ -119,7 +119,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 md:gap-4">
         <div className="lg:col-span-3 glass-card-purple p-6 animate-fade-up" style={{ animationDelay: '300ms' }}>
           <h3 className="font-display font-semibold text-foreground mb-4">Pipeline Overview</h3>
           <ResponsiveContainer width="100%" height={260}>
