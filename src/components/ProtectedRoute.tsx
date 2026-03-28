@@ -3,10 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
-
-  // Allow preview mode bypass — auth works correctly on published URL
-  const isPreview = window.location.hostname.includes('lovableproject.com') || window.location.hostname.includes('lovable.app');
+  const { user, loading, isPreviewBypass } = useAuth();
 
   if (loading) {
     return (
@@ -16,7 +13,8 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!user && !isPreview) return <Navigate to="/login" replace />;
+  // Allow access if user is authenticated OR in preview bypass mode
+  if (!user && !isPreviewBypass) return <Navigate to="/login" replace />;
 
   return <>{children}</>;
 }
