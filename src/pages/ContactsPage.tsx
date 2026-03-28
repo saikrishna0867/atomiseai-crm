@@ -75,21 +75,21 @@ export default function ContactsPage() {
       if (error) throw error;
 
       await Promise.allSettled([
-      webhooks.newLead({
-        name: form.name, email: form.email, phone: form.phone, company: form.company,
-        source: form.source, assignedRep: form.assigned_rep, assignedRepEmail: form.assigned_rep_email,
-        pipelineStage: form.pipeline_stage, notes: form.notes
-      }),
-      webhooks.startDrip({
-        leadId, contactName: form.name, contactEmail: form.email,
-        assignedRep: form.assigned_rep, assignedRepEmail: form.assigned_rep_email,
-        source: form.source, company: form.company
-      }),
-      supabase.from('activity_log').insert({
-        lead_id: leadId, event_type: 'lead_assigned',
-        description: 'Contact added to CRM', performed_by: 'System (n8n)'
-      })]
-      );
+        webhooks.newLead({
+          name: form.name, email: form.email, phone: form.phone, company: form.company,
+          source: form.source, assignedRep: form.assigned_rep, assignedRepEmail: form.assigned_rep_email,
+          pipelineStage: form.pipeline_stage, notes: form.notes
+        }),
+        webhooks.startDrip({
+          leadId, contactName: form.name, contactEmail: form.email,
+          assignedRep: form.assigned_rep, assignedRepEmail: form.assigned_rep_email,
+          source: form.source, company: form.company
+        }),
+        supabase.from('activity_log').insert({
+          lead_id: leadId, event_type: 'lead_assigned',
+          description: 'Contact added to CRM', performed_by: 'System (n8n)'
+        })
+      ]);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
@@ -126,24 +126,23 @@ export default function ContactsPage() {
         <div className="skeleton-shimmer h-10 w-48 rounded-xl" />
         <div className="skeleton-shimmer h-12 rounded-xl" />
         <div className="skeleton-shimmer h-96 rounded-2xl" />
-      </div>);
-
+      </div>
+    );
   }
 
   return (
     <div className="p-6 space-y-5">
-      {/* Filter Bar */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px] max-w-[320px]">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search contacts..." className="glass-input w-full pr-3 text-sm rounded-[10px]" style={{ paddingLeft: '2.5rem' }} />
         </div>
         {[
-        { value: stageFilter, onChange: setStageFilter, options: STAGES, label: 'Stage', width: 'w-40' },
-        { value: sourceFilter, onChange: setSourceFilter, options: SOURCES, label: 'Source', width: 'w-36' },
-        { value: priorityFilter, onChange: setPriorityFilter, options: PRIORITIES, label: 'Priority', width: 'w-32' }].
-        map((f) =>
-        <Select key={f.label} value={f.value} onValueChange={f.onChange}>
+          { value: stageFilter, onChange: setStageFilter, options: STAGES, label: 'Stage', width: 'w-40' },
+          { value: sourceFilter, onChange: setSourceFilter, options: SOURCES, label: 'Source', width: 'w-36' },
+          { value: priorityFilter, onChange: setPriorityFilter, options: PRIORITIES, label: 'Priority', width: 'w-32' },
+        ].map((f) =>
+          <Select key={f.label} value={f.value} onValueChange={f.onChange}>
             <SelectTrigger className={`${f.width} glass-input text-sm`}><SelectValue placeholder={f.label} /></SelectTrigger>
             <SelectContent className="bg-card border-border">
               <SelectItem value="all">All {f.label === 'Priority' ? 'Priorities' : `${f.label}s`}</SelectItem>
@@ -152,33 +151,32 @@ export default function ContactsPage() {
           </Select>
         )}
         <div className="flex-1" />
-        <Button onClick={() => setAddOpen(true)} className="gap-2 font-display text-sm rounded-xl px-5 shadow-[0_4px_20px_rgba(124,58,237,0.4)] hover:shadow-[0_8px_24px_rgba(124,58,237,0.5)] hover:translate-y-[-1px] transition-all duration-200">
+        <Button onClick={() => setAddOpen(true)} className="gap-2 font-display text-sm rounded-xl px-5 transition-all duration-200" style={{ background: '#c9a96e', color: '#07091e', boxShadow: '0 4px 20px rgba(201,169,110,0.4)' }}>
           <Plus className="w-4 h-4" /> Add Contact
         </Button>
       </div>
 
-      {/* Table */}
       {filtered.length === 0 ?
-      <EmptyState icon={Users} title="No contacts yet" description="Add your first contact to get started." action={<Button onClick={() => setAddOpen(true)} className="gap-2"><Plus className="w-4 h-4" /> Add Contact</Button>} /> :
+        <EmptyState icon={Users} title="No contacts yet" description="Add your first contact to get started." action={<Button onClick={() => setAddOpen(true)} className="gap-2" style={{ background: '#c9a96e', color: '#07091e' }}><Plus className="w-4 h-4" /> Add Contact</Button>} /> :
 
-      <div className="rounded-2xl border overflow-hidden" style={{ borderColor: 'rgba(124,58,237,0.18)', background: 'hsl(240 24% 10%)' }}>
+        <div className="rounded-2xl border overflow-hidden" style={{ borderColor: 'rgba(201,169,110,0.15)', background: '#10133a' }}>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr style={{ background: 'rgba(124,58,237,0.08)', borderBottom: '1px solid rgba(124,58,237,0.15)' }}>
+                <tr style={{ background: 'rgba(201,169,110,0.08)', borderBottom: '1px solid rgba(201,169,110,0.15)' }}>
                   <th className="w-10 px-4 py-3"><Checkbox className="border-muted-foreground/40 pointer-events-none" checked={false} /></th>
                   {['Name', 'Phone', 'Company', 'Stage', 'Priority', 'Rep', 'Source', 'Created', 'Actions'].map((h) =>
-                <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{h}</th>
-                )}
+                    <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{h}</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((c: any) =>
-              <tr key={c.id} className="h-[60px] border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(124,58,237,0.05)] transition-[background] duration-150">
+                  <tr key={c.id} className="h-[60px] border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(201,169,110,0.04)] transition-[background] duration-150">
                     <td className="px-4 py-3"><Checkbox className="border-muted-foreground/40 data-[state=checked]:bg-primary data-[state=checked]:border-primary" /></td>
                     <td className="px-4 py-3 min-w-[200px]">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: 'linear-gradient(135deg, #7c3aed, #6d28d9)' }}>
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: '#10133a', border: '1px solid #c9a96e', color: '#c9a96e' }}>
                           {c.name?.charAt(0)}
                         </div>
                         <div>
@@ -222,25 +220,24 @@ export default function ContactsPage() {
                       </DropdownMenu>
                     </td>
                   </tr>
-              )}
+                )}
               </tbody>
             </table>
           </div>
         </div>
       }
 
-      {/* Add Contact Modal */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="p-0 border-0 bg-transparent shadow-none max-w-[560px]">
           <div
             className="rounded-[20px] overflow-hidden max-h-[90vh] overflow-y-auto"
             style={{
-              background: '#141420',
-              border: '1px solid rgba(124,58,237,0.3)',
-              boxShadow: '0 24px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(124,58,237,0.15)'
+              background: '#0d0f2b',
+              border: '1px solid rgba(201,169,110,0.25)',
+              boxShadow: '0 24px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(201,169,110,0.10)'
             }}>
             
-            <div className="p-6 border-b" style={{ borderColor: 'rgba(124,58,237,0.15)' }}>
+            <div className="p-6 border-b" style={{ borderColor: 'rgba(201,169,110,0.12)' }}>
               <DialogHeader>
                 <DialogTitle className="font-display text-xl font-bold text-foreground">Add New Contact</DialogTitle>
               </DialogHeader>
@@ -248,7 +245,6 @@ export default function ContactsPage() {
             </div>
             <form onSubmit={async (e) => {
               e.preventDefault();
-              // Check for duplicate email
               const existing = contacts.find((c: any) => c.email?.toLowerCase() === form.email.toLowerCase());
               if (existing && !pendingSubmit) {
                 setEmailWarning(true);
@@ -313,13 +309,12 @@ export default function ContactsPage() {
                 <Button type="button" variant="ghost" onClick={() => setAddOpen(false)} className="text-muted-foreground">Cancel</Button>
                 <Button
                   type="submit"
-                  className="flex-1 font-display text-[15px] rounded-xl h-12 shadow-[0_4px_20px_rgba(124,58,237,0.4)] bg-gradient-to-r from-primary to-[#4c1d95] hover:shadow-[0_8px_24px_rgba(124,58,237,0.5)] transition-all duration-200"
+                  className="flex-1 font-display text-[15px] rounded-xl h-12 transition-all duration-200"
+                  style={{ background: '#c9a96e', color: '#07091e', boxShadow: '0 4px 20px rgba(201,169,110,0.4)' }}
                   disabled={addMutation.isPending}>
-                  
                   {addMutation.isPending ?
-                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving & triggering automation...</> :
-
-                  'Add Contact + Trigger Automation ⚡'
+                    <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving & triggering automation...</> :
+                    'Add Contact + Trigger Automation ⚡'
                   }
                 </Button>
               </div>
@@ -335,7 +330,6 @@ export default function ContactsPage() {
         description="This action cannot be undone."
         onConfirm={() => deleteId && deleteMutation.mutate(deleteId)}
         loading={deleteMutation.isPending} />
-      
 
       <ConfirmDialog
         open={emailWarning}
@@ -349,7 +343,6 @@ export default function ContactsPage() {
           setPendingSubmit(true);
           setTimeout(() => addMutation.mutate(), 0);
         }} />
-      
-    </div>);
-
+    </div>
+  );
 }

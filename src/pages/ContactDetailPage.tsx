@@ -12,8 +12,8 @@ import { ArrowLeft, Sparkles, Loader2, Mail, Phone, Building2 } from 'lucide-rea
 import { formatDistanceToNow, format } from 'date-fns';
 
 const EVENT_COLORS: Record<string, string> = {
-  lead_assigned: '#22d3ee', stage_change: '#fbbf24', campaign_email_sent: '#7c3aed',
-  campaign_launched: '#7c3aed', appointment_booked: '#34d399', drip_email_sent: '#60a5fa',
+  lead_assigned: '#22d3ee', stage_change: '#fbbf24', campaign_email_sent: '#c9a96e',
+  campaign_launched: '#c9a96e', appointment_booked: '#34d399', drip_email_sent: '#60a5fa',
   ai_summary_generated: '#f472b6',
 };
 
@@ -93,17 +93,16 @@ export default function ContactDetailPage() {
         <ArrowLeft className="w-4 h-4" /> Back to Contacts
       </Button>
 
-      {/* Hero Header */}
       <div
         className="rounded-2xl p-6 flex items-center gap-5"
         style={{
-          background: 'linear-gradient(135deg, rgba(124,58,237,0.08) 0%, rgba(20,20,40,0.9) 100%)',
-          border: '1px solid rgba(124,58,237,0.2)',
+          background: 'linear-gradient(135deg, rgba(201,169,110,0.06) 0%, rgba(16,19,58,0.9) 100%)',
+          border: '1px solid rgba(201,169,110,0.20)',
         }}
       >
         <div
-          className="w-[60px] h-[60px] rounded-full flex items-center justify-center text-2xl font-bold text-white font-display shrink-0"
-          style={{ background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}
+          className="w-[60px] h-[60px] rounded-full flex items-center justify-center text-2xl font-bold font-display shrink-0"
+          style={{ background: '#10133a', border: '2px solid #c9a96e', color: '#c9a96e' }}
         >
           {contact.name?.charAt(0)}
         </div>
@@ -122,7 +121,6 @@ export default function ContactDetailPage() {
         </div>
       </div>
 
-      {/* Tabs */}
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList className="bg-secondary border border-border rounded-xl">
           {['overview', 'activity', 'tasks', 'appointments', 'ai'].map(t => (
@@ -141,15 +139,15 @@ export default function ContactDetailPage() {
 
         <TabsContent value="activity" className="glass-card-purple p-6 space-y-1">
           {activities.length === 0 ? <p className="text-sm text-muted-foreground">No activity yet</p> : activities.map((a: any, i: number) => (
-            <div key={a.id} className={`flex items-start gap-3 py-3 px-3 rounded-lg ${i % 2 === 0 ? 'bg-[rgba(124,58,237,0.03)]' : ''}`}>
-              <div className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" style={{ background: EVENT_COLORS[a.event_type] || '#7c3aed' }} />
+            <div key={a.id} className={`flex items-start gap-3 py-3 px-3 rounded-lg ${i % 2 === 0 ? 'bg-[rgba(201,169,110,0.03)]' : ''}`}>
+              <div className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" style={{ background: EVENT_COLORS[a.event_type] || '#c9a96e' }} />
               <div className="flex-1">
                 <span
                   className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border mb-1"
                   style={{
-                    background: `${EVENT_COLORS[a.event_type] || '#7c3aed'}15`,
-                    color: EVENT_COLORS[a.event_type] || '#7c3aed',
-                    borderColor: `${EVENT_COLORS[a.event_type] || '#7c3aed'}30`,
+                    background: `${EVENT_COLORS[a.event_type] || '#c9a96e'}15`,
+                    color: EVENT_COLORS[a.event_type] || '#c9a96e',
+                    borderColor: `${EVENT_COLORS[a.event_type] || '#c9a96e'}30`,
                   }}
                 >
                   {a.event_type?.replace(/_/g, ' ')}
@@ -163,7 +161,7 @@ export default function ContactDetailPage() {
 
         <TabsContent value="tasks" className="glass-card-purple p-6 space-y-3">
           {tasks.length === 0 ? <p className="text-sm text-muted-foreground">No tasks</p> : tasks.map((t: any) => (
-            <div key={t.id} className="flex items-center gap-3 py-2 border-b border-border/30 last:border-0">
+            <div key={t.id} className="flex items-center gap-3 py-2 border-b last:border-0" style={{ borderColor: 'rgba(201,169,110,0.10)' }}>
               <StatusBadge type="status" value={t.status} />
               <span className="text-sm text-foreground flex-1">{t.title}</span>
               <StatusBadge type="priority" value={t.priority} />
@@ -174,7 +172,7 @@ export default function ContactDetailPage() {
 
         <TabsContent value="appointments" className="glass-card-purple p-6 space-y-3">
           {appointments.length === 0 ? <p className="text-sm text-muted-foreground">No appointments</p> : appointments.map((a: any) => (
-            <div key={a.id} className="flex items-center gap-3 py-2 border-b border-border/30 last:border-0">
+            <div key={a.id} className="flex items-center gap-3 py-2 border-b last:border-0" style={{ borderColor: 'rgba(201,169,110,0.10)' }}>
               <StatusBadge type="status" value={a.status || 'Scheduled'} />
               <span className="text-sm text-foreground flex-1">{a.appointment_type}</span>
               <span className="text-xs text-muted-foreground">{a.appointment_date} at {a.appointment_time}</span>
@@ -186,8 +184,8 @@ export default function ContactDetailPage() {
           <button
             onClick={generateSummary}
             disabled={aiLoading}
-            className="flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-display font-semibold text-white disabled:opacity-50 transition-all"
-            style={{ background: 'linear-gradient(135deg, #7c3aed, #4c1d95)', boxShadow: '0 4px 20px rgba(124,58,237,0.4)' }}
+            className="flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-display font-semibold disabled:opacity-50 transition-all"
+            style={{ background: 'linear-gradient(135deg, #c9a96e, #a8823c)', color: '#07091e', boxShadow: '0 4px 20px rgba(201,169,110,0.35)' }}
           >
             {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             {aiLoading ? '🤖 AI is analyzing...' : '🤖 Generate AI Summary'}
@@ -202,11 +200,11 @@ export default function ContactDetailPage() {
           )}
           {!aiLoading && aiSummary && (
             <div className="space-y-4">
-              <div className="border-l-[3px] border-primary pl-4 py-2 rounded-r-lg" style={{ background: 'rgba(124,58,237,0.04)' }}>
-                <p className="text-sm text-muted-foreground leading-relaxed">{aiSummary.summary}</p>
+              <div className="border-l-[3px] pl-4 py-2 rounded-r-lg" style={{ borderColor: '#c9a96e', background: 'rgba(201,169,110,0.04)' }}>
+                <p className="text-sm leading-relaxed" style={{ color: '#d4b483' }}>{aiSummary.summary}</p>
               </div>
               {aiSummary.next_action && (
-                <div className="rounded-lg p-3 border-l-[3px]" style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.2)', borderLeft: '3px solid #fbbf24', color: '#fbbf24' }}>
+                <div className="rounded-lg p-3 border-l-[3px]" style={{ background: 'rgba(232,201,138,0.06)', border: '1px solid rgba(232,201,138,0.20)', borderLeft: '3px solid #e8c98a', color: '#e8c98a' }}>
                   <p className="text-[11px] uppercase tracking-wider mb-1 opacity-70">Next Action</p>
                   {aiSummary.next_action}
                 </div>

@@ -27,7 +27,6 @@ export default function SettingsPage() {
   const testN8n = async () => {
     setTestingN8n(true);
     try {
-      // n8n is connected if webhooks work — just show connected
       setN8nStatus('connected');
       toast({ title: 'n8n connection test successful ✅' });
     } catch {
@@ -43,7 +42,7 @@ export default function SettingsPage() {
     try {
       const { error } = await supabase.from('contacts').select('id').limit(1);
       setSupabaseStatus(error ? 'error' : 'connected');
-      toast({ title: error ? 'Connection error' : 'Supabase connection test successful ✅', variant: error ? 'destructive' : 'default' });
+      toast({ title: error ? 'Connection error' : 'Database connection test successful ✅', variant: error ? 'destructive' : 'default' });
     } catch {
       setSupabaseStatus('error');
     } finally {
@@ -64,7 +63,6 @@ export default function SettingsPage() {
           <TabsTrigger value="general" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">General</TabsTrigger>
           <TabsTrigger value="team" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">Team</TabsTrigger>
           <TabsTrigger value="integrations" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">Integrations</TabsTrigger>
-          
         </TabsList>
 
         <TabsContent value="general" className="glass-card-purple p-6 space-y-4">
@@ -76,17 +74,17 @@ export default function SettingsPage() {
             <Label className="text-xs text-muted-foreground">CRM Name</Label>
             <input value={crmName} onChange={e => setCrmName(e.target.value)} className="glass-input w-full" />
           </div>
-          <Button onClick={() => toast({ title: 'Settings saved ✅' })} className="font-display rounded-xl">Save Changes</Button>
+          <Button onClick={() => toast({ title: 'Settings saved ✅' })} className="font-display rounded-xl" style={{ background: '#c9a96e', color: '#07091e' }}>Save Changes</Button>
         </TabsContent>
 
         <TabsContent value="team" className="glass-card-purple p-6 space-y-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-display font-semibold text-foreground">Team Members</h3>
-            <Button size="sm" onClick={() => toast({ title: 'Invite sent ✉️' })} className="gap-2 font-display rounded-xl"><UserPlus className="w-4 h-4" /> Invite Member</Button>
+            <Button size="sm" onClick={() => toast({ title: 'Invite sent ✉️' })} className="gap-2 font-display rounded-xl" style={{ background: '#c9a96e', color: '#07091e' }}><UserPlus className="w-4 h-4" /> Invite Member</Button>
           </div>
-          <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(124,58,237,0.15)' }}>
+          <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(201,169,110,0.15)' }}>
             <table className="w-full text-sm">
-              <thead><tr style={{ background: 'rgba(124,58,237,0.08)' }}>
+              <thead><tr style={{ background: 'rgba(201,169,110,0.08)' }}>
                 {['Name', 'Email', 'Role'].map(h => (
                   <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{h}</th>
                 ))}
@@ -97,7 +95,9 @@ export default function SettingsPage() {
                     <td className="px-4 py-3 text-foreground">{m.name}</td>
                     <td className="px-4 py-3 text-muted-foreground">{m.email}</td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${m.role === 'Admin' ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-accent-blue/10 text-accent-blue border border-accent-blue/20'}`}>
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${m.role === 'Admin' ? 'border' : 'bg-accent-blue/10 text-accent-blue border border-accent-blue/20'}`}
+                        style={m.role === 'Admin' ? { background: 'rgba(201,169,110,0.10)', color: '#c9a96e', borderColor: 'rgba(201,169,110,0.20)' } : undefined}
+                      >
                         {m.role}
                       </span>
                     </td>
@@ -109,7 +109,6 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="integrations" className="space-y-4">
-          {/* n8n */}
           <div className="glass-card-purple p-5 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-accent-orange/10"><Zap className="w-5 h-5 text-accent-orange" /></div>
@@ -120,13 +119,12 @@ export default function SettingsPage() {
             </div>
             <div className="flex items-center gap-3">
               <StatusDot status={n8nStatus === 'idle' ? 'connected' : n8nStatus} />
-              <Button size="sm" variant="outline" className="border-[rgba(124,58,237,0.2)] text-foreground rounded-lg" onClick={testN8n} disabled={testingN8n}>
+              <Button size="sm" variant="outline" className="text-foreground rounded-lg" style={{ borderColor: 'rgba(201,169,110,0.20)' }} onClick={testN8n} disabled={testingN8n}>
                 {testingN8n ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null} Test
               </Button>
             </div>
           </div>
 
-          {/* Supabase */}
           <div className="glass-card-purple p-5 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-accent-green/10"><Database className="w-5 h-5 text-accent-green" /></div>
@@ -137,13 +135,12 @@ export default function SettingsPage() {
             </div>
             <div className="flex items-center gap-3">
               <StatusDot status={supabaseStatus === 'idle' ? 'connected' : supabaseStatus} />
-              <Button size="sm" variant="outline" className="border-[rgba(124,58,237,0.2)] text-foreground rounded-lg" onClick={testSupabase} disabled={testingSupabase}>
+              <Button size="sm" variant="outline" className="text-foreground rounded-lg" style={{ borderColor: 'rgba(201,169,110,0.20)' }} onClick={testSupabase} disabled={testingSupabase}>
                 {testingSupabase ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null} Test
               </Button>
             </div>
           </div>
         </TabsContent>
-
       </Tabs>
     </div>
   );

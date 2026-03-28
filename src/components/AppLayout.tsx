@@ -49,8 +49,8 @@ export default function AppLayout() {
           collapsed ? 'w-[72px]' : 'w-64'
         )}
         style={{
-          background: 'linear-gradient(180deg, hsl(240 40% 5%) 0%, hsl(240 33% 8%) 100%)',
-          borderColor: 'rgba(124,58,237,0.15)',
+          background: 'linear-gradient(180deg, #07091e 0%, #0d0f2b 100%)',
+          borderColor: 'rgba(201,169,110,0.12)',
         }}
       >
         {/* Logo + Toggle */}
@@ -59,12 +59,12 @@ export default function AppLayout() {
             'border-b transition-all duration-300 flex items-center mx-0 px-[15px]',
             collapsed ? 'flex-col gap-2 px-3 py-4 justify-center' : 'h-[72px] px-6 justify-between'
           )}
-          style={{ borderColor: 'rgba(124,58,237,0.15)' }}
+          style={{ borderColor: 'rgba(201,169,110,0.12)' }}
         >
           <AtomiseLogo collapsed={collapsed} />
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-[rgba(124,58,237,0.1)] transition-colors"
+            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-[rgba(201,169,110,0.08)] transition-colors"
             title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {collapsed ? (
@@ -82,17 +82,17 @@ export default function AppLayout() {
           ))}
 
           {/* Divider */}
-          <div className="mx-4 my-2 border-t" style={{ borderColor: 'rgba(124,58,237,0.1)' }} />
+          <div className="mx-4 my-2 border-t" style={{ borderColor: 'rgba(201,169,110,0.10)' }} />
 
           <SidebarNavItem to="/settings" icon={Settings} label="Settings" collapsed={collapsed} />
         </nav>
 
         {/* User Profile */}
-        <div className="p-4 border-t" style={{ borderColor: 'rgba(124,58,237,0.15)' }}>
+        <div className="p-4 border-t" style={{ borderColor: 'rgba(201,169,110,0.10)' }}>
           <div className={cn('flex items-center', collapsed ? 'justify-center' : 'gap-3')}>
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
-              style={{ background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+              style={{ background: '#10133a', border: '1px solid #c9a96e', color: '#c9a96e' }}
             >
               {initial}
             </div>
@@ -101,7 +101,10 @@ export default function AppLayout() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-foreground truncate leading-tight">{user?.email?.split('@')[0] || 'Sai Krishna'}</p>
                   <p className="text-[10px] text-muted-foreground truncate mt-0.5">{user?.email || ''}</p>
-                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-primary/20 text-purple-bright mt-1">
+                  <span
+                    className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-medium mt-1"
+                    style={{ background: 'rgba(201,169,110,0.12)', color: '#c9a96e' }}
+                  >
                     Admin
                   </span>
                 </div>

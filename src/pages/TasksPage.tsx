@@ -87,9 +87,9 @@ export default function TasksPage() {
       <div className="flex items-center justify-between">
         <div />
         <div className="flex gap-2">
-          <Button variant={view === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setView('list')} className="gap-1 border-border rounded-lg"><LayoutList className="w-4 h-4" /> List</Button>
-          <Button variant={view === 'board' ? 'default' : 'outline'} size="sm" onClick={() => setView('board')} className="gap-1 border-border rounded-lg"><Columns3 className="w-4 h-4" /> Board</Button>
-          <Button onClick={() => setAddOpen(true)} className="gap-2 font-display text-sm rounded-xl"><Plus className="w-4 h-4" /> Add Task</Button>
+          <Button variant={view === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setView('list')} className="gap-1 rounded-lg"><LayoutList className="w-4 h-4" /> List</Button>
+          <Button variant={view === 'board' ? 'default' : 'outline'} size="sm" onClick={() => setView('board')} className="gap-1 rounded-lg"><Columns3 className="w-4 h-4" /> Board</Button>
+          <Button onClick={() => setAddOpen(true)} className="gap-2 font-display text-sm rounded-xl" style={{ background: '#c9a96e', color: '#07091e' }}><Plus className="w-4 h-4" /> Add Task</Button>
         </div>
       </div>
 
@@ -111,12 +111,12 @@ export default function TasksPage() {
       </div>
 
       {filtered.length === 0 ? (
-        <EmptyState icon={CheckSquare} title="No tasks" description="Create a task to get started." action={<Button onClick={() => setAddOpen(true)}><Plus className="w-4 h-4 mr-2" /> Add Task</Button>} />
+        <EmptyState icon={CheckSquare} title="No tasks" description="Create a task to get started." action={<Button onClick={() => setAddOpen(true)} style={{ background: '#c9a96e', color: '#07091e' }}><Plus className="w-4 h-4 mr-2" /> Add Task</Button>} />
       ) : view === 'board' ? (
         <div className="grid grid-cols-3 gap-4">
           {STATUSES.map(status => (
             <div key={status} className="glass-card-purple rounded-2xl overflow-hidden">
-              <div className="p-4 border-b" style={{ borderColor: 'rgba(124,58,237,0.1)' }}>
+              <div className="p-4 border-b" style={{ borderColor: 'rgba(201,169,110,0.10)' }}>
                 <h3 className="font-display font-semibold text-sm text-foreground">{status}</h3>
                 <span className="text-xs text-muted-foreground">{filtered.filter((t: any) => t.status === status).length} tasks</span>
               </div>
@@ -128,8 +128,8 @@ export default function TasksPage() {
                       key={t.id}
                       className="rounded-xl p-3.5 border mb-2"
                       style={{
-                        background: 'hsl(240 24% 10%)',
-                        borderColor: 'rgba(124,58,237,0.15)',
+                        background: '#10133a',
+                        borderColor: 'rgba(201,169,110,0.15)',
                         borderLeft: `3px solid ${PRIORITY_BORDER[t.priority] || '#fbbf24'}`,
                       }}
                     >
@@ -138,7 +138,7 @@ export default function TasksPage() {
                         {isDueToday && <span className="text-xs bg-amber-400/20 text-amber-400 px-1.5 py-0.5 rounded font-medium">📅 Due Today</span>}
                       </div>
                       <p className="text-sm font-medium text-foreground mt-1">{t.title}</p>
-                      {t.contact_name && <p className="text-xs text-purple-bright mt-1">{t.contact_name}</p>}
+                      {t.contact_name && <p className="text-xs mt-1" style={{ color: '#c9a96e' }}>{t.contact_name}</p>}
                       <div className="flex items-center justify-between mt-2">
                         <span className={`text-xs ${isOverdue ? 'text-destructive font-medium' : isDueToday ? 'text-amber-400 font-medium' : 'text-muted-foreground'}`}>
                           {t.due_date ? format(parseISO(t.due_date), 'MMM d') : '—'}
@@ -159,7 +159,7 @@ export default function TasksPage() {
       ) : (
         <div className="glass-card-purple overflow-hidden rounded-2xl">
           <table className="w-full text-sm">
-            <thead><tr style={{ background: 'rgba(124,58,237,0.08)', borderBottom: '1px solid rgba(124,58,237,0.15)' }}>
+            <thead><tr style={{ background: 'rgba(201,169,110,0.08)', borderBottom: '1px solid rgba(201,169,110,0.15)' }}>
               {['Title', 'Contact', 'Priority', 'Due Date', 'Assigned To', 'Status'].map(h => (
                 <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{h}</th>
               ))}
@@ -168,7 +168,7 @@ export default function TasksPage() {
               {filtered.map((t: any) => {
                 const { isOverdue, isDueToday } = getDateStatus(t);
                 return (
-                <tr key={t.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(124,58,237,0.05)] transition-colors">
+                <tr key={t.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(201,169,110,0.04)] transition-colors">
                   <td className="px-4 py-3 font-medium text-foreground">
                     <div className="flex items-center gap-2">
                       {isOverdue && <AlertCircle className="w-3.5 h-3.5 text-destructive shrink-0" />}
@@ -176,7 +176,7 @@ export default function TasksPage() {
                       {t.title}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-purple-bright text-xs">{t.contact_name}</td>
+                  <td className="px-4 py-3 text-xs" style={{ color: '#c9a96e' }}>{t.contact_name}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
                       <div className="w-2 h-2 rounded-full" style={{ background: PRIORITY_BORDER[t.priority] || '#fbbf24' }} />
@@ -206,7 +206,7 @@ export default function TasksPage() {
       )}
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="bg-[#141420] border-[rgba(124,58,237,0.3)] rounded-[20px]">
+        <DialogContent className="rounded-[20px]" style={{ background: '#0d0f2b', border: '1px solid rgba(201,169,110,0.25)' }}>
           <DialogHeader><DialogTitle className="font-display">Add Task</DialogTitle></DialogHeader>
           <form onSubmit={e => { e.preventDefault(); addMutation.mutate(); }} className="space-y-3">
             <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Title *</Label><input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} required className="glass-input w-full" /></div>
@@ -228,7 +228,7 @@ export default function TasksPage() {
                 </Select>
               </div>
             </div>
-            <Button type="submit" className="w-full font-display rounded-xl h-11" disabled={addMutation.isPending}>{addMutation.isPending ? 'Adding...' : 'Add Task'}</Button>
+            <Button type="submit" className="w-full font-display rounded-xl h-11" style={{ background: '#c9a96e', color: '#07091e' }} disabled={addMutation.isPending}>{addMutation.isPending ? 'Adding...' : 'Add Task'}</Button>
           </form>
         </DialogContent>
       </Dialog>

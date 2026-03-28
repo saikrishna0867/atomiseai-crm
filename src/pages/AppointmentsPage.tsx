@@ -102,9 +102,9 @@ export default function AppointmentsPage() {
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-end gap-2">
-        <Button variant={view === 'calendar' ? 'default' : 'outline'} size="sm" onClick={() => setView('calendar')} className="gap-1 border-border rounded-lg"><CalIcon className="w-4 h-4" /> Calendar</Button>
-        <Button variant={view === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setView('list')} className="gap-1 border-border rounded-lg"><List className="w-4 h-4" /> List</Button>
-        <Button onClick={() => setAddOpen(true)} className="gap-2 font-display text-sm rounded-xl"><Plus className="w-4 h-4" /> Book Appointment</Button>
+        <Button variant={view === 'calendar' ? 'default' : 'outline'} size="sm" onClick={() => setView('calendar')} className="gap-1 rounded-lg"><CalIcon className="w-4 h-4" /> Calendar</Button>
+        <Button variant={view === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setView('list')} className="gap-1 rounded-lg"><List className="w-4 h-4" /> List</Button>
+        <Button onClick={() => setAddOpen(true)} className="gap-2 font-display text-sm rounded-xl" style={{ background: '#c9a96e', color: '#07091e' }}><Plus className="w-4 h-4" /> Book Appointment</Button>
       </div>
 
       {view === 'calendar' ? (
@@ -128,12 +128,13 @@ export default function AppointmentsPage() {
                   <button
                     key={day.toISOString()}
                     onClick={() => setSelectedDate(day)}
-                    className={`min-h-[80px] p-2 rounded-lg text-sm transition-all relative border ${isSelected ? 'bg-primary/20 border-primary/40 text-primary' : isToday ? 'bg-primary/5 border-primary/10 text-primary' : 'border-[rgba(124,58,237,0.08)] hover:bg-[rgba(124,58,237,0.06)] text-foreground'}`}
+                    className={`min-h-[80px] p-2 rounded-lg text-sm transition-all relative border ${isSelected ? 'border-[rgba(201,169,110,0.4)] text-[#c9a96e]' : isToday ? 'border-[rgba(201,169,110,0.15)] text-[#c9a96e]' : 'border-[rgba(201,169,110,0.08)] hover:bg-[rgba(201,169,110,0.04)] text-foreground'}`}
+                    style={isSelected ? { background: 'rgba(201,169,110,0.10)' } : isToday ? { background: 'rgba(201,169,110,0.05)' } : undefined}
                   >
                     <span className="absolute top-2 left-2">{format(day, 'd')}</span>
                     {appts.length > 0 && (
                       <div className="absolute bottom-2 left-2 right-2">
-                        <span className="text-[10px] text-primary truncate block">{appts[0]?.appointment_type?.substring(0, 8)}...</span>
+                        <span className="text-[10px] truncate block" style={{ color: '#c9a96e' }}>{appts[0]?.appointment_type?.substring(0, 8)}...</span>
                         {appts.length > 1 && <span className="text-[10px] text-muted-foreground">+{appts.length - 1} more</span>}
                       </div>
                     )}
@@ -149,38 +150,38 @@ export default function AppointmentsPage() {
             {selectedAppts.length === 0 ? (
               <p className="text-sm text-muted-foreground">No appointments</p>
             ) : selectedAppts.map((a: any) => (
-              <div key={a.id} className="py-3 border-b border-border/30 last:border-0 space-y-1">
+              <div key={a.id} className="py-3 border-b last:border-0 space-y-1" style={{ borderColor: 'rgba(201,169,110,0.10)' }}>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-foreground">{a.contact_name}</span>
                   <StatusBadge type="status" value={a.status || 'Scheduled'} />
                 </div>
                 <p className="text-xs text-muted-foreground">{a.appointment_type} • {a.appointment_time}</p>
                 <p className="text-xs text-muted-foreground">Rep: {a.rep_name}</p>
-                {a.meeting_link && <a href={a.meeting_link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">Join Meeting</a>}
+                {a.meeting_link && <a href={a.meeting_link} target="_blank" rel="noopener noreferrer" className="text-xs hover:underline" style={{ color: '#c9a96e' }}>Join Meeting</a>}
               </div>
             ))}
           </div>
         </div>
       ) : (
         appointments.length === 0 ? (
-          <EmptyState icon={CalendarDays} title="No appointments" description="Book your first appointment." action={<Button onClick={() => setAddOpen(true)}><Plus className="w-4 h-4 mr-2" /> Book Appointment</Button>} />
+          <EmptyState icon={CalendarDays} title="No appointments" description="Book your first appointment." action={<Button onClick={() => setAddOpen(true)} style={{ background: '#c9a96e', color: '#07091e' }}><Plus className="w-4 h-4 mr-2" /> Book Appointment</Button>} />
         ) : (
           <div className="glass-card-purple overflow-hidden rounded-2xl">
             <table className="w-full text-sm">
-              <thead><tr style={{ background: 'rgba(124,58,237,0.08)', borderBottom: '1px solid rgba(124,58,237,0.15)' }}>
+              <thead><tr style={{ background: 'rgba(201,169,110,0.08)', borderBottom: '1px solid rgba(201,169,110,0.15)' }}>
                 {['Contact', 'Type', 'Date', 'Time', 'Rep', 'Link', 'Status'].map(h => (
                   <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{h}</th>
                 ))}
               </tr></thead>
               <tbody>
                 {appointments.map((a: any) => (
-                  <tr key={a.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(124,58,237,0.05)]">
+                  <tr key={a.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(201,169,110,0.04)]">
                     <td className="px-4 py-3 text-foreground">{a.contact_name}</td>
                     <td className="px-4 py-3 text-muted-foreground text-xs">{a.appointment_type}</td>
                     <td className="px-4 py-3 text-muted-foreground text-xs">{a.appointment_date}</td>
                     <td className="px-4 py-3 text-muted-foreground text-xs">{a.appointment_time}</td>
                     <td className="px-4 py-3 text-muted-foreground text-xs">{a.rep_name}</td>
-                    <td className="px-4 py-3">{a.meeting_link && <a href={a.meeting_link} target="_blank" className="text-primary text-xs hover:underline">Join</a>}</td>
+                    <td className="px-4 py-3">{a.meeting_link && <a href={a.meeting_link} target="_blank" className="text-xs hover:underline" style={{ color: '#c9a96e' }}>Join</a>}</td>
                     <td className="px-4 py-3"><StatusBadge type="status" value={a.status || 'Scheduled'} /></td>
                   </tr>
                 ))}
@@ -191,7 +192,7 @@ export default function AppointmentsPage() {
       )}
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="bg-[#141420] border-[rgba(124,58,237,0.3)] rounded-[20px] max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="rounded-[20px] max-w-lg max-h-[90vh] overflow-y-auto" style={{ background: '#0d0f2b', border: '1px solid rgba(201,169,110,0.25)' }}>
           <DialogHeader><DialogTitle className="font-display">Book Appointment</DialogTitle></DialogHeader>
           <form onSubmit={e => { e.preventDefault(); addMutation.mutate(); }} className="space-y-3">
             <div className="space-y-1.5">
@@ -227,7 +228,7 @@ export default function AppointmentsPage() {
               <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Rep Email *</Label><input type="email" value={form.rep_email} onChange={e => setForm(p => ({ ...p, rep_email: e.target.value }))} required className="glass-input w-full" /></div>
             </div>
             <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Notes</Label><input value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} className="glass-input w-full" /></div>
-            <Button type="submit" className="w-full font-display rounded-xl h-11" disabled={addMutation.isPending}>{addMutation.isPending ? 'Booking...' : 'Book Appointment'}</Button>
+            <Button type="submit" className="w-full font-display rounded-xl h-11" style={{ background: '#c9a96e', color: '#07091e' }} disabled={addMutation.isPending}>{addMutation.isPending ? 'Booking...' : 'Book Appointment'}</Button>
           </form>
         </DialogContent>
       </Dialog>
