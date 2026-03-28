@@ -109,7 +109,7 @@ export default function DashboardPage() {
   return (
     <div className="p-4 md:p-6 space-y-4 md:space-y-6">
       {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-3 md:gap-4">
         <KpiCard title="Total Contacts" value={stats.contacts.toLocaleString()} icon={Users} glowColor="#22d3ee" iconColor="#c9a96e" delay={0} />
         <KpiCard title="Pipeline Value" value={`£${stats.pipelineValue.toLocaleString()}`} icon={DollarSign} glowColor="#34d399" iconColor="#c9a96e" delay={80} />
         <KpiCard title="Deals Won" value={stats.won.toLocaleString()} icon={Trophy} glowColor="#c9a96e" iconColor="#c9a96e" delay={160} />
