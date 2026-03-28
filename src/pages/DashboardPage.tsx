@@ -122,8 +122,8 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 md:gap-4">
         <div className="lg:col-span-3 glass-card-purple p-4 md:p-6 animate-fade-up" style={{ animationDelay: '300ms' }}>
           <h3 className="font-display font-semibold text-foreground mb-3 md:mb-4 text-sm md:text-base">Pipeline Overview</h3>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={stageData} barCategoryGap="15%">
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={stageData} margin={{ top: 8, right: 8, left: 8, bottom: 28 }} barCategoryGap="20%">
               <XAxis
                 dataKey="name"
                 axisLine={false}
@@ -131,25 +131,33 @@ export default function DashboardPage() {
                 interval={0}
                 angle={0}
                 minTickGap={0}
-                tickMargin={8}
+                tickMargin={10}
                 tick={({ x, y, payload }: any) => {
-                  const abbrevMap: Record<string, string> = {
-                    'Lead': 'Lead',
-                    'Qualified': 'Qual',
-                    'Proposal': 'Prop',
-                    'Negotiation': 'Nego',
+                  const labelMap: Record<string, string> = {
+                    Lead: 'Lead',
+                    Qualified: 'Qual',
+                    Proposal: 'Prop',
+                    Negotiation: 'Nego',
                     'Closed Won': 'Won',
                     'Closed Lost': 'Lost',
                   };
                   const isMobile = window.innerWidth < 640;
-                  const label = isMobile ? (abbrevMap[payload.value] || payload.value) : payload.value;
+                  const label = isMobile ? (labelMap[payload.value] ?? payload.value) : payload.value;
+
                   return (
-                    <text x={x} y={y + 14} textAnchor="middle" dominantBaseline="hanging" fill="#7a80b0" fontSize={isMobile ? 9 : 11} transform="">
+                    <text
+                      x={x}
+                      y={y + 16}
+                      textAnchor="middle"
+                      dominantBaseline="hanging"
+                      fill="#7a80b0"
+                      fontSize={isMobile ? 10 : 11}
+                    >
                       {label}
                     </text>
                   );
                 }}
-                height={28}
+                height={40}
               />
               <YAxis tick={{ fill: '#7a80b0', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
