@@ -155,11 +155,11 @@ export default function DashboardPage() {
             </BarChart>
           </ResponsiveContainer>
         </div>
-        <div className="lg:col-span-2 glass-card-purple p-6 animate-fade-up" style={{ animationDelay: '400ms' }}>
-          <h3 className="font-display font-semibold text-foreground mb-4">Deal Status</h3>
-          <ResponsiveContainer width="100%" height={220}>
+        <div className="lg:col-span-2 glass-card-purple p-4 md:p-6 animate-fade-up" style={{ animationDelay: '400ms' }}>
+          <h3 className="font-display font-semibold text-foreground mb-3 md:mb-4 text-sm md:text-base">Deal Status</h3>
+          <ResponsiveContainer width="100%" height={200}>
             <PieChart>
-              <Pie data={dealStatusData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} dataKey="value" stroke="none">
+              <Pie data={dealStatusData} cx="50%" cy="50%" innerRadius={50} outerRadius={75} dataKey="value" stroke="none">
                 {dealStatusData.map((_, i) => (
                   <Cell key={i} fill={PIE_COLORS[i]} />
                 ))}
