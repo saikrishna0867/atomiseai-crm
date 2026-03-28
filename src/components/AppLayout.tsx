@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { useState, useCallback } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AtomiseLogo } from '@/components/AtomiseLogo';
 import { SidebarNavItem } from '@/components/SidebarNavItem';
 import { TopHeader } from '@/components/TopHeader';
