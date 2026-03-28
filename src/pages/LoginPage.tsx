@@ -10,11 +10,16 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, user, enterPreviewMode } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => { document.title = 'Sign In | Atomise CRM'; }, []);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) navigate('/dashboard', { replace: true });
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,13 +30,19 @@ export default function LoginPage() {
         toast({ title: 'Account created!', description: 'Check your email to verify.' });
       } else {
         await signIn(email, password);
-        navigate('/dashboard');
+        toast({ title: 'Welcome back! 👋', description: 'Signed in successfully.' });
+        navigate('/dashboard', { replace: true });
       }
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePreviewMode = () => {
+    enterPreviewMode();
+    navigate('/dashboard', { replace: true });
   };
 
   return (
@@ -125,7 +136,7 @@ export default function LoginPage() {
               type="button"
               variant="outline"
               className="w-full border-[rgba(201,169,110,0.20)] text-muted-foreground hover:text-foreground rounded-xl"
-              onClick={() => navigate('/dashboard')}
+              onClick={handlePreviewMode}
             >
               Skip Login (Preview Mode)
             </Button>

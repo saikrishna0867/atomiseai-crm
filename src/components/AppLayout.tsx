@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { useState, useCallback } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AtomiseLogo } from '@/components/AtomiseLogo';
 import { SidebarNavItem } from '@/components/SidebarNavItem';
 import { TopHeader } from '@/components/TopHeader';
@@ -34,6 +34,12 @@ const pageMeta: Record<string, { title: string; subtitle: string }> = {
 export default function AppLayout() {
   const { user, signOut } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleSignOut = useCallback(async () => {
+    await signOut();
+    navigate('/login', { replace: true });
+  }, [signOut, navigate]);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const basePath = '/' + location.pathname.split('/')[1];
@@ -107,7 +113,7 @@ export default function AppLayout() {
                 </span>
               </div>
               <button
-                onClick={signOut}
+                onClick={handleSignOut}
                 className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
                 title="Sign out"
               >
