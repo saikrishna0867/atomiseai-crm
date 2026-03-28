@@ -14,11 +14,11 @@ const EVENT_ICONS: Record<string, any> = {
 };
 
 const EVENT_COLORS: Record<string, string> = {
-  lead_assigned: '#34d399',
+  lead_assigned: '#c9a96e',
   stage_change: '#c9a96e',
-  appointment_booked: '#60a5fa',
-  campaign_launched: '#fbbf24',
-  summary_generated: '#f472b6',
+  appointment_booked: '#c9a96e',
+  campaign_launched: '#c9a96e',
+  summary_generated: '#c9a96e',
 };
 
 interface NotificationPopoverProps {
