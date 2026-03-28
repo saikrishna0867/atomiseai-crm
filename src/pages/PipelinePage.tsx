@@ -26,18 +26,22 @@ function DealCard({ deal, onDelete }: { deal: any; onDelete: () => void }) {
     transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)${isDragging ? ' rotate(2deg) scale(1.02)' : ''}` : undefined,
     opacity: isDragging ? 0.85 : 1,
     cursor: isDragging ? 'grabbing' : 'grab',
-    ...(isDragging ? { boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 0 2px rgba(124,58,237,0.5)', zIndex: 50 } : {}),
+    ...(isDragging ? { boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 0 2px rgba(201,169,110,0.5)', zIndex: 50 } : {}),
   };
 
   return (
     <div
       ref={setNodeRef}
-      style={style}
-      className="relative rounded-xl p-4 mb-2.5 border transition-all duration-200 hover:border-[rgba(124,58,237,0.4)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.4),0_0_0_1px_rgba(124,58,237,0.2)] hover:translate-y-[-2px]"
+      style={{
+        ...style,
+        background: 'rgba(16,19,58,0.90)',
+        borderColor: 'rgba(201,169,110,0.12)',
+        borderLeft: '3px solid #c9a96e',
+      }}
+      className="relative rounded-xl p-4 mb-2.5 border transition-all duration-200 hover:border-[rgba(201,169,110,0.35)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.4),0_0_0_1px_rgba(201,169,110,0.15)] hover:translate-y-[-2px]"
       {...attributes}
       {...listeners}
     >
-      <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full" style={{ background: STAGE_COLORS[deal.stage] || '#7c3aed' }} />
       <div className="pl-2">
         <div className="flex items-start justify-between">
           <span className="text-sm font-medium text-foreground">{deal.contact_name}</span>
@@ -49,13 +53,13 @@ function DealCard({ deal, onDelete }: { deal: any; onDelete: () => void }) {
           <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><Building2 className="w-3 h-3" /> {deal.company}</p>
         )}
         {deal.deal_value && (
-          <p className="text-base font-display font-bold text-accent-green mt-2">£{Number(deal.deal_value).toLocaleString()}</p>
+          <p className="text-base font-display font-bold mt-2" style={{ color: '#c9a96e' }}>£{Number(deal.deal_value).toLocaleString()}</p>
         )}
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-center gap-1.5">
             {deal.assigned_rep && (
               <>
-                <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ background: 'linear-gradient(135deg, #7c3aed, #6d28d9)' }}>
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold" style={{ background: '#10133a', border: '1px solid #c9a96e', color: '#c9a96e' }}>
                   {deal.assigned_rep.charAt(0)}
                 </div>
                 <span className="text-xs text-muted-foreground">{deal.assigned_rep}</span>
@@ -78,17 +82,17 @@ function StageColumn({ stage, deals, onAddDeal, onDeleteDeal }: { stage: string;
       ref={setNodeRef}
       className="flex flex-col w-[280px] shrink-0 rounded-2xl border transition-colors"
       style={{
-        background: isOver ? 'rgba(124,58,237,0.06)' : 'rgba(14,14,22,0.6)',
-        borderColor: isOver ? 'rgba(124,58,237,0.35)' : 'rgba(124,58,237,0.12)',
+        background: isOver ? 'rgba(201,169,110,0.06)' : 'rgba(13,15,43,0.6)',
+        borderColor: isOver ? 'rgba(201,169,110,0.35)' : 'rgba(201,169,110,0.12)',
         maxHeight: 'calc(100vh - 180px)',
       }}
     >
-      <div className="p-4 border-b" style={{ borderColor: 'rgba(124,58,237,0.1)' }}>
+      <div className="p-4 border-b" style={{ borderColor: 'rgba(201,169,110,0.10)' }}>
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-display font-bold" style={{ color: STAGE_COLORS[stage] }}>{stage}</h3>
-          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary text-[11px] font-bold text-white">{deals.length}</span>
+          <span className="flex items-center justify-center w-5 h-5 rounded-full text-[11px] font-bold" style={{ background: '#c9a96e', color: '#07091e' }}>{deals.length}</span>
         </div>
-        <p className="text-xs text-accent-green mt-1">£{totalValue.toLocaleString()}</p>
+        <p className="text-xs mt-1" style={{ color: '#c9a96e' }}>£{totalValue.toLocaleString()}</p>
       </div>
       <div className="flex-1 p-3 space-y-0 overflow-y-auto">
         {deals.map(deal => (
@@ -98,8 +102,8 @@ function StageColumn({ stage, deals, onAddDeal, onDeleteDeal }: { stage: string;
       <div className="p-3">
         <button
           onClick={onAddDeal}
-          className="w-full rounded-[10px] py-2.5 text-[13px] text-purple-bright/70 border border-dashed transition-all duration-200 hover:bg-[rgba(124,58,237,0.12)] hover:border-[rgba(124,58,237,0.4)] hover:text-purple-bright"
-          style={{ borderColor: 'rgba(124,58,237,0.25)', background: 'rgba(124,58,237,0.06)' }}
+          className="w-full rounded-[10px] py-2.5 text-[13px] border border-dashed transition-all duration-200 hover:border-[rgba(201,169,110,0.4)]"
+          style={{ borderColor: 'rgba(201,169,110,0.25)', background: 'rgba(201,169,110,0.06)', color: '#c9a96e' }}
         >
           <Plus className="w-3.5 h-3.5 inline mr-1" /> Add Deal
         </button>
@@ -214,7 +218,7 @@ export default function PipelinePage() {
       </DndContext>
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="bg-[#141420] border-[rgba(124,58,237,0.3)] rounded-[20px]">
+        <DialogContent className="rounded-[20px]" style={{ background: '#0d0f2b', border: '1px solid rgba(201,169,110,0.25)' }}>
           <DialogHeader><DialogTitle className="font-display">Add Deal — {addStage}</DialogTitle></DialogHeader>
           <form onSubmit={e => {
             e.preventDefault();
@@ -247,7 +251,7 @@ export default function PipelinePage() {
                 />
               </div>
             ))}
-            <Button type="submit" className="w-full font-display rounded-xl h-11" disabled={addMutation.isPending}>{addMutation.isPending ? 'Adding...' : 'Add Deal'}</Button>
+            <Button type="submit" className="w-full font-display rounded-xl h-11" style={{ background: '#c9a96e', color: '#07091e' }} disabled={addMutation.isPending}>{addMutation.isPending ? 'Adding...' : 'Add Deal'}</Button>
           </form>
         </DialogContent>
       </Dialog>

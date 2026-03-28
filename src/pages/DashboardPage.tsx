@@ -4,14 +4,14 @@ import { KpiCard } from '@/components/KpiCard';
 import { Users, DollarSign, Trophy, TrendingDown, TrendingUp, ListTodo, Plus, CalendarDays } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { formatDistanceToNow } from 'date-fns';
 
 const EVENT_COLORS: Record<string, string> = {
   lead_assigned: '#22d3ee',
   stage_change: '#fbbf24',
-  campaign_email_sent: '#7c3aed',
-  campaign_launched: '#7c3aed',
+  campaign_email_sent: '#c9a96e',
+  campaign_launched: '#c9a96e',
   appointment_booked: '#34d399',
   drip_email_sent: '#60a5fa',
   ai_summary_generated: '#f472b6',
@@ -103,19 +103,19 @@ export default function DashboardPage() {
 
   if (loading) return <SkeletonDashboard />;
 
-  const PIE_COLORS = ['#34d399', '#f87171', '#7c3aed'];
+  const PIE_COLORS = ['#34d399', '#f87171', '#c9a96e'];
   const totalDeals = dealStatusData.reduce((s, d) => s + d.value, 0);
 
   return (
     <div className="p-6 space-y-6">
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        <KpiCard title="Total Contacts" value={stats.contacts.toLocaleString()} icon={Users} glowColor="#22d3ee" iconColor="#22d3ee" delay={0} />
-        <KpiCard title="Pipeline Value" value={`£${stats.pipelineValue.toLocaleString()}`} icon={DollarSign} glowColor="#34d399" iconColor="#34d399" delay={80} />
-        <KpiCard title="Deals Won" value={stats.won.toLocaleString()} icon={Trophy} glowColor="#7c3aed" iconColor="#7c3aed" delay={160} />
-        <KpiCard title="Deals Lost" value={stats.lost.toLocaleString()} icon={TrendingDown} glowColor="#f87171" iconColor="#f87171" delay={240} />
-        <KpiCard title="Conversion Rate" value={`${stats.convRate}%`} icon={TrendingUp} glowColor="#fbbf24" iconColor="#fbbf24" delay={320} />
-        <KpiCard title="Open Tasks" value={stats.openTasks.toLocaleString()} icon={ListTodo} glowColor="#60a5fa" iconColor="#60a5fa" delay={400} />
+        <KpiCard title="Total Contacts" value={stats.contacts.toLocaleString()} icon={Users} glowColor="#22d3ee" iconColor="#c9a96e" delay={0} />
+        <KpiCard title="Pipeline Value" value={`£${stats.pipelineValue.toLocaleString()}`} icon={DollarSign} glowColor="#34d399" iconColor="#c9a96e" delay={80} />
+        <KpiCard title="Deals Won" value={stats.won.toLocaleString()} icon={Trophy} glowColor="#c9a96e" iconColor="#c9a96e" delay={160} />
+        <KpiCard title="Deals Lost" value={stats.lost.toLocaleString()} icon={TrendingDown} glowColor="#f87171" iconColor="#c9a96e" delay={240} />
+        <KpiCard title="Conversion Rate" value={`${stats.convRate}%`} icon={TrendingUp} glowColor="#fbbf24" iconColor="#c9a96e" delay={320} />
+        <KpiCard title="Open Tasks" value={stats.openTasks.toLocaleString()} icon={ListTodo} glowColor="#60a5fa" iconColor="#c9a96e" delay={400} />
       </div>
 
       {/* Charts */}
@@ -124,34 +124,34 @@ export default function DashboardPage() {
           <h3 className="font-display font-semibold text-foreground mb-4">Pipeline Overview</h3>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={stageData} barCategoryGap="20%">
-              <XAxis dataKey="name" tick={{ fill: '#9b9bc0', fontSize: 11 }} axisLine={false} tickLine={false} interval={0} />
-              <YAxis tick={{ fill: '#9b9bc0', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <XAxis dataKey="name" tick={{ fill: '#7a80b0', fontSize: 11 }} axisLine={false} tickLine={false} interval={0} />
+              <YAxis tick={{ fill: '#7a80b0', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
-                cursor={{ fill: 'rgba(124,58,237,0.08)' }}
+                cursor={{ fill: 'rgba(201,169,110,0.08)' }}
                 content={({ active, payload, label }) => {
                   if (!active || !payload?.length) return null;
                   const val = payload[0]?.value as number;
                   return (
                     <div style={{
-                      background: 'rgba(20,20,32,0.95)',
-                      border: '1px solid rgba(124,58,237,0.3)',
+                      background: 'rgba(13,15,43,0.95)',
+                      border: '1px solid rgba(201,169,110,0.3)',
                       borderRadius: 12,
-                      color: '#f1f0ff',
+                      color: '#fff',
                       backdropFilter: 'blur(12px)',
                       padding: '10px 14px',
                       minWidth: 100,
                     }}>
-                      <p style={{ fontSize: 12, color: '#9b9bc0', marginBottom: 4 }}>{label}</p>
+                      <p style={{ fontSize: 12, color: '#7a80b0', marginBottom: 4 }}>{label}</p>
                       {val > 0 ? (
                         <p style={{ fontSize: 15, fontWeight: 700 }}>{val} lead{val !== 1 ? 's' : ''}</p>
                       ) : (
-                        <p style={{ fontSize: 12, color: '#9b9bc0', fontStyle: 'italic' }}>No leads yet</p>
+                        <p style={{ fontSize: 12, color: '#7a80b0', fontStyle: 'italic' }}>No leads yet</p>
                       )}
                     </div>
                   );
                 }}
               />
-              <Bar dataKey="value" fill="#7c3aed" radius={[6, 6, 0, 0]} maxBarSize={40} />
+              <Bar dataKey="value" fill="#c9a96e" radius={[6, 6, 0, 0]} maxBarSize={40} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -164,10 +164,9 @@ export default function DashboardPage() {
                   <Cell key={i} fill={PIE_COLORS[i]} />
                 ))}
               </Pie>
-              <Tooltip contentStyle={{ background: 'rgba(20,20,32,0.95)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: 12, color: '#f1f0ff' }} />
+              <Tooltip contentStyle={{ background: 'rgba(13,15,43,0.95)', border: '1px solid rgba(201,169,110,0.3)', borderRadius: 12, color: '#fff' }} />
             </PieChart>
           </ResponsiveContainer>
-          {/* Center total */}
           <div className="text-center -mt-[148px] mb-[108px]">
             <p className="text-2xl font-display font-bold text-foreground">{totalDeals}</p>
             <p className="text-xs text-muted-foreground">Total Deals</p>
@@ -187,21 +186,24 @@ export default function DashboardPage() {
       <div className="flex gap-3 animate-fade-up" style={{ animationDelay: '500ms' }}>
         <Button
           onClick={() => navigate('/contacts')}
-          className="gap-2 font-display text-sm rounded-xl px-5 py-2.5 shadow-[0_4px_20px_rgba(124,58,237,0.4)] hover:shadow-[0_8px_24px_rgba(124,58,237,0.5)] hover:translate-y-[-1px] transition-all duration-200"
+          className="gap-2 font-display text-sm rounded-xl px-5 py-2.5 transition-all duration-200"
+          style={{ background: '#c9a96e', color: '#07091e', boxShadow: '0 4px 20px rgba(201,169,110,0.4)' }}
         >
           <Plus className="w-4 h-4" /> Add Contact
         </Button>
         <Button
           onClick={() => navigate('/pipeline')}
           variant="outline"
-          className="gap-2 border-[rgba(124,58,237,0.3)] text-purple-bright hover:bg-[rgba(124,58,237,0.08)] rounded-xl px-5 py-2.5 transition-all duration-200"
+          className="gap-2 text-[#c9a96e] hover:bg-[rgba(201,169,110,0.08)] rounded-xl px-5 py-2.5 transition-all duration-200"
+          style={{ borderColor: 'rgba(201,169,110,0.40)' }}
         >
           <Plus className="w-4 h-4" /> New Deal
         </Button>
         <Button
           onClick={() => navigate('/appointments')}
           variant="ghost"
-          className="gap-2 text-muted-foreground hover:text-foreground border border-border-subtle rounded-xl px-5 py-2.5 transition-all duration-200"
+          className="gap-2 text-muted-foreground hover:text-foreground rounded-xl px-5 py-2.5 transition-all duration-200"
+          style={{ border: '1px solid rgba(201,169,110,0.15)' }}
         >
           <CalendarDays className="w-4 h-4" /> Schedule Appointment
         </Button>
@@ -214,19 +216,19 @@ export default function DashboardPage() {
           {activities.length === 0 ? (
             <p className="text-sm text-muted-foreground">No recent activity</p>
           ) : activities.map((a) => (
-            <div key={a.id} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-[rgba(124,58,237,0.05)] transition-colors my-[11px]">
+            <div key={a.id} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-[rgba(201,169,110,0.04)] transition-colors my-[11px]">
               <div
                 className="w-3 h-3 rounded-full shrink-0"
-                style={{ background: EVENT_COLORS[a.event_type] || '#7c3aed' }}
+                style={{ background: EVENT_COLORS[a.event_type] || '#c9a96e' }}
               />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span
                     className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border"
                     style={{
-                      background: `${EVENT_COLORS[a.event_type] || '#7c3aed'}15`,
-                      color: EVENT_COLORS[a.event_type] || '#7c3aed',
-                      borderColor: `${EVENT_COLORS[a.event_type] || '#7c3aed'}30`,
+                      background: `${EVENT_COLORS[a.event_type] || '#c9a96e'}15`,
+                      color: EVENT_COLORS[a.event_type] || '#c9a96e',
+                      borderColor: `${EVENT_COLORS[a.event_type] || '#c9a96e'}30`,
                     }}
                   >
                     {a.event_type?.replace(/_/g, ' ')}
