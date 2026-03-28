@@ -204,7 +204,7 @@ export default function PipelinePage() {
   return (
     <div className="p-4 md:p-6 space-y-4">
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <div className="flex gap-4 overflow-x-auto pb-4" style={{ minHeight: 'calc(100vh - 160px)' }}>
+        <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory md:snap-none scroll-smooth px-[7.5vw] sm:px-0 -mx-[7.5vw] sm:mx-0" style={{ minHeight: 'calc(100vh - 160px)', WebkitOverflowScrolling: 'touch' }}>
           {STAGES.map(stage => (
             <StageColumn
               key={stage}
