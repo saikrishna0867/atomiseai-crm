@@ -37,7 +37,6 @@ export default function AISummariesPage() {
     },
   });
 
-  // Fetch all summaries to know which contacts have one + sentiment dot
   const { data: allSummaries = [] } = useQuery({
     queryKey: ['ai_summaries_index'],
     queryFn: async () => {
@@ -47,13 +46,11 @@ export default function AISummariesPage() {
     },
   });
 
-  // Build a map: lead_id -> latest summary meta
   const summaryMap = new Map<string, { deal_health: string; generated_at: string; contact_name: string }>();
   allSummaries.forEach((s: any) => {
     if (!summaryMap.has(s.lead_id)) summaryMap.set(s.lead_id, s);
   });
 
-  // Fetch full summary when selectedLeadId changes
   const fetchSummary = async (leadId: string) => {
     setLoadingSummary(true);
     setSummary(null);
@@ -104,7 +101,6 @@ export default function AISummariesPage() {
     handleGenerate(leadId);
   };
 
-  // Build left panel list: contacts that have summaries + all contacts for search
   const contactsWithMeta = contacts.map((c: any) => ({
     ...c,
     hasSummary: summaryMap.has(c.lead_id),
@@ -112,7 +108,6 @@ export default function AISummariesPage() {
     generatedAt: summaryMap.get(c.lead_id)?.generated_at,
   }));
 
-  // Show contacts with summaries first, then others
   const sorted = [...contactsWithMeta].sort((a, b) => {
     if (a.hasSummary && !b.hasSummary) return -1;
     if (!a.hasSummary && b.hasSummary) return 1;
@@ -128,8 +123,7 @@ export default function AISummariesPage() {
     <div className="p-6 flex gap-6 h-[calc(100vh-64px)]">
       {/* Left Panel */}
       <div className="w-80 shrink-0 flex flex-col glass-card-purple overflow-hidden">
-        {/* Generate Section */}
-        <div className="p-4 border-b" style={{ borderColor: 'rgba(124,58,237,0.15)' }}>
+        <div className="p-4 border-b" style={{ borderColor: 'rgba(201,169,110,0.15)' }}>
           <h3 className="font-display font-semibold text-foreground text-sm mb-3">Generate New Summary</h3>
           <Select onValueChange={handleGenerateFromDropdown}>
             <SelectTrigger className="glass-input text-sm" disabled={generating}>
@@ -141,21 +135,20 @@ export default function AISummariesPage() {
           </Select>
           {generating && (
             <div className="mt-3 space-y-2">
-              <div className="flex items-center gap-2 text-sm text-primary">
+              <div className="flex items-center gap-2 text-sm" style={{ color: '#c9a96e' }}>
                 <Sparkles className="w-4 h-4 animate-spin" />
                 <span>🤖 AI is analyzing contact history...</span>
               </div>
               <div className="flex gap-1">
-                <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+                <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: '#c9a96e', animationDelay: '0ms' }} />
+                <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: '#c9a96e', animationDelay: '150ms' }} />
+                <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: '#c9a96e', animationDelay: '300ms' }} />
               </div>
               <p className="text-[11px] text-muted-foreground">This takes about 8 seconds...</p>
             </div>
           )}
         </div>
 
-        {/* Search */}
         <div className="px-4 pt-3 pb-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
@@ -163,7 +156,6 @@ export default function AISummariesPage() {
           </div>
         </div>
 
-        {/* Contact List */}
         <div className="flex-1 overflow-y-auto px-2 pb-2">
           {filtered.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-6">No contacts found</p>
@@ -174,7 +166,8 @@ export default function AISummariesPage() {
               <button
                 key={c.lead_id}
                 onClick={() => handleSelectContact(c.lead_id)}
-                className={`w-full text-left p-3 rounded-xl mb-1 transition-all duration-150 ${isActive ? 'bg-[rgba(124,58,237,0.18)] border border-primary/30' : 'hover:bg-[rgba(124,58,237,0.06)] border border-transparent'}`}
+                className={`w-full text-left p-3 rounded-xl mb-1 transition-all duration-150 border ${isActive ? 'border-[rgba(201,169,110,0.30)]' : 'border-transparent hover:bg-[rgba(201,169,110,0.04)]'}`}
+                style={isActive ? { background: 'rgba(201,169,110,0.10)' } : undefined}
               >
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-foreground">{c.name}</span>
@@ -204,31 +197,28 @@ export default function AISummariesPage() {
             <div className="skeleton-shimmer h-24 rounded-xl" />
           </div>
         ) : !summary ? (
-          /* No summary exists for this contact */
           <div className="flex flex-col items-center justify-center h-full gap-4">
-            <Sparkles className="w-12 h-12 text-primary/40" />
+            <Sparkles className="w-12 h-12" style={{ color: 'rgba(201,169,110,0.4)' }} />
             <h3 className="font-display text-lg font-semibold text-foreground">No summary for {selectedContact?.name || 'this contact'}</h3>
             <p className="text-sm text-muted-foreground">Generate an AI-powered summary to get insights and next actions.</p>
             <button
               onClick={() => handleGenerate(selectedLeadId)}
               disabled={generating}
-              className="flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-display font-semibold text-white disabled:opacity-50 transition-all duration-200"
-              style={{ background: 'linear-gradient(135deg, #7c3aed, #4c1d95)', boxShadow: '0 4px 20px rgba(124,58,237,0.4)' }}
+              className="flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-display font-semibold disabled:opacity-50 transition-all duration-200"
+              style={{ background: 'linear-gradient(135deg, #c9a96e, #a8823c)', color: '#07091e', boxShadow: '0 4px 20px rgba(201,169,110,0.35)' }}
             >
               {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               {generating ? 'AI is analyzing...' : '🤖 Generate AI Summary'}
             </button>
           </div>
         ) : (
-          /* Summary exists — display it */
           <div
             className="rounded-[20px] p-7 h-full overflow-y-auto"
             style={{
-              background: 'linear-gradient(135deg, rgba(124,58,237,0.05) 0%, rgba(20,20,40,0.9) 100%)',
-              border: '1px solid rgba(124,58,237,0.25)',
+              background: 'linear-gradient(135deg, rgba(201,169,110,0.04) 0%, rgba(16,19,58,0.95) 100%)',
+              border: '1px solid rgba(201,169,110,0.20)',
             }}
           >
-            {/* Header */}
             <div className="flex items-start justify-between mb-6">
               <div>
                 <div className="flex items-center gap-3">
@@ -249,25 +239,23 @@ export default function AISummariesPage() {
               )}
             </div>
 
-            {/* AI Summary */}
             <div className="mb-6">
               <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground mb-3">AI Summary</p>
-              <div className="border-l-[3px] border-primary pl-4 py-2 rounded-r-lg" style={{ background: 'rgba(124,58,237,0.04)' }}>
-                <p className="text-[15px] text-muted-foreground leading-[1.7]">{summary.summary_text}</p>
+              <div className="border-l-[3px] pl-4 py-2 rounded-r-lg" style={{ borderColor: '#c9a96e', background: 'rgba(201,169,110,0.04)' }}>
+                <p className="text-[15px] leading-[1.7]" style={{ color: '#d4b483' }}>{summary.summary_text}</p>
               </div>
             </div>
 
-            {/* Next Action */}
             {summary.next_action && (
               <div className="mb-6">
-                <p className="text-[11px] uppercase tracking-[0.1em] mb-3" style={{ color: '#fbbf24' }}>Recommended Next Action</p>
+                <p className="text-[11px] uppercase tracking-[0.1em] mb-3" style={{ color: '#e8c98a' }}>Recommended Next Action</p>
                 <div
                   className="rounded-lg p-4"
                   style={{
-                    background: 'rgba(251,191,36,0.08)',
-                    border: '1px solid rgba(251,191,36,0.2)',
-                    borderLeft: '3px solid #fbbf24',
-                    color: '#fbbf24',
+                    background: 'rgba(232,201,138,0.06)',
+                    border: '1px solid rgba(232,201,138,0.20)',
+                    borderLeft: '3px solid #e8c98a',
+                    color: '#e8c98a',
                   }}
                 >
                   {summary.next_action}
@@ -275,13 +263,12 @@ export default function AISummariesPage() {
               </div>
             )}
 
-            {/* Regenerate */}
             <div className="mt-8">
               <button
                 onClick={() => handleGenerate(summary.lead_id)}
                 disabled={generating}
-                className="flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-display font-semibold text-white disabled:opacity-50 transition-all duration-200"
-                style={{ background: 'linear-gradient(135deg, #7c3aed, #4c1d95)', boxShadow: '0 4px 20px rgba(124,58,237,0.4)' }}
+                className="flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-display font-semibold disabled:opacity-50 transition-all duration-200"
+                style={{ background: 'linear-gradient(135deg, #c9a96e, #a8823c)', color: '#07091e', boxShadow: '0 4px 20px rgba(201,169,110,0.35)' }}
               >
                 {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                 {generating ? 'AI is analyzing...' : '🤖 Generate AI Summary'}
