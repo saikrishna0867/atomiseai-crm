@@ -167,11 +167,11 @@ export default function DashboardPage() {
               <Tooltip contentStyle={{ background: 'rgba(13,15,43,0.95)', border: '1px solid rgba(201,169,110,0.3)', borderRadius: 12, color: '#fff' }} />
             </PieChart>
           </ResponsiveContainer>
-          <div className="text-center -mt-[148px] mb-[108px]">
-            <p className="text-2xl font-display font-bold text-foreground">{totalDeals}</p>
-            <p className="text-xs text-muted-foreground">Total Deals</p>
+          <div className="text-center -mt-[130px] mb-[90px]">
+            <p className="text-xl md:text-2xl font-display font-bold text-foreground">{totalDeals}</p>
+            <p className="text-[10px] md:text-xs text-muted-foreground">Total Deals</p>
           </div>
-          <div className="flex justify-center gap-4 mt-2">
+          <div className="flex flex-wrap justify-center gap-3 md:gap-4 mt-2">
             {dealStatusData.map((d, i) => (
               <div key={d.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: PIE_COLORS[i] }} />
