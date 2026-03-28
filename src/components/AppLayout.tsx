@@ -113,7 +113,7 @@ export default function AppLayout() {
                 </span>
               </div>
               <button
-                onClick={signOut}
+                onClick={handleSignOut}
                 className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
                 title="Sign out"
               >
