@@ -34,6 +34,12 @@ const pageMeta: Record<string, { title: string; subtitle: string }> = {
 export default function AppLayout() {
   const { user, signOut } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleSignOut = useCallback(async () => {
+    await signOut();
+    navigate('/login', { replace: true });
+  }, [signOut, navigate]);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const basePath = '/' + location.pathname.split('/')[1];
