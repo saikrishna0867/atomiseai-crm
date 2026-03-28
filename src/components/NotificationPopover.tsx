@@ -130,36 +130,36 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
         {/* Notification list */}
         <div className="relative flex-1 min-h-0 overflow-hidden">
           <ScrollArea className="h-full [&>[data-radix-scroll-area-viewport]]:max-h-[50vh] sm:[&>[data-radix-scroll-area-viewport]]:max-h-[380px]">
-          <div className="px-3 py-2">
+          <div className="px-2.5 sm:px-3 py-1.5 sm:py-2">
             {isLoading ? (
-              <div className="flex items-center justify-center py-12">
+              <div className="flex items-center justify-center py-10">
                 <div className="w-5 h-5 border-2 border-[rgba(201,169,110,0.3)] border-t-[#c9a96e] rounded-full animate-spin" />
               </div>
             ) : filtered.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <Bell className="w-7 h-7 text-muted-foreground/25 mb-2" />
-                <p className="text-[13px] text-muted-foreground">No notifications yet</p>
+              <div className="flex flex-col items-center justify-center py-10 text-center">
+                <Bell className="w-6 h-6 text-muted-foreground/25 mb-2" />
+                <p className="text-[12px] sm:text-[13px] text-muted-foreground">No notifications yet</p>
               </div>
             ) : (
-              <div className="space-y-0.5">
+              <div className="space-y-px">
                 {filtered.map((n: any) => {
                   const Icon = EVENT_ICONS[n.event_type] || ClipboardList;
                   const color = EVENT_COLORS[n.event_type] || '#c9a96e';
                   return (
-                    <div key={n.id} className="flex items-start gap-3 px-2 py-2.5 rounded-xl hover:bg-white/[0.03] transition-colors cursor-default">
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${color}12` }}>
-                        <Icon className="w-3.5 h-3.5" style={{ color }} />
+                    <div key={n.id} className="flex items-start gap-2.5 px-2 py-2 sm:py-2.5 rounded-xl hover:bg-white/[0.03] transition-colors cursor-default">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${color}12` }}>
+                        <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" style={{ color }} />
                       </div>
-                      <div className="flex-1 min-w-0 pt-0.5">
-                        <p className="text-[13px] text-white leading-[1.4] line-clamp-2">{n.description}</p>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <span className="text-[11px] text-muted-foreground leading-none">
+                      <div className="flex-1 min-w-0 pt-px">
+                        <p className="text-[12px] sm:text-[13px] text-white leading-[1.4] line-clamp-2">{n.description}</p>
+                        <div className="flex items-center gap-1.5 mt-0.5 sm:mt-1">
+                          <span className="text-[10px] sm:text-[11px] text-muted-foreground leading-none">
                             {n.timestamp ? formatDistanceToNow(new Date(n.timestamp), { addSuffix: true }) : ''}
                           </span>
                           {n.performed_by && (
                             <>
-                              <span className="text-muted-foreground/25 text-[11px]">·</span>
-                              <span className="text-[11px] text-muted-foreground/70 truncate max-w-[140px]">{n.performed_by}</span>
+                              <span className="text-muted-foreground/25 text-[10px]">·</span>
+                              <span className="text-[10px] sm:text-[11px] text-muted-foreground/70 truncate max-w-[100px] sm:max-w-[140px]">{n.performed_by}</span>
                             </>
                           )}
                         </div>
