@@ -7,15 +7,17 @@ interface SidebarNavItemProps {
   icon: LucideIcon;
   label: string;
   collapsed?: boolean;
+  onClick?: () => void;
 }
 
-export function SidebarNavItem({ to, icon: Icon, label, collapsed }: SidebarNavItemProps) {
+export function SidebarNavItem({ to, icon: Icon, label, collapsed, onClick }: SidebarNavItemProps) {
   const location = useLocation();
   const isActive = location.pathname === to || location.pathname.startsWith(to + '/');
 
   return (
     <RouterNavLink
       to={to}
+      onClick={onClick}
       title={collapsed ? label : undefined}
       className={cn(
         'flex items-center h-11 text-sm font-medium transition-all duration-[180ms] ease-out my-0.5',

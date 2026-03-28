@@ -57,7 +57,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-4 md:p-6 space-y-4">
       <Tabs defaultValue="general" className="space-y-4">
         <TabsList className="bg-secondary border border-border rounded-xl">
           <TabsTrigger value="general" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">General</TabsTrigger>
@@ -109,7 +109,7 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="integrations" className="space-y-4">
-          <div className="glass-card-purple p-5 flex items-center justify-between">
+          <div className="glass-card-purple p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-accent-orange/10"><Zap className="w-5 h-5 text-accent-orange" /></div>
               <div>
@@ -125,7 +125,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="glass-card-purple p-5 flex items-center justify-between">
+          <div className="glass-card-purple p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-accent-green/10"><Database className="w-5 h-5 text-accent-green" /></div>
               <div>

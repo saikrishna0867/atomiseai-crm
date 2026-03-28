@@ -80,7 +80,7 @@ function StageColumn({ stage, deals, onAddDeal, onDeleteDeal }: { stage: string;
   return (
     <div
       ref={setNodeRef}
-      className="flex flex-col w-[280px] shrink-0 rounded-2xl border transition-colors"
+      className="flex flex-col w-[240px] md:w-[280px] shrink-0 rounded-2xl border transition-colors"
       style={{
         background: isOver ? 'rgba(201,169,110,0.06)' : 'rgba(13,15,43,0.6)',
         borderColor: isOver ? 'rgba(201,169,110,0.35)' : 'rgba(201,169,110,0.12)',
@@ -202,7 +202,7 @@ export default function PipelinePage() {
   }
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-4 md:p-6 space-y-4">
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <div className="flex gap-4 overflow-x-auto pb-4" style={{ minHeight: 'calc(100vh - 160px)' }}>
           {STAGES.map(stage => (

@@ -131,9 +131,9 @@ export default function ContactsPage() {
   }
 
   return (
-    <div className="p-6 space-y-5">
+    <div className="p-4 md:p-6 space-y-4 md:space-y-5">
       <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[200px] max-w-[320px]">
+        <div className="relative flex-1 min-w-[160px] max-w-[320px]">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search contacts..." className="glass-input w-full pr-3 text-sm rounded-[10px]" style={{ paddingLeft: '2.5rem' }} />
         </div>

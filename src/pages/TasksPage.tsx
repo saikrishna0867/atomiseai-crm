@@ -83,13 +83,13 @@ export default function TasksPage() {
   }
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="p-4 md:p-6 space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div />
-        <div className="flex gap-2">
-          <Button variant={view === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setView('list')} className="gap-1 rounded-lg"><LayoutList className="w-4 h-4" /> List</Button>
-          <Button variant={view === 'board' ? 'default' : 'outline'} size="sm" onClick={() => setView('board')} className="gap-1 rounded-lg"><Columns3 className="w-4 h-4" /> Board</Button>
-          <Button onClick={() => setAddOpen(true)} className="gap-2 font-display text-sm rounded-xl" style={{ background: '#c9a96e', color: '#07091e' }}><Plus className="w-4 h-4" /> Add Task</Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant={view === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setView('list')} className="gap-1 rounded-lg"><LayoutList className="w-4 h-4" /> <span className="hidden sm:inline">List</span></Button>
+          <Button variant={view === 'board' ? 'default' : 'outline'} size="sm" onClick={() => setView('board')} className="gap-1 rounded-lg"><Columns3 className="w-4 h-4" /> <span className="hidden sm:inline">Board</span></Button>
+          <Button onClick={() => setAddOpen(true)} className="gap-2 font-display text-sm rounded-xl" style={{ background: '#c9a96e', color: '#07091e' }}><Plus className="w-4 h-4" /> <span className="hidden sm:inline">Add Task</span></Button>
         </div>
       </div>
 
@@ -113,7 +113,7 @@ export default function TasksPage() {
       {filtered.length === 0 ? (
         <EmptyState icon={CheckSquare} title="No tasks" description="Create a task to get started." action={<Button onClick={() => setAddOpen(true)} style={{ background: '#c9a96e', color: '#07091e' }}><Plus className="w-4 h-4 mr-2" /> Add Task</Button>} />
       ) : view === 'board' ? (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
           {STATUSES.map(status => (
             <div key={status} className="glass-card-purple rounded-2xl overflow-hidden">
               <div className="p-4 border-b" style={{ borderColor: 'rgba(201,169,110,0.10)' }}>

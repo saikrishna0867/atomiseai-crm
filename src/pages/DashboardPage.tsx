@@ -107,9 +107,9 @@ export default function DashboardPage() {
   const totalDeals = dealStatusData.reduce((s, d) => s + d.value, 0);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-4 md:space-y-6">
       {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-3 md:gap-4">
         <KpiCard title="Total Contacts" value={stats.contacts.toLocaleString()} icon={Users} glowColor="#22d3ee" iconColor="#c9a96e" delay={0} />
         <KpiCard title="Pipeline Value" value={`£${stats.pipelineValue.toLocaleString()}`} icon={DollarSign} glowColor="#34d399" iconColor="#c9a96e" delay={80} />
         <KpiCard title="Deals Won" value={stats.won.toLocaleString()} icon={Trophy} glowColor="#c9a96e" iconColor="#c9a96e" delay={160} />
@@ -119,7 +119,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 md:gap-4">
         <div className="lg:col-span-3 glass-card-purple p-6 animate-fade-up" style={{ animationDelay: '300ms' }}>
           <h3 className="font-display font-semibold text-foreground mb-4">Pipeline Overview</h3>
           <ResponsiveContainer width="100%" height={260}>
@@ -183,7 +183,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="flex gap-3 animate-fade-up" style={{ animationDelay: '500ms' }}>
+      <div className="flex flex-wrap gap-2 md:gap-3 animate-fade-up" style={{ animationDelay: '500ms' }}>
         <Button
           onClick={() => navigate('/contacts')}
           className="gap-2 font-display text-sm rounded-xl px-5 py-2.5 transition-all duration-200"

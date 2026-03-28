@@ -100,15 +100,15 @@ export default function AppointmentsPage() {
   if (isLoading) return <div className="p-6"><div className="skeleton-shimmer h-96 rounded-2xl" /></div>;
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex items-center justify-end gap-2">
-        <Button variant={view === 'calendar' ? 'default' : 'outline'} size="sm" onClick={() => setView('calendar')} className="gap-1 rounded-lg"><CalIcon className="w-4 h-4" /> Calendar</Button>
-        <Button variant={view === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setView('list')} className="gap-1 rounded-lg"><List className="w-4 h-4" /> List</Button>
-        <Button onClick={() => setAddOpen(true)} className="gap-2 font-display text-sm rounded-xl" style={{ background: '#c9a96e', color: '#07091e' }}><Plus className="w-4 h-4" /> Book Appointment</Button>
+    <div className="p-4 md:p-6 space-y-4">
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <Button variant={view === 'calendar' ? 'default' : 'outline'} size="sm" onClick={() => setView('calendar')} className="gap-1 rounded-lg"><CalIcon className="w-4 h-4" /> <span className="hidden sm:inline">Calendar</span></Button>
+        <Button variant={view === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setView('list')} className="gap-1 rounded-lg"><List className="w-4 h-4" /> <span className="hidden sm:inline">List</span></Button>
+        <Button onClick={() => setAddOpen(true)} className="gap-2 font-display text-sm rounded-xl" style={{ background: '#c9a96e', color: '#07091e' }}><Plus className="w-4 h-4" /> <span className="hidden sm:inline">Book Appointment</span></Button>
       </div>
 
       {view === 'calendar' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
           <div className="lg:col-span-2 glass-card-purple p-5">
             <div className="flex items-center justify-between mb-4">
               <Button variant="ghost" size="sm" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="text-muted-foreground">←</Button>

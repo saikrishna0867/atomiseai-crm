@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Bell } from 'lucide-react';
+import { Search, Bell, Menu } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { NotificationPopover } from '@/components/NotificationPopover';
@@ -8,9 +8,10 @@ interface TopHeaderProps {
   title: string;
   subtitle: string;
   userInitial: string;
+  onMenuClick?: () => void;
 }
 
-export function TopHeader({ title, subtitle, userInitial }: TopHeaderProps) {
+export function TopHeader({ title, subtitle, userInitial, onMenuClick }: TopHeaderProps) {
   const [search, setSearch] = useState('');
   const [notifOpen, setNotifOpen] = useState(false);
 
@@ -25,16 +26,24 @@ export function TopHeader({ title, subtitle, userInitial }: TopHeaderProps) {
 
   return (
     <header
-      className="h-16 flex items-center gap-4 px-6 sticky top-0 z-40 shrink-0 border-b"
+      className="h-14 md:h-16 flex items-center gap-3 md:gap-4 px-4 md:px-6 sticky top-0 z-40 shrink-0 border-b"
       style={{
         background: 'rgba(7,9,30,0.85)',
         backdropFilter: 'blur(12px)',
         borderColor: 'rgba(201,169,110,0.10)',
       }}
     >
+      {/* Mobile hamburger */}
+      <button
+        onClick={onMenuClick}
+        className="md:hidden p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-[rgba(201,169,110,0.08)] transition-colors"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
+
       <div className="flex-1 min-w-0">
-        <h1 className="text-[22px] font-display font-bold text-foreground leading-tight">{title}</h1>
-        {subtitle && <p className="text-[13px] text-muted-foreground truncate">{subtitle}</p>}
+        <h1 className="text-lg md:text-[22px] font-display font-bold text-foreground leading-tight truncate">{title}</h1>
+        {subtitle && <p className="text-[11px] md:text-[13px] text-muted-foreground truncate hidden sm:block">{subtitle}</p>}
       </div>
 
       {/* Search */}
@@ -66,7 +75,7 @@ export function TopHeader({ title, subtitle, userInitial }: TopHeaderProps) {
 
       {/* User Avatar */}
       <div
-        className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+        className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
         style={{ background: '#10133a', border: '1px solid #c9a96e', color: '#c9a96e' }}
       >
         {userInitial}
