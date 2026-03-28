@@ -57,7 +57,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-4 md:p-6 space-y-4">
       <Tabs defaultValue="general" className="space-y-4">
         <TabsList className="bg-secondary border border-border rounded-xl">
           <TabsTrigger value="general" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">General</TabsTrigger>
