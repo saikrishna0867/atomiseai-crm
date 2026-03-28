@@ -80,7 +80,7 @@ function StageColumn({ stage, deals, onAddDeal, onDeleteDeal }: { stage: string;
   return (
     <div
       ref={setNodeRef}
-      className="flex flex-col w-[240px] md:w-[280px] shrink-0 rounded-2xl border transition-colors"
+      className="flex flex-col w-[85vw] sm:w-[240px] md:w-[280px] shrink-0 rounded-2xl border transition-colors snap-center"
       style={{
         background: isOver ? 'rgba(201,169,110,0.06)' : 'rgba(13,15,43,0.6)',
         borderColor: isOver ? 'rgba(201,169,110,0.35)' : 'rgba(201,169,110,0.12)',
