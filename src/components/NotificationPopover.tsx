@@ -147,7 +147,7 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
                         <Icon className="w-3.5 h-3.5" style={{ color }} />
                       </div>
                       <div className="flex-1 min-w-0 pt-0.5">
-                        <p className="text-[13px] text-foreground leading-[1.4] line-clamp-2">{n.description}</p>
+                        <p className="text-[13px] text-white leading-[1.4] line-clamp-2">{n.description}</p>
                         <div className="flex items-center gap-1.5 mt-1">
                           <span className="text-[11px] text-muted-foreground leading-none">
                             {n.timestamp ? formatDistanceToNow(new Date(n.timestamp), { addSuffix: true }) : ''}
