@@ -123,8 +123,31 @@ export default function DashboardPage() {
         <div className="lg:col-span-3 glass-card-purple p-4 md:p-6 animate-fade-up" style={{ animationDelay: '300ms' }}>
           <h3 className="font-display font-semibold text-foreground mb-3 md:mb-4 text-sm md:text-base">Pipeline Overview</h3>
           <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={stageData} barCategoryGap="20%">
-              <XAxis dataKey="name" tick={{ fill: '#7a80b0', fontSize: 10 }} axisLine={false} tickLine={false} interval={0} angle={-35} textAnchor="end" height={50} />
+            <BarChart data={stageData} barCategoryGap="15%">
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                interval={0}
+                tick={({ x, y, payload }: any) => {
+                  const abbrevMap: Record<string, string> = {
+                    'Lead': 'Lead',
+                    'Qualified': 'Qual',
+                    'Proposal': 'Prop',
+                    'Negotiation': 'Nego',
+                    'Closed Won': 'Won',
+                    'Closed Lost': 'Lost',
+                  };
+                  const isMobile = window.innerWidth < 640;
+                  const label = isMobile ? (abbrevMap[payload.value] || payload.value) : payload.value;
+                  return (
+                    <text x={x} y={y + 12} textAnchor="middle" fill="#7a80b0" fontSize={isMobile ? 9 : 11}>
+                      {label}
+                    </text>
+                  );
+                }}
+                height={30}
+              />
               <YAxis tick={{ fill: '#7a80b0', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
                 cursor={{ fill: 'rgba(201,169,110,0.08)' }}
