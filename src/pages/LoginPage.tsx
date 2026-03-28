@@ -66,7 +66,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right Panel — Login Form */}
-      <div className="flex-1 flex items-center justify-center bg-background p-6">
+      <div className="flex-1 flex items-center justify-center bg-background p-4 md:p-6">
         <div className="w-full max-w-[420px]">
           <div
             className="rounded-3xl p-10 space-y-6"

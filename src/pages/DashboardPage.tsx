@@ -183,7 +183,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="flex gap-3 animate-fade-up" style={{ animationDelay: '500ms' }}>
+      <div className="flex flex-wrap gap-2 md:gap-3 animate-fade-up" style={{ animationDelay: '500ms' }}>
         <Button
           onClick={() => navigate('/contacts')}
           className="gap-2 font-display text-sm rounded-xl px-5 py-2.5 transition-all duration-200"

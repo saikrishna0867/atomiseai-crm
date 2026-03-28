@@ -120,9 +120,9 @@ export default function AISummariesPage() {
   const sent = summary ? (HEALTH_CONFIG[summary.deal_health] || HEALTH_CONFIG.Unknown) : null;
 
   return (
-    <div className="p-6 flex gap-6 h-[calc(100vh-64px)]">
+    <div className="p-4 md:p-6 flex flex-col md:flex-row gap-4 md:gap-6 h-auto md:h-[calc(100vh-64px)]">
       {/* Left Panel */}
-      <div className="w-80 shrink-0 flex flex-col glass-card-purple overflow-hidden">
+      <div className="w-full md:w-80 shrink-0 flex flex-col glass-card-purple overflow-hidden max-h-[50vh] md:max-h-none">
         <div className="p-4 border-b" style={{ borderColor: 'rgba(201,169,110,0.15)' }}>
           <h3 className="font-display font-semibold text-foreground text-sm mb-3">Generate New Summary</h3>
           <Select onValueChange={handleGenerateFromDropdown}>

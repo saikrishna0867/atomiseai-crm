@@ -108,7 +108,7 @@ export default function AppointmentsPage() {
       </div>
 
       {view === 'calendar' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
           <div className="lg:col-span-2 glass-card-purple p-5">
             <div className="flex items-center justify-between mb-4">
               <Button variant="ghost" size="sm" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="text-muted-foreground">←</Button>
