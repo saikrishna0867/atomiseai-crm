@@ -53,10 +53,11 @@ export default function AppointmentsPage() {
     mutationFn: async () => {
       const apptId = crypto.randomUUID();
       const contact = contacts.find((c: any) => c.lead_id === form.lead_id);
+      const formattedTime = `${timeHour} ${timePeriod}`;
       const record = {
         appt_id: apptId, lead_id: form.lead_id, contact_name: form.contact_name,
         contact_email: form.contact_email, rep_name: form.rep_name, appointment_date: form.appointment_date,
-        appointment_time: form.appointment_time, appointment_type: form.appointment_type,
+        appointment_time: formattedTime, appointment_type: form.appointment_type,
         meeting_link: form.meeting_link, status: 'Scheduled',
       };
       const { error } = await supabase.from('appointments').insert(record);
