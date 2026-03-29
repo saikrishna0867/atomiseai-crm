@@ -74,8 +74,8 @@ export default function DashboardPage() {
       const allStages = ['Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'];
       const stageCounts: Record<string, number> = {};
       allStages.forEach(s => { stageCounts[s] = 0; });
-      contacts.forEach(c => {
-        const s = c.pipeline_stage || 'Lead';
+      deals.forEach(d => {
+        const s = d.stage || 'Lead';
         if (stageCounts[s] !== undefined) stageCounts[s]++;
       });
       setStageData(allStages.map(name => ({ name, value: stageCounts[name] })));
