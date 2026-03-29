@@ -197,7 +197,7 @@ export default function AppointmentsPage() {
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="rounded-[20px] max-w-lg max-h-[90vh] overflow-y-auto" style={{ background: '#0d0f2b', border: '1px solid rgba(201,169,110,0.25)' }}>
           <DialogHeader><DialogTitle className="font-display">Book Appointment</DialogTitle></DialogHeader>
-          <form onSubmit={e => { e.preventDefault(); setForm(p => ({ ...p, appointment_time: `${timeHour} ${timePeriod}` })); addMutation.mutate(); }} className="space-y-3">
+          <form onSubmit={e => { e.preventDefault(); addMutation.mutate(); }} className="space-y-3">
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Select Contact *</Label>
               <Select value={form.lead_id} onValueChange={selectContact}>
