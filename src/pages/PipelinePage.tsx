@@ -153,12 +153,13 @@ export default function PipelinePage() {
       const { data, error } = await supabase.from('pipeline_deals').insert([insertData]).select();
       if (error) throw error;
       // Fire stage-change webhook only if stage is NOT Lead
-      if (addStage !== 'Lead' && data) {
+      const created = data?.[0];
+      if (addStage !== 'Lead' && created) {
         try {
           await webhooks.stageChange({
-            leadId: data.lead_id, contactEmail: data.contact_email, contactName: data.contact_name,
-            oldStage: 'Lead', newStage: addStage, assignedRep: data.assigned_rep || 'Admin',
-            assignedRepEmail: form.assigned_rep_email || 'admin@atomise.ai', dealValue: data.deal_value,
+            leadId: created.lead_id, contactEmail: created.contact_email, contactName: created.contact_name,
+            oldStage: 'Lead', newStage: addStage, assignedRep: created.assigned_rep || 'Admin',
+            assignedRepEmail: form.assigned_rep_email || 'admin@atomise.ai', dealValue: created.deal_value,
           });
         } catch (_) { /* webhook failure is non-blocking */ }
       }
