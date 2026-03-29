@@ -29,6 +29,8 @@ export default function AppointmentsPage() {
     contact_name: '', contact_email: '', lead_id: '', appointment_type: 'Discovery Call',
     appointment_date: '', appointment_time: '', meeting_link: '', rep_name: '', rep_email: '', notes: '', duration: '30',
   });
+  const [timeHour, setTimeHour] = useState('09:00');
+  const [timePeriod, setTimePeriod] = useState<'AM' | 'PM'>('AM');
 
   const { data: appointments = [], isLoading } = useQuery({
     queryKey: ['appointments'],
