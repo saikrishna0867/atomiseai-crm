@@ -29,6 +29,8 @@ export default function AppointmentsPage() {
     contact_name: '', contact_email: '', lead_id: '', appointment_type: 'Discovery Call',
     appointment_date: '', appointment_time: '', meeting_link: '', rep_name: '', rep_email: '', notes: '', duration: '30',
   });
+  const [timeHour, setTimeHour] = useState('09:00');
+  const [timePeriod, setTimePeriod] = useState<'AM' | 'PM'>('AM');
 
   const { data: appointments = [], isLoading } = useQuery({
     queryKey: ['appointments'],
@@ -51,10 +53,11 @@ export default function AppointmentsPage() {
     mutationFn: async () => {
       const apptId = crypto.randomUUID();
       const contact = contacts.find((c: any) => c.lead_id === form.lead_id);
+      const formattedTime = `${timeHour} ${timePeriod}`;
       const record = {
         appt_id: apptId, lead_id: form.lead_id, contact_name: form.contact_name,
         contact_email: form.contact_email, rep_name: form.rep_name, appointment_date: form.appointment_date,
-        appointment_time: form.appointment_time, appointment_type: form.appointment_type,
+        appointment_time: formattedTime, appointment_type: form.appointment_type,
         meeting_link: form.meeting_link, status: 'Scheduled',
       };
       const { error } = await supabase.from('appointments').insert(record);
@@ -65,7 +68,7 @@ export default function AppointmentsPage() {
           leadId: form.lead_id, contactName: form.contact_name, contactEmail: form.contact_email,
           contactPhone: contact?.phone || '', company: contact?.company || '',
           repName: form.rep_name, repEmail: form.rep_email, appointmentDate: form.appointment_date,
-          appointmentTime: form.appointment_time, appointmentType: form.appointment_type,
+          appointmentTime: formattedTime, appointmentType: form.appointment_type,
           duration: form.duration, meetingLink: form.meeting_link, notes: form.notes,
         }),
         supabase.from('activity_log').insert({
@@ -211,9 +214,39 @@ export default function AppointmentsPage() {
                 <SelectContent className="bg-card border-border">{APPT_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Date *</Label><input type="date" value={form.appointment_date} onChange={e => setForm(p => ({ ...p, appointment_date: e.target.value }))} required className="glass-input w-full" /></div>
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Time *</Label><input type="time" value={form.appointment_time} onChange={e => setForm(p => ({ ...p, appointment_time: e.target.value }))} required className="glass-input w-full" /></div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Date *</Label>
+              <input type="date" value={form.appointment_date} onChange={e => setForm(p => ({ ...p, appointment_date: e.target.value }))} required className="glass-input w-full" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Time *</Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="time"
+                  value={timeHour}
+                  onChange={e => setTimeHour(e.target.value)}
+                  required
+                  className="glass-input flex-1"
+                />
+                <div className="flex rounded-lg overflow-hidden border border-[rgba(201,169,110,0.2)]">
+                  {(['AM', 'PM'] as const).map(p => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setTimePeriod(p)}
+                      className={`px-3 py-2 text-xs font-semibold transition-colors ${timePeriod === p ? 'text-[#07091e]' : 'text-muted-foreground hover:text-foreground'}`}
+                      style={timePeriod === p ? { background: '#c9a96e' } : undefined}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {form.appointment_date && timeHour && (
+                <p className="text-xs mt-1" style={{ color: '#c9a96e' }}>
+                  Meeting scheduled for {format(new Date(form.appointment_date + 'T00:00:00'), 'dd MMM yyyy')} at {timeHour} {timePeriod}
+                </p>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Duration</Label>
