@@ -134,8 +134,28 @@ export default function PipelinePage() {
 
   const addMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from('pipeline_deals').insert({ ...form, deal_value: Number(form.deal_value) || 0, stage: addStage, lead_id: crypto.randomUUID() });
+      const { assigned_rep_email, ...rest } = form;
+      const payload = {
+        contact_name: rest.contact_name,
+        contact_email: rest.contact_email,
+        company: rest.company,
+        deal_value: Number(rest.deal_value) || 0,
+        stage: addStage,
+        assigned_rep: rest.assigned_rep,
+        notes: rest.notes,
+        lead_id: `LEAD-${Date.now()}`,
+        created_at: new Date().toISOString(),
+      };
+      const { data, error } = await supabase.from('pipeline_deals').insert([payload]).select().single();
       if (error) throw error;
+      // Fire webhook with rep email for automation
+      try {
+        await webhooks.stageChange({
+          leadId: data.lead_id, contactEmail: data.contact_email, contactName: data.contact_name,
+          oldStage: 'New', newStage: addStage, assignedRep: data.assigned_rep || 'Admin',
+          assignedRepEmail: assigned_rep_email || 'admin@atomise.ai', dealValue: data.deal_value,
+        });
+      } catch (_) { /* webhook failure is non-blocking */ }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pipeline_deals'] });
