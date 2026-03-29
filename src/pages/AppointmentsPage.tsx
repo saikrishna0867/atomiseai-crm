@@ -213,9 +213,39 @@ export default function AppointmentsPage() {
                 <SelectContent className="bg-card border-border">{APPT_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Date *</Label><input type="date" value={form.appointment_date} onChange={e => setForm(p => ({ ...p, appointment_date: e.target.value }))} required className="glass-input w-full" /></div>
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Time *</Label><input type="time" value={form.appointment_time} onChange={e => setForm(p => ({ ...p, appointment_time: e.target.value }))} required className="glass-input w-full" /></div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Date *</Label>
+              <input type="date" value={form.appointment_date} onChange={e => setForm(p => ({ ...p, appointment_date: e.target.value }))} required className="glass-input w-full" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Time *</Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="time"
+                  value={timeHour}
+                  onChange={e => setTimeHour(e.target.value)}
+                  required
+                  className="glass-input flex-1"
+                />
+                <div className="flex rounded-lg overflow-hidden border border-[rgba(201,169,110,0.2)]">
+                  {(['AM', 'PM'] as const).map(p => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setTimePeriod(p)}
+                      className={`px-3 py-2 text-xs font-semibold transition-colors ${timePeriod === p ? 'text-[#07091e]' : 'text-muted-foreground hover:text-foreground'}`}
+                      style={timePeriod === p ? { background: '#c9a96e' } : undefined}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {form.appointment_date && timeHour && (
+                <p className="text-xs mt-1" style={{ color: '#c9a96e' }}>
+                  Meeting scheduled for {format(new Date(form.appointment_date + 'T00:00:00'), 'dd MMM yyyy')} at {timeHour} {timePeriod}
+                </p>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Duration</Label>
