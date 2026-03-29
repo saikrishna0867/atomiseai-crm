@@ -134,34 +134,38 @@ export default function PipelinePage() {
 
   const addMutation = useMutation({
     mutationFn: async () => {
-      const { assigned_rep_email, ...rest } = form;
+      const now = new Date().toISOString();
       const payload = {
-        contact_name: rest.contact_name,
-        contact_email: rest.contact_email,
-        company: rest.company,
-        deal_value: Number(rest.deal_value) || 0,
-        stage: addStage,
-        assigned_rep: rest.assigned_rep,
-        notes: rest.notes,
         lead_id: `LEAD-${Date.now()}`,
-        created_at: new Date().toISOString(),
+        contact_name: form.contact_name,
+        contact_email: form.contact_email,
+        company: form.company || '',
+        deal_value: Number(form.deal_value) || 0,
+        stage: addStage,
+        assigned_rep: form.assigned_rep,
+        assigned_rep_email: form.assigned_rep_email || '',
+        notes: form.notes || '',
+        created_at: now,
+        updated_at: now,
       };
-      const { data, error } = await supabase.from('pipeline_deals').insert([payload]).select().single();
+      const { data, error } = await supabase.from('pipeline_deals').insert([payload]).select().maybeSingle();
       if (error) throw error;
-      // Fire webhook with rep email for automation
-      try {
-        await webhooks.stageChange({
-          leadId: data.lead_id, contactEmail: data.contact_email, contactName: data.contact_name,
-          oldStage: 'New', newStage: addStage, assignedRep: data.assigned_rep || 'Admin',
-          assignedRepEmail: assigned_rep_email || 'admin@atomise.ai', dealValue: data.deal_value,
-        });
-      } catch (_) { /* webhook failure is non-blocking */ }
+      // Fire stage-change webhook only if stage is NOT Lead
+      if (addStage !== 'Lead' && data) {
+        try {
+          await webhooks.stageChange({
+            leadId: data.lead_id, contactEmail: data.contact_email, contactName: data.contact_name,
+            oldStage: 'Lead', newStage: addStage, assignedRep: data.assigned_rep || 'Admin',
+            assignedRepEmail: form.assigned_rep_email || 'admin@atomise.ai', dealValue: data.deal_value,
+          });
+        } catch (_) { /* webhook failure is non-blocking */ }
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pipeline_deals'] });
       setAddOpen(false);
       setForm({ contact_name: '', contact_email: '', company: '', deal_value: '', assigned_rep: '', assigned_rep_email: '', notes: '' });
-      toast({ title: 'Deal created ✅' });
+      toast({ title: 'Deal added successfully!' });
     },
     onError: (e: any) => { console.error('[Pipeline]', e); toast({ title: 'Error', description: e.message, variant: 'destructive' }); },
   });
