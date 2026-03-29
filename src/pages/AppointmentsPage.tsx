@@ -68,7 +68,7 @@ export default function AppointmentsPage() {
           leadId: form.lead_id, contactName: form.contact_name, contactEmail: form.contact_email,
           contactPhone: contact?.phone || '', company: contact?.company || '',
           repName: form.rep_name, repEmail: form.rep_email, appointmentDate: form.appointment_date,
-          appointmentTime: form.appointment_time, appointmentType: form.appointment_type,
+          appointmentTime: formattedTime, appointmentType: form.appointment_type,
           duration: form.duration, meetingLink: form.meeting_link, notes: form.notes,
         }),
         supabase.from('activity_log').insert({
