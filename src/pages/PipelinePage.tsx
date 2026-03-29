@@ -135,28 +135,31 @@ export default function PipelinePage() {
   const addMutation = useMutation({
     mutationFn: async () => {
       const now = new Date().toISOString();
-      const payload = {
+      const insertData = {
         lead_id: `LEAD-${Date.now()}`,
         contact_name: form.contact_name,
         contact_email: form.contact_email,
         company: form.company || '',
-        deal_value: Number(form.deal_value) || 0,
+        deal_value: parseFloat(form.deal_value) || 0,
         stage: addStage,
         assigned_rep: form.assigned_rep,
         assigned_rep_email: form.assigned_rep_email || '',
         notes: form.notes || '',
+        source: 'CRM Manual Entry',
+        priority: 'Medium',
         created_at: now,
         updated_at: now,
       };
-      const { data, error } = await supabase.from('pipeline_deals').insert([payload]).select().maybeSingle();
+      const { data, error } = await supabase.from('pipeline_deals').insert([insertData]).select();
       if (error) throw error;
       // Fire stage-change webhook only if stage is NOT Lead
-      if (addStage !== 'Lead' && data) {
+      const created = data?.[0];
+      if (addStage !== 'Lead' && created) {
         try {
           await webhooks.stageChange({
-            leadId: data.lead_id, contactEmail: data.contact_email, contactName: data.contact_name,
-            oldStage: 'Lead', newStage: addStage, assignedRep: data.assigned_rep || 'Admin',
-            assignedRepEmail: form.assigned_rep_email || 'admin@atomise.ai', dealValue: data.deal_value,
+            leadId: created.lead_id, contactEmail: created.contact_email, contactName: created.contact_name,
+            oldStage: 'Lead', newStage: addStage, assignedRep: created.assigned_rep || 'Admin',
+            assignedRepEmail: form.assigned_rep_email || 'admin@atomise.ai', dealValue: created.deal_value,
           });
         } catch (_) { /* webhook failure is non-blocking */ }
       }
