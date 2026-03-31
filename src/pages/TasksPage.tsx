@@ -151,9 +151,14 @@ export default function TasksPage() {
                         borderLeft: `3px solid ${PRIORITY_BORDER[t.priority] || '#fbbf24'}`,
                       }}
                     >
-                      <div className="flex items-start gap-2">
-                        {isOverdue && <span className="text-xs bg-destructive/20 text-destructive px-1.5 py-0.5 rounded font-medium">⚠️ Overdue</span>}
-                        {isDueToday && <span className="text-xs bg-amber-400/20 text-amber-400 px-1.5 py-0.5 rounded font-medium">📅 Due Today</span>}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {isOverdue && <span className="text-xs bg-destructive/20 text-destructive px-1.5 py-0.5 rounded font-medium">⚠️ Overdue</span>}
+                          {isDueToday && <span className="text-xs bg-amber-400/20 text-amber-400 px-1.5 py-0.5 rounded font-medium">📅 Due Today</span>}
+                        </div>
+                        <button onClick={() => setDeleteTarget(t.id)} className="p-1 rounded-md hover:bg-destructive/20 transition-colors shrink-0" title="Delete task">
+                          <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
+                        </button>
                       </div>
                       <p className="text-sm font-medium text-foreground mt-1">{t.title}</p>
                       {t.contact_name && <p className="text-xs mt-1" style={{ color: '#c9a96e' }}>{t.contact_name}</p>}
