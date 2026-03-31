@@ -63,11 +63,13 @@ export default function TasksPage() {
   });
 
   const filtered = tasks.filter((t: any) => {
-    return (statusFilter === 'all' || t.status === statusFilter) && (priorityFilter === 'all' || t.priority === priorityFilter);
+    const tStatus = (t.status || '').toLowerCase();
+    const tPriority = (t.priority || '').toLowerCase();
+    return (statusFilter === 'all' || tStatus === statusFilter.toLowerCase()) && (priorityFilter === 'all' || tPriority === priorityFilter.toLowerCase());
   });
 
   const getDateStatus = (t: any) => {
-    if (!t.due_date || t.status === 'Completed') return { isOverdue: false, isDueToday: false };
+    if (!t.due_date || (t.status || '').toLowerCase() === 'completed') return { isOverdue: false, isDueToday: false };
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const dueDate = new Date(t.due_date);
@@ -118,10 +120,10 @@ export default function TasksPage() {
             <div key={status} className="glass-card-purple rounded-2xl overflow-hidden">
               <div className="p-4 border-b" style={{ borderColor: 'rgba(201,169,110,0.10)' }}>
                 <h3 className="font-display font-semibold text-sm text-foreground">{status}</h3>
-                <span className="text-xs text-muted-foreground">{filtered.filter((t: any) => t.status === status).length} tasks</span>
+                <span className="text-xs text-muted-foreground">{filtered.filter((t: any) => (t.status || '').toLowerCase() === status.toLowerCase()).length} tasks</span>
               </div>
               <div className="p-3 space-y-2 max-h-[60vh] overflow-y-auto">
-                {filtered.filter((t: any) => t.status === status).map((t: any) => {
+                {filtered.filter((t: any) => (t.status || '').toLowerCase() === status.toLowerCase()).map((t: any) => {
                   const { isOverdue, isDueToday } = getDateStatus(t);
                   return (
                     <div
@@ -145,7 +147,7 @@ export default function TasksPage() {
                         </span>
                         <span className="text-xs text-muted-foreground">{t.assigned_to}</span>
                       </div>
-                      <Select value={t.status} onValueChange={v => updateStatus.mutate({ id: t.id, status: v })}>
+                      <Select value={STATUSES.find(s => s.toLowerCase() === (t.status || '').toLowerCase()) || t.status} onValueChange={v => updateStatus.mutate({ id: t.id, status: v })}>
                         <SelectTrigger className="h-7 text-xs mt-2 glass-input"><SelectValue /></SelectTrigger>
                         <SelectContent className="bg-card border-border">{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                       </Select>
@@ -192,7 +194,7 @@ export default function TasksPage() {
                   </td>
                   <td className="px-4 py-3 text-muted-foreground text-xs">{t.assigned_to}</td>
                   <td className="px-4 py-3">
-                    <Select value={t.status} onValueChange={v => updateStatus.mutate({ id: t.id, status: v })}>
+                    <Select value={STATUSES.find(s => s.toLowerCase() === (t.status || '').toLowerCase()) || t.status} onValueChange={v => updateStatus.mutate({ id: t.id, status: v })}>
                       <SelectTrigger className="w-32 h-7 text-xs glass-input"><SelectValue /></SelectTrigger>
                       <SelectContent className="bg-card border-border">{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                     </Select>
