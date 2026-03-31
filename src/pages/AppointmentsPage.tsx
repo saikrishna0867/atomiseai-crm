@@ -9,7 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { CalendarDays, Plus, List, Calendar as CalIcon } from 'lucide-react';
+import { CalendarDays, Plus, List, Calendar as CalIcon, Trash2 } from 'lucide-react';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths } from 'date-fns';
 
 const APPT_TYPES = ['Discovery Call', 'Demo', 'Follow-Up Call', 'Proposal Review', 'Onboarding'];
@@ -22,6 +23,7 @@ export default function AppointmentsPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   useEffect(() => { document.title = 'Appointments | Atomise CRM'; }, []);
 
@@ -84,6 +86,19 @@ export default function AppointmentsPage() {
       toast({ title: '📅 Appointment booked — confirmation emails sent to both parties ✅' });
     },
     onError: (e: any) => { console.error('[Appointments]', e); toast({ title: 'Error', description: e.message, variant: 'destructive' }); },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('appointments').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      setDeleteTarget(null);
+      toast({ title: 'Appointment deleted' });
+    },
+    onError: (e: any) => { toast({ title: 'Error', description: e.message, variant: 'destructive' }); },
   });
 
   const selectContact = (leadId: string) => {
@@ -156,7 +171,10 @@ export default function AppointmentsPage() {
               <div key={a.id} className="py-3 border-b last:border-0 space-y-1" style={{ borderColor: 'rgba(201,169,110,0.10)' }}>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-foreground">{a.contact_name}</span>
-                  <StatusBadge type="status" value={a.status || 'Scheduled'} />
+                  <div className="flex items-center gap-2">
+                    <StatusBadge type="status" value={a.status || 'Scheduled'} />
+                    <button onClick={() => setDeleteTarget(a.id)} className="p-1 rounded hover:bg-red-500/10 text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                  </div>
                 </div>
                 <p className="text-xs text-muted-foreground">{a.appointment_type} • {a.appointment_time}</p>
                 <p className="text-xs text-muted-foreground">Rep: {a.rep_name}</p>
@@ -172,7 +190,7 @@ export default function AppointmentsPage() {
           <div className="glass-card-purple overflow-hidden rounded-2xl">
             <table className="w-full text-sm">
               <thead><tr style={{ background: 'rgba(201,169,110,0.08)', borderBottom: '1px solid rgba(201,169,110,0.15)' }}>
-                {['Contact', 'Type', 'Date', 'Time', 'Rep', 'Link', 'Status'].map(h => (
+                {['Contact', 'Type', 'Date', 'Time', 'Rep', 'Link', 'Status', 'Actions'].map(h => (
                   <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{h}</th>
                 ))}
               </tr></thead>
@@ -186,6 +204,9 @@ export default function AppointmentsPage() {
                     <td className="px-4 py-3 text-muted-foreground text-xs">{a.rep_name}</td>
                     <td className="px-4 py-3">{a.meeting_link && <a href={a.meeting_link} target="_blank" className="text-xs hover:underline" style={{ color: '#c9a96e' }}>Join</a>}</td>
                     <td className="px-4 py-3"><StatusBadge type="status" value={a.status || 'Scheduled'} /></td>
+                    <td className="px-4 py-3">
+                      <button onClick={() => setDeleteTarget(a.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -265,6 +286,15 @@ export default function AppointmentsPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title="Delete Appointment"
+        description="Are you sure you want to delete this appointment? This action cannot be undone."
+        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget)}
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }
