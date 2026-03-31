@@ -14,7 +14,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  useEffect(() => { document.title = 'Sign In | Atomise CRM'; }, []);
+  useEffect(() => { document.title = 'Sign In | Automise AI CRM'; }, []);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -57,7 +57,7 @@ export default function LoginPage() {
         <div className="absolute w-[200px] h-[200px] rounded-full bottom-[15%] right-[15%]" style={{ background: 'rgba(201,169,110,0.06)', filter: 'blur(60px)', animation: 'float 6s ease-in-out infinite reverse' }} />
 
         <div className="relative z-10 text-center space-y-6 px-8">
-          <img src="/atomise-logo.png" alt="Atomise AI" className="w-24 h-24 mx-auto object-contain" />
+          <img src="/atomise-logo.png" alt="Automise AI" className="w-24 h-24 mx-auto object-contain" />
           <h1 className="font-display text-4xl font-bold text-white">ATOMISE AI</h1>
           <p className="text-xl font-display" style={{ color: '#d4b483' }}>Automating Tomorrow, Today</p>
           <div className="space-y-3 mt-8">
@@ -89,7 +89,7 @@ export default function LoginPage() {
           >
             {/* Logo */}
             <div className="flex items-center justify-center mb-2">
-              <img src="/atomise-logo.png" alt="Atomise AI" className="w-12 h-12 object-contain" />
+              <img src="/atomise-logo.png" alt="Automise AI" className="w-12 h-12 object-contain" />
             </div>
 
             <div className="text-center">
@@ -129,7 +129,7 @@ export default function LoginPage() {
             </button>
 
             <div className="rounded-[10px] p-3" style={{ background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.15)' }}>
-              <p className="text-xs text-muted-foreground text-center">🔑 Demo: <span className="text-foreground font-medium">admin@atomise.ai</span> / <span className="text-foreground font-medium">atomise2026</span></p>
+              <p className="text-xs text-muted-foreground text-center">🔑 Demo: <span className="text-foreground font-medium">admin@automise.ai</span> / <span className="text-foreground font-medium">atomise2026</span></p>
             </div>
 
             <Button

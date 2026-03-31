@@ -27,7 +27,7 @@ export default function AISummariesPage() {
   const [summary, setSummary] = useState<any>(null);
   const [loadingSummary, setLoadingSummary] = useState(false);
 
-  useEffect(() => { document.title = 'AI Summaries | Atomise CRM'; }, []);
+  useEffect(() => { document.title = 'AI Summaries | Automise AI CRM'; }, []);
 
   const { data: contacts = [] } = useQuery({
     queryKey: ['contacts-for-ai'],
@@ -80,7 +80,7 @@ export default function AISummariesPage() {
   const handleGenerate = async (leadId: string) => {
     setGenerating(true);
     try {
-      const repEmail = user?.email || session?.user?.email || 'admin@atomise.ai';
+      const repEmail = user?.email || session?.user?.email || 'admin@automise.ai';
       await webhooks.generateSummary({ leadId, repEmail });
       toast({ title: '🤖 AI is analyzing contact history...' });
       await new Promise(r => setTimeout(r, 8000));

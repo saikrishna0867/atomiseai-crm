@@ -34,7 +34,7 @@ export default function ContactDetailPage() {
   });
 
   useEffect(() => {
-    if (contact?.name) document.title = `${contact.name} | Atomise CRM`;
+    if (contact?.name) document.title = `${contact.name} | Automise AI CRM`;
   }, [contact]);
 
   const { data: activities = [] } = useQuery({
@@ -72,7 +72,7 @@ export default function ContactDetailPage() {
   const generateSummary = async () => {
     setAiLoading(true);
     try {
-      await webhooks.generateSummary({ leadId, repEmail: user?.email || 'admin@atomise.ai' });
+      await webhooks.generateSummary({ leadId, repEmail: user?.email || 'admin@automise.ai' });
       toast({ title: '🤖 AI is analyzing...' });
       setTimeout(async () => {
         await refetchSummary();

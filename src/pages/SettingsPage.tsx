@@ -8,21 +8,21 @@ import { supabase } from '@/lib/supabase';
 import { Settings, Zap, Database, UserPlus, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
 const teamMembers = [
-  { name: 'Admin User', email: 'admin@atomise.ai', role: 'Admin' },
-  { name: 'Sarah Johnson', email: 'sarah@atomise.ai', role: 'Sales Rep' },
-  { name: 'Mike Chen', email: 'mike@atomise.ai', role: 'Sales Rep' },
+  { name: 'Admin User', email: 'admin@automise.ai', role: 'Admin' },
+  { name: 'Sarah Johnson', email: 'sarah@automise.ai', role: 'Sales Rep' },
+  { name: 'Mike Chen', email: 'mike@automise.ai', role: 'Sales Rep' },
 ];
 
 export default function SettingsPage() {
   const { toast } = useToast();
-  const [companyName, setCompanyName] = useState('Atomise AI');
+  const [companyName, setCompanyName] = useState('Automise AI');
   const { crmName, setCrmName } = useAppSettings();
   const [testingN8n, setTestingN8n] = useState(false);
   const [testingSupabase, setTestingSupabase] = useState(false);
   const [n8nStatus, setN8nStatus] = useState<'idle' | 'connected' | 'error'>('idle');
   const [supabaseStatus, setSupabaseStatus] = useState<'idle' | 'connected' | 'error'>('idle');
 
-  useEffect(() => { document.title = 'Settings | Atomise CRM'; }, []);
+  useEffect(() => { document.title = 'Settings | Automise AI CRM'; }, []);
 
   const testN8n = async () => {
     setTestingN8n(true);
