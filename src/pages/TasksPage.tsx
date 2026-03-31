@@ -63,7 +63,9 @@ export default function TasksPage() {
   });
 
   const filtered = tasks.filter((t: any) => {
-    return (statusFilter === 'all' || t.status === statusFilter) && (priorityFilter === 'all' || t.priority === priorityFilter);
+    const tStatus = (t.status || '').toLowerCase();
+    const tPriority = (t.priority || '').toLowerCase();
+    return (statusFilter === 'all' || tStatus === statusFilter.toLowerCase()) && (priorityFilter === 'all' || tPriority === priorityFilter.toLowerCase());
   });
 
   const getDateStatus = (t: any) => {
