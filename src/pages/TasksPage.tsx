@@ -214,11 +214,16 @@ export default function TasksPage() {
                     {isDueToday && <span className="text-[10px] bg-amber-400/20 text-amber-400 px-1.5 py-0.5 rounded ml-2">Due Today</span>}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground text-xs">{t.assigned_to}</td>
-                  <td className="px-4 py-3">
-                    <Select value={STATUSES.find(s => s.toLowerCase() === (t.status || '').toLowerCase()) || t.status} onValueChange={v => updateStatus.mutate({ id: t.id, status: v })}>
-                      <SelectTrigger className="w-32 h-7 text-xs glass-input"><SelectValue /></SelectTrigger>
-                      <SelectContent className="bg-card border-border">{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                    </Select>
+                   <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Select value={STATUSES.find(s => s.toLowerCase() === (t.status || '').toLowerCase()) || t.status} onValueChange={v => updateStatus.mutate({ id: t.id, status: v })}>
+                        <SelectTrigger className="w-32 h-7 text-xs glass-input"><SelectValue /></SelectTrigger>
+                        <SelectContent className="bg-card border-border">{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                      </Select>
+                      <button onClick={() => setDeleteTarget(t.id)} className="p-1 rounded-md hover:bg-destructive/20 transition-colors" title="Delete task">
+                        <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
                 );
