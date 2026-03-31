@@ -213,6 +213,31 @@ export default function CampaignsPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* View Campaign Dialog */}
+      <Dialog open={!!viewCampaign} onOpenChange={(open) => !open && setViewCampaign(null)}>
+        <DialogContent className="rounded-[20px] max-w-lg" style={{ background: '#0d0f2b', border: '1px solid rgba(201,169,110,0.25)' }}>
+          <DialogHeader><DialogTitle className="font-display">{viewCampaign?.campaign_name}</DialogTitle></DialogHeader>
+          {viewCampaign && (
+            <div className="space-y-3 text-sm">
+              <div className="grid grid-cols-2 gap-3">
+                <div><span className="text-muted-foreground text-xs">Target Stage</span><p className="text-foreground mt-0.5"><StatusBadge type="stage" value={viewCampaign.target_stage} /></p></div>
+                <div><span className="text-muted-foreground text-xs">Status</span><div className="mt-0.5">{getStatusBadge(viewCampaign.status)}</div></div>
+                <div><span className="text-muted-foreground text-xs">Contacts Targeted</span><p className="text-foreground mt-0.5">{viewCampaign.contacts_targeted || 0}</p></div>
+                <div><span className="text-muted-foreground text-xs">Emails Sent</span><p className="text-foreground mt-0.5">{viewCampaign.emails_sent || 0}</p></div>
+                <div><span className="text-muted-foreground text-xs">Launched</span><p className="text-foreground mt-0.5">{viewCampaign.launched_at ? format(new Date(viewCampaign.launched_at), 'd MMM yyyy') : '—'}</p></div>
+                <div><span className="text-muted-foreground text-xs">Launched By</span><p className="text-foreground mt-0.5">{viewCampaign.rep_name || '—'}</p></div>
+              </div>
+              {viewCampaign.email_subject && (
+                <div className="rounded-xl p-3" style={{ background: '#10133a', border: '1px solid rgba(201,169,110,0.10)' }}>
+                  <p className="text-xs text-muted-foreground mb-1">Subject</p>
+                  <p className="text-foreground font-medium">{viewCampaign.email_subject}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
