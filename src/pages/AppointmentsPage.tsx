@@ -174,6 +174,7 @@ export default function AppointmentsPage() {
                   <span className="text-sm font-medium text-foreground">{a.contact_name}</span>
                   <div className="flex items-center gap-2">
                     <StatusBadge type="status" value={a.status || 'Scheduled'} />
+                    <button onClick={() => setViewAppt(a)} className="p-1 rounded hover:bg-[rgba(201,169,110,0.1)] transition-colors" style={{ color: '#c9a96e' }}><Eye className="w-3.5 h-3.5" /></button>
                     <button onClick={() => setDeleteTarget(a.id)} className="p-1 rounded hover:bg-red-500/10 text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
                 </div>
