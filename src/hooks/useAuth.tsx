@@ -69,7 +69,7 @@ export const AuthProvider = forwardRef<HTMLDivElement, { children: React.ReactNo
       {children}
     </AuthContext.Provider>
   );
-}
+});
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
