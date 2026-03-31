@@ -110,7 +110,7 @@ const StageColumn = forwardRef<HTMLDivElement, { stage: string; deals: any[]; on
       </div>
     </div>
   );
-}
+});
 
 export default function PipelinePage() {
   const { toast } = useToast();
