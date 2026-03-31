@@ -73,7 +73,7 @@ function DealCard({ deal, onDelete }: { deal: any; onDelete: () => void }) {
   );
 }
 
-function StageColumn({ stage, deals, onAddDeal, onDeleteDeal }: { stage: string; deals: any[]; onAddDeal: () => void; onDeleteDeal: (id: string) => void }) {
+const StageColumn = forwardRef<HTMLDivElement, { stage: string; deals: any[]; onAddDeal: () => void; onDeleteDeal: (id: string) => void }>(function StageColumn({ stage, deals, onAddDeal, onDeleteDeal }, _ref) {
   const { setNodeRef, isOver } = useDroppable({ id: stage });
   const totalValue = deals.reduce((sum, d) => sum + (Number(d.deal_value) || 0), 0);
 
