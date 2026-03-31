@@ -15,11 +15,11 @@ export function TopHeader({ title, subtitle, userInitial, onMenuClick }: TopHead
   const [search, setSearch] = useState('');
   const [notifOpen, setNotifOpen] = useState(false);
 
-  const { data: taskCount = 0 } = useQuery({
-    queryKey: ['unread-tasks-count'],
+  const { data: notifCount = 0 } = useQuery({
+    queryKey: ['notification-count'],
     queryFn: async () => {
-      const { data } = await supabase.from('tasks').select('status');
-      return (data || []).filter(t => (t.status || '').toLowerCase() === 'pending').length;
+      const { count } = await supabase.from('activity_log').select('*', { count: 'exact', head: true });
+      return count || 0;
     },
     refetchInterval: 30000,
   });
