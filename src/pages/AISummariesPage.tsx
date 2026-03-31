@@ -40,7 +40,7 @@ export default function AISummariesPage() {
   const { data: allSummaries = [] } = useQuery({
     queryKey: ['ai_summaries_index'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('ai_summaries').select('lead_id, deal_health, generated_at, contact_name').order('generated_at', { ascending: false });
+      const { data, error } = await supabase.from('ai_summaries').select('lead_id, deal_health, sentiment, generated_at, contact_name').order('generated_at', { ascending: false });
       if (error) throw error;
       return data || [];
     },
@@ -117,7 +117,8 @@ export default function AISummariesPage() {
   const filtered = sorted.filter(c => !searchQ || c.name?.toLowerCase().includes(searchQ.toLowerCase()));
 
   const selectedContact = contacts.find((c: any) => c.lead_id === selectedLeadId);
-  const sent = summary ? (HEALTH_CONFIG[summary.deal_health] || HEALTH_CONFIG.Unknown) : null;
+  const healthValue = summary?.deal_health || (summary?.sentiment === 'Positive' ? 'Hot' : summary?.sentiment === 'Neutral' ? 'Warm' : summary?.sentiment === 'Needs Attention' ? 'Cold' : 'Unknown');
+  const sent = summary ? (HEALTH_CONFIG[healthValue] || HEALTH_CONFIG.Unknown) : null;
 
   return (
     <div className="p-4 md:p-6 flex flex-col md:flex-row gap-4 md:gap-6 h-auto md:h-[calc(100vh-64px)]">
@@ -242,7 +243,7 @@ export default function AISummariesPage() {
             <div className="mb-6">
               <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground mb-3">AI Summary</p>
               <div className="border-l-[3px] pl-4 py-2 rounded-r-lg" style={{ borderColor: '#c9a96e', background: 'rgba(201,169,110,0.04)' }}>
-                <p className="text-[15px] leading-[1.7]" style={{ color: '#d4b483' }}>{summary.summary_text}</p>
+                <p className="text-[15px] leading-[1.7]" style={{ color: '#d4b483' }}>{summary.summary_text || summary.summary}</p>
               </div>
             </div>
 
