@@ -41,7 +41,7 @@ export default function DashboardPage() {
   const [dealStatusData, setDealStatusData] = useState<any[]>([]);
   const [activities, setActivities] = useState<any[]>([]);
 
-  useEffect(() => { document.title = 'Dashboard | Atomise CRM'; }, []);
+  useEffect(() => { document.title = 'Dashboard | Automise AI CRM'; }, []);
 
   const fetchData = async () => {
     try {

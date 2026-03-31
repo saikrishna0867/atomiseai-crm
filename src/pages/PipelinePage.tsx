@@ -119,7 +119,7 @@ export default function PipelinePage() {
   const [addStage, setAddStage] = useState('Lead');
   const [form, setForm] = useState({ contact_name: '', contact_email: '', company: '', deal_value: '', assigned_rep: '', assigned_rep_email: '', notes: '' });
 
-  useEffect(() => { document.title = 'Pipeline | Atomise CRM'; }, []);
+  useEffect(() => { document.title = 'Pipeline | Automise AI CRM'; }, []);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
@@ -159,7 +159,7 @@ export default function PipelinePage() {
           await webhooks.stageChange({
             leadId: created.lead_id, contactEmail: created.contact_email, contactName: created.contact_name,
             oldStage: 'Lead', newStage: addStage, assignedRep: created.assigned_rep || 'Admin',
-            assignedRepEmail: form.assigned_rep_email || 'admin@atomise.ai', dealValue: created.deal_value,
+            assignedRepEmail: form.assigned_rep_email || 'admin@automise.ai', dealValue: created.deal_value,
           });
         } catch (_) { /* webhook failure is non-blocking */ }
       }
@@ -205,7 +205,7 @@ export default function PipelinePage() {
       await Promise.allSettled([
         webhooks.stageChange({
           leadId: deal.lead_id, contactEmail: deal.contact_email, contactName: deal.contact_name,
-          oldStage, newStage, assignedRep: deal.assigned_rep || 'Admin', assignedRepEmail: deal.assigned_rep_email || 'admin@atomise.ai', dealValue: deal.deal_value,
+          oldStage, newStage, assignedRep: deal.assigned_rep || 'Admin', assignedRepEmail: deal.assigned_rep_email || 'admin@automise.ai', dealValue: deal.deal_value,
         }),
         supabase.from('activity_log').insert({
           lead_id: deal.lead_id, event_type: 'stage_change',

@@ -50,7 +50,7 @@ export default function ContactsPage() {
   const [emailWarning, setEmailWarning] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(false);
 
-  useEffect(() => {document.title = 'Contacts | Atomise CRM';}, []);
+  useEffect(() => {document.title = 'Contacts | Automise AI CRM';}, []);
 
   const [form, setForm] = useState({
     name: '', email: '', phone: '', company: '', source: 'Website Form',

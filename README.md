@@ -1,7 +1,7 @@
-# Atomise CRM
+# Automise AI CRM
 
 A production-grade CRM platform built for the 
-Atomise AI Batch Challenge.
+Automise AI Batch Challenge.
 
 ## Live URL
 https://atomise-crm-pr.lovable.app
@@ -36,9 +36,9 @@ contacts, pipeline_deals, activity_log,
 tasks, appointments, campaigns, 
 drip_sequences, ai_summaries, dashboard_stats
 
-Built by Saikrishna | Atomise AI Batch 2026
+Built by Saikrishna | Automise AI Batch 2026
 
-I built Atomise CRM using React via Lovable for the 
+I built Automise AI CRM using React via Lovable for the 
 frontend, Supabase as the PostgreSQL database with 
 9 tables, and N8n for all automation with 6 live 
 working workflows. The stack also integrates GPT-4o 
