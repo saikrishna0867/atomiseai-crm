@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { CheckSquare, Plus, AlertCircle, LayoutList, Columns3 } from 'lucide-react';
+import { CheckSquare, Plus, AlertCircle, LayoutList, Columns3, Trash2 } from 'lucide-react';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { format, isPast, parseISO } from 'date-fns';
 
 const STATUSES = ['Pending', 'In Progress', 'Completed'];
@@ -24,6 +25,7 @@ export default function TasksPage() {
   const [view, setView] = useState<'list' | 'board'>('board');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [form, setForm] = useState({ title: '', description: '', contact_name: '', assigned_to: '', due_date: '', priority: 'Medium', status: 'Pending', lead_id: '' });
 
   useEffect(() => { document.title = 'Tasks | Atomise CRM'; }, []);
@@ -60,6 +62,20 @@ export default function TasksPage() {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({ title: 'Task updated' });
     },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('tasks').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-tasks-notif'] });
+      setDeleteTarget(null);
+      toast({ title: 'Task deleted 🗑️' });
+    },
+    onError: (e: any) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
   });
 
   const filtered = tasks.filter((t: any) => {
@@ -135,9 +151,14 @@ export default function TasksPage() {
                         borderLeft: `3px solid ${PRIORITY_BORDER[t.priority] || '#fbbf24'}`,
                       }}
                     >
-                      <div className="flex items-start gap-2">
-                        {isOverdue && <span className="text-xs bg-destructive/20 text-destructive px-1.5 py-0.5 rounded font-medium">⚠️ Overdue</span>}
-                        {isDueToday && <span className="text-xs bg-amber-400/20 text-amber-400 px-1.5 py-0.5 rounded font-medium">📅 Due Today</span>}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {isOverdue && <span className="text-xs bg-destructive/20 text-destructive px-1.5 py-0.5 rounded font-medium">⚠️ Overdue</span>}
+                          {isDueToday && <span className="text-xs bg-amber-400/20 text-amber-400 px-1.5 py-0.5 rounded font-medium">📅 Due Today</span>}
+                        </div>
+                        <button onClick={() => setDeleteTarget(t.id)} className="p-1 rounded-md hover:bg-destructive/20 transition-colors shrink-0" title="Delete task">
+                          <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
+                        </button>
                       </div>
                       <p className="text-sm font-medium text-foreground mt-1">{t.title}</p>
                       {t.contact_name && <p className="text-xs mt-1" style={{ color: '#c9a96e' }}>{t.contact_name}</p>}
@@ -193,11 +214,16 @@ export default function TasksPage() {
                     {isDueToday && <span className="text-[10px] bg-amber-400/20 text-amber-400 px-1.5 py-0.5 rounded ml-2">Due Today</span>}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground text-xs">{t.assigned_to}</td>
-                  <td className="px-4 py-3">
-                    <Select value={STATUSES.find(s => s.toLowerCase() === (t.status || '').toLowerCase()) || t.status} onValueChange={v => updateStatus.mutate({ id: t.id, status: v })}>
-                      <SelectTrigger className="w-32 h-7 text-xs glass-input"><SelectValue /></SelectTrigger>
-                      <SelectContent className="bg-card border-border">{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                    </Select>
+                   <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Select value={STATUSES.find(s => s.toLowerCase() === (t.status || '').toLowerCase()) || t.status} onValueChange={v => updateStatus.mutate({ id: t.id, status: v })}>
+                        <SelectTrigger className="w-32 h-7 text-xs glass-input"><SelectValue /></SelectTrigger>
+                        <SelectContent className="bg-card border-border">{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                      </Select>
+                      <button onClick={() => setDeleteTarget(t.id)} className="p-1 rounded-md hover:bg-destructive/20 transition-colors" title="Delete task">
+                        <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
                 );
@@ -234,6 +260,16 @@ export default function TasksPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        title="Delete Task"
+        description="Are you sure you want to delete this task? This action cannot be undone."
+        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget)}
+        loading={deleteMutation.isPending}
+        confirmLabel="Delete"
+      />
     </div>
   );
 }

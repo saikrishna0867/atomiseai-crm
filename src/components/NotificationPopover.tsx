@@ -1,9 +1,10 @@
 import { useState, useRef } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { Bell, UserPlus, ArrowRightLeft, Calendar, Mail, Sparkles, ClipboardList, X } from 'lucide-react';
+import { Bell, UserPlus, ArrowRightLeft, Calendar, Mail, Sparkles, ClipboardList, X, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 
 const EVENT_ICONS: Record<string, any> = {
   lead_assigned: UserPlus,
@@ -30,7 +31,19 @@ interface NotificationPopoverProps {
 export function NotificationPopover({ open, onClose, taskCount }: NotificationPopoverProps) {
   const [filter, setFilter] = useState<string>('all');
   const chipsRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
+  const deleteNotification = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('activity_log').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      toast({ title: 'Notification removed' });
+    },
+  });
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ['notifications'],
     queryFn: async () => {
@@ -145,12 +158,12 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
                   const Icon = EVENT_ICONS[n.event_type] || ClipboardList;
                   const color = EVENT_COLORS[n.event_type] || '#c9a96e';
                   return (
-                    <div key={n.id} className="flex items-start gap-2.5 px-2 py-2 sm:py-2.5 rounded-xl hover:bg-white/[0.03] transition-colors cursor-default">
+                    <div key={n.id} className="group flex items-start gap-2.5 px-2 py-2 sm:py-2.5 rounded-xl hover:bg-white/[0.03] transition-colors cursor-default">
                       <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${color}12` }}>
                         <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" style={{ color }} />
                       </div>
                       <div className="flex-1 min-w-0 pt-px">
-                        <p className="text-[12px] sm:text-[13px] text-white leading-[1.4] line-clamp-2">{n.description}</p>
+                        <p className="text-[12px] sm:text-[13px] text-foreground leading-[1.4] line-clamp-2">{n.description}</p>
                         <div className="flex items-center gap-1.5 mt-0.5 sm:mt-1">
                           <span className="text-[10px] sm:text-[11px] text-muted-foreground leading-none">
                             {n.timestamp ? formatDistanceToNow(new Date(n.timestamp), { addSuffix: true }) : ''}
@@ -163,6 +176,13 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
                           )}
                         </div>
                       </div>
+                      <button
+                        onClick={() => deleteNotification.mutate(n.id)}
+                        className="p-1 rounded-md opacity-0 group-hover:opacity-100 hover:bg-destructive/20 transition-all shrink-0"
+                        title="Remove notification"
+                      >
+                        <Trash2 className="w-3 h-3 text-muted-foreground hover:text-destructive" />
+                      </button>
                     </div>
                   );
                 })}
