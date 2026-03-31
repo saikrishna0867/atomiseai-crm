@@ -51,10 +51,9 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
       const { data } = await supabase
         .from('tasks')
         .select('id, title, due_date, priority, status')
-        .eq('status', 'Pending')
         .order('due_date', { ascending: true })
-        .limit(10);
-      return data || [];
+        .limit(20);
+      return (data || []).filter(t => (t.status || '').toLowerCase() === 'pending').slice(0, 10);
     },
     enabled: open,
   });
