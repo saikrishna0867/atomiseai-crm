@@ -24,6 +24,7 @@ export default function AppointmentsPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [viewAppt, setViewAppt] = useState<any>(null);
 
   useEffect(() => { document.title = 'Appointments | Atomise CRM'; }, []);
 
