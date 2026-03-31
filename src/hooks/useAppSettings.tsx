@@ -6,7 +6,7 @@ interface AppSettingsContextType {
 }
 
 const AppSettingsContext = createContext<AppSettingsContextType>({
-  crmName: 'Atomise CRM',
+  crmName: 'Automise AI CRM',
   setCrmName: () => {},
 });
 
