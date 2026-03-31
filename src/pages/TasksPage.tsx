@@ -69,7 +69,7 @@ export default function TasksPage() {
   });
 
   const getDateStatus = (t: any) => {
-    if (!t.due_date || t.status === 'Completed') return { isOverdue: false, isDueToday: false };
+    if (!t.due_date || (t.status || '').toLowerCase() === 'completed') return { isOverdue: false, isDueToday: false };
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const dueDate = new Date(t.due_date);
