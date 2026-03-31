@@ -117,7 +117,8 @@ export default function AISummariesPage() {
   const filtered = sorted.filter(c => !searchQ || c.name?.toLowerCase().includes(searchQ.toLowerCase()));
 
   const selectedContact = contacts.find((c: any) => c.lead_id === selectedLeadId);
-  const sent = summary ? (HEALTH_CONFIG[summary.deal_health] || HEALTH_CONFIG.Unknown) : null;
+  const healthValue = summary?.deal_health || (summary?.sentiment === 'Positive' ? 'Hot' : summary?.sentiment === 'Neutral' ? 'Warm' : summary?.sentiment === 'Needs Attention' ? 'Cold' : 'Unknown');
+  const sent = summary ? (HEALTH_CONFIG[healthValue] || HEALTH_CONFIG.Unknown) : null;
 
   return (
     <div className="p-4 md:p-6 flex flex-col md:flex-row gap-4 md:gap-6 h-auto md:h-[calc(100vh-64px)]">
