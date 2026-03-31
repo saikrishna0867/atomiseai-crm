@@ -147,7 +147,7 @@ export default function TasksPage() {
                         </span>
                         <span className="text-xs text-muted-foreground">{t.assigned_to}</span>
                       </div>
-                      <Select value={t.status} onValueChange={v => updateStatus.mutate({ id: t.id, status: v })}>
+                      <Select value={STATUSES.find(s => s.toLowerCase() === (t.status || '').toLowerCase()) || t.status} onValueChange={v => updateStatus.mutate({ id: t.id, status: v })}>
                         <SelectTrigger className="h-7 text-xs mt-2 glass-input"><SelectValue /></SelectTrigger>
                         <SelectContent className="bg-card border-border">{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                       </Select>
