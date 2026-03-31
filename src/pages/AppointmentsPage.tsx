@@ -300,6 +300,36 @@ export default function AppointmentsPage() {
         onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget)}
         loading={deleteMutation.isPending}
       />
+
+      <Dialog open={!!viewAppt} onOpenChange={(open) => !open && setViewAppt(null)}>
+        <DialogContent className="rounded-[20px] max-w-lg" style={{ background: '#0d0f2b', border: '1px solid rgba(201,169,110,0.25)' }}>
+          <DialogHeader><DialogTitle className="font-display">{viewAppt?.contact_name} — {viewAppt?.appointment_type}</DialogTitle></DialogHeader>
+          {viewAppt && (
+            <div className="space-y-3 text-sm">
+              <div className="grid grid-cols-2 gap-3">
+                <div><span className="text-muted-foreground text-xs">Date</span><p className="text-foreground mt-0.5">{viewAppt.appointment_date}</p></div>
+                <div><span className="text-muted-foreground text-xs">Time</span><p className="text-foreground mt-0.5">{viewAppt.appointment_time}</p></div>
+                <div><span className="text-muted-foreground text-xs">Contact Email</span><p className="text-foreground mt-0.5">{viewAppt.contact_email}</p></div>
+                <div><span className="text-muted-foreground text-xs">Rep</span><p className="text-foreground mt-0.5">{viewAppt.rep_name}</p></div>
+                <div><span className="text-muted-foreground text-xs">Duration</span><p className="text-foreground mt-0.5">{viewAppt.duration_mins || 30} mins</p></div>
+                <div><span className="text-muted-foreground text-xs">Status</span><div className="mt-0.5"><StatusBadge type="status" value={viewAppt.status || 'Scheduled'} /></div></div>
+              </div>
+              {viewAppt.meeting_link && (
+                <div className="rounded-xl p-3" style={{ background: '#10133a', border: '1px solid rgba(201,169,110,0.10)' }}>
+                  <p className="text-xs text-muted-foreground mb-1">Meeting Link</p>
+                  <a href={viewAppt.meeting_link} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: '#c9a96e' }}>{viewAppt.meeting_link}</a>
+                </div>
+              )}
+              {viewAppt.notes && (
+                <div className="rounded-xl p-3" style={{ background: '#10133a', border: '1px solid rgba(201,169,110,0.10)' }}>
+                  <p className="text-xs text-muted-foreground mb-1">Notes</p>
+                  <p className="text-foreground">{viewAppt.notes}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
