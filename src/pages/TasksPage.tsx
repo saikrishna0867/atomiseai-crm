@@ -123,7 +123,7 @@ export default function TasksPage() {
                 <span className="text-xs text-muted-foreground">{filtered.filter((t: any) => (t.status || '').toLowerCase() === status.toLowerCase()).length} tasks</span>
               </div>
               <div className="p-3 space-y-2 max-h-[60vh] overflow-y-auto">
-                {filtered.filter((t: any) => t.status === status).map((t: any) => {
+                {filtered.filter((t: any) => (t.status || '').toLowerCase() === status.toLowerCase()).map((t: any) => {
                   const { isOverdue, isDueToday } = getDateStatus(t);
                   return (
                     <div
