@@ -286,6 +286,15 @@ export default function AppointmentsPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title="Delete Appointment"
+        description="Are you sure you want to delete this appointment? This action cannot be undone."
+        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget)}
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }
