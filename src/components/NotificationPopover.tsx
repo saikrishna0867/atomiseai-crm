@@ -106,10 +106,7 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
           </button>
         </div>
 
-        {/* Pending tasks banner */}
-        {taskCount > 0 && (
-          <div
-            className="mx-3 sm:mx-4 mt-2.5 px-3 py-2 rounded-xl flex items-center gap-2"
+        {/* Pending tasks banner removed */}
             style={{ background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.12)' }}
           >
             <ClipboardList className="w-3.5 h-3.5 shrink-0" style={{ color: '#c9a96e' }} />
