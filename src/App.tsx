@@ -21,7 +21,7 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _forceRebuild = 1;
+const _forceRebuild = 2;
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
