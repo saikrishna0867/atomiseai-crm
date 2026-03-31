@@ -88,6 +88,19 @@ export default function AppointmentsPage() {
     onError: (e: any) => { console.error('[Appointments]', e); toast({ title: 'Error', description: e.message, variant: 'destructive' }); },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('appointments').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      setDeleteTarget(null);
+      toast({ title: 'Appointment deleted' });
+    },
+    onError: (e: any) => { toast({ title: 'Error', description: e.message, variant: 'destructive' }); },
+  });
+
   const selectContact = (leadId: string) => {
     const c = contacts.find((c: any) => c.lead_id === leadId);
     if (c) setForm(p => ({ ...p, lead_id: leadId, contact_name: c.name, contact_email: c.email }));
