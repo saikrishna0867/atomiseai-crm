@@ -41,7 +41,7 @@ export default function CampaignsPage() {
       const campaignId = crypto.randomUUID();
       const { error } = await supabase.from('campaigns').insert({
         campaign_id: campaignId, campaign_name: form.campaign_name, target_stage: form.target_stage,
-        email_subject: form.email_subject, rep_name: form.rep_name, status: 'Sending', contacts_targeted: 0,
+        email_subject: form.email_subject, rep_name: form.rep_name, rep_email: form.rep_email, status: 'Sending', emails_sent: 0,
       });
       if (error) throw error;
 

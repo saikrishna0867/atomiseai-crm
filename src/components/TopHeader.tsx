@@ -18,8 +18,8 @@ export function TopHeader({ title, subtitle, userInitial, onMenuClick }: TopHead
   const { data: taskCount = 0 } = useQuery({
     queryKey: ['unread-tasks-count'],
     queryFn: async () => {
-      const { count } = await supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('status', 'Pending');
-      return count || 0;
+      const { data } = await supabase.from('tasks').select('status');
+      return (data || []).filter(t => (t.status || '').toLowerCase() === 'pending').length;
     },
     refetchInterval: 30000,
   });
