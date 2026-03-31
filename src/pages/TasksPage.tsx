@@ -120,7 +120,7 @@ export default function TasksPage() {
             <div key={status} className="glass-card-purple rounded-2xl overflow-hidden">
               <div className="p-4 border-b" style={{ borderColor: 'rgba(201,169,110,0.10)' }}>
                 <h3 className="font-display font-semibold text-sm text-foreground">{status}</h3>
-                <span className="text-xs text-muted-foreground">{filtered.filter((t: any) => t.status === status).length} tasks</span>
+                <span className="text-xs text-muted-foreground">{filtered.filter((t: any) => (t.status || '').toLowerCase() === status.toLowerCase()).length} tasks</span>
               </div>
               <div className="p-3 space-y-2 max-h-[60vh] overflow-y-auto">
                 {filtered.filter((t: any) => t.status === status).map((t: any) => {
