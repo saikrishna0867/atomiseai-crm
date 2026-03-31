@@ -64,6 +64,20 @@ export default function TasksPage() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('tasks').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-tasks-notif'] });
+      setDeleteTarget(null);
+      toast({ title: 'Task deleted 🗑️' });
+    },
+    onError: (e: any) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
+  });
+
   const filtered = tasks.filter((t: any) => {
     const tStatus = (t.status || '').toLowerCase();
     const tPriority = (t.priority || '').toLowerCase();
