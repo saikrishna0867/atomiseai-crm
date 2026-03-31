@@ -242,8 +242,53 @@ export default function AISummariesPage() {
 
             <div className="mb-6">
               <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground mb-3">AI Summary</p>
-              <div className="border-l-[3px] pl-4 py-2 rounded-r-lg" style={{ borderColor: '#c9a96e', background: 'rgba(201,169,110,0.04)' }}>
-                <p className="text-[15px] leading-[1.7]" style={{ color: '#d4b483' }}>{summary.summary_text || summary.summary}</p>
+              <div className="space-y-3">
+                {(() => {
+                  const raw = summary.summary_text || summary.summary || '';
+                  // Split by numbered sections like "1. LEAD OVERVIEW:" or "2. KEY INSIGHTS:"
+                  const sections = raw.split(/(?=\d+\.\s+[A-Z][A-Z\s]+:)/g).filter((s: string) => s.trim());
+                  if (sections.length <= 1) {
+                    // Fallback: no numbered sections, show as-is
+                    return (
+                      <div className="border-l-[3px] pl-4 py-3 rounded-r-lg" style={{ borderColor: '#c9a96e', background: 'rgba(201,169,110,0.04)' }}>
+                        <p className="text-sm leading-[1.7] text-foreground/90">{raw}</p>
+                      </div>
+                    );
+                  }
+                  const icons: Record<string, string> = { 'LEAD OVERVIEW': '📋', 'KEY INSIGHTS': '💡', 'RECOMMENDED NEXT ACTION': '🎯', 'DEAL HEALTH': '❤️‍🩹', 'NEXT ACTION': '🎯', 'SUMMARY': '📝' };
+                  return sections.map((section: string, i: number) => {
+                    const match = section.match(/^\d+\.\s+([A-Z][A-Z\s]+):\s*(.*)/s);
+                    if (!match) return (
+                      <div key={i} className="border-l-[3px] pl-4 py-3 rounded-r-lg" style={{ borderColor: '#c9a96e', background: 'rgba(201,169,110,0.04)' }}>
+                        <p className="text-sm leading-[1.7] text-foreground/90">{section.trim()}</p>
+                      </div>
+                    );
+                    const title = match[1].trim();
+                    const body = match[2].trim();
+                    const icon = icons[title] || '📌';
+                    // Split bullet points (lines starting with – or -)
+                    const bullets = body.split(/\s*[–-]\s+/).filter((b: string) => b.trim());
+                    return (
+                      <div key={i} className="rounded-xl p-4" style={{ background: 'rgba(201,169,110,0.04)', border: '1px solid rgba(201,169,110,0.12)' }}>
+                        <p className="text-xs font-semibold uppercase tracking-[0.08em] mb-2 flex items-center gap-2" style={{ color: '#c9a96e' }}>
+                          <span>{icon}</span> {title}
+                        </p>
+                        {bullets.length > 1 ? (
+                          <ul className="space-y-1.5 ml-1">
+                            {bullets.map((b: string, j: number) => (
+                              <li key={j} className="text-sm leading-[1.7] text-foreground/90 flex items-start gap-2">
+                                <span className="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style={{ background: '#c9a96e' }} />
+                                {b.trim()}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-sm leading-[1.7] text-foreground/90">{body}</p>
+                        )}
+                      </div>
+                    );
+                  });
+                })()}
               </div>
             </div>
 
