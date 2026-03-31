@@ -171,7 +171,10 @@ export default function AppointmentsPage() {
               <div key={a.id} className="py-3 border-b last:border-0 space-y-1" style={{ borderColor: 'rgba(201,169,110,0.10)' }}>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-foreground">{a.contact_name}</span>
-                  <StatusBadge type="status" value={a.status || 'Scheduled'} />
+                  <div className="flex items-center gap-2">
+                    <StatusBadge type="status" value={a.status || 'Scheduled'} />
+                    <button onClick={() => setDeleteTarget(a.id)} className="p-1 rounded hover:bg-red-500/10 text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                  </div>
                 </div>
                 <p className="text-xs text-muted-foreground">{a.appointment_type} • {a.appointment_time}</p>
                 <p className="text-xs text-muted-foreground">Rep: {a.rep_name}</p>
