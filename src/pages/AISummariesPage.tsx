@@ -243,7 +243,7 @@ export default function AISummariesPage() {
             <div className="mb-6">
               <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground mb-3">AI Summary</p>
               <div className="border-l-[3px] pl-4 py-2 rounded-r-lg" style={{ borderColor: '#c9a96e', background: 'rgba(201,169,110,0.04)' }}>
-                <p className="text-[15px] leading-[1.7]" style={{ color: '#d4b483' }}>{summary.summary_text}</p>
+                <p className="text-[15px] leading-[1.7]" style={{ color: '#d4b483' }}>{summary.summary_text || summary.summary}</p>
               </div>
             </div>
 

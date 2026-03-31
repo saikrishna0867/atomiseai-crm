@@ -201,7 +201,7 @@ export default function ContactDetailPage() {
           {!aiLoading && aiSummary && (
             <div className="space-y-4">
               <div className="border-l-[3px] pl-4 py-2 rounded-r-lg" style={{ borderColor: '#c9a96e', background: 'rgba(201,169,110,0.04)' }}>
-                <p className="text-sm leading-relaxed" style={{ color: '#d4b483' }}>{aiSummary.summary}</p>
+                <p className="text-sm leading-relaxed" style={{ color: '#d4b483' }}>{aiSummary.summary_text || aiSummary.summary}</p>
               </div>
               {aiSummary.next_action && (
                 <div className="rounded-lg p-3 border-l-[3px]" style={{ background: 'rgba(232,201,138,0.06)', border: '1px solid rgba(232,201,138,0.20)', borderLeft: '3px solid #e8c98a', color: '#e8c98a' }}>
