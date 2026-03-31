@@ -40,7 +40,7 @@ export default function AISummariesPage() {
   const { data: allSummaries = [] } = useQuery({
     queryKey: ['ai_summaries_index'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('ai_summaries').select('lead_id, deal_health, generated_at, contact_name').order('generated_at', { ascending: false });
+      const { data, error } = await supabase.from('ai_summaries').select('lead_id, deal_health, sentiment, generated_at, contact_name').order('generated_at', { ascending: false });
       if (error) throw error;
       return data || [];
     },
