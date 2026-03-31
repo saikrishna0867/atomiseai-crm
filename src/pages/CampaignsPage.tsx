@@ -154,7 +154,7 @@ export default function CampaignsPage() {
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-card border-border">
-                        <DropdownMenuItem className="gap-2 text-xs"><Eye className="w-3.5 h-3.5" /> View</DropdownMenuItem>
+                        <DropdownMenuItem className="gap-2 text-xs" onClick={() => setViewCampaign(c)}><Eye className="w-3.5 h-3.5" /> View</DropdownMenuItem>
                         <DropdownMenuItem className="gap-2 text-xs text-red-400" onClick={() => deleteMutation.mutate(c.id)}><Trash2 className="w-3.5 h-3.5" /> Delete</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
