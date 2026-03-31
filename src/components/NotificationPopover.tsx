@@ -32,7 +32,19 @@ interface NotificationPopoverProps {
 export function NotificationPopover({ open, onClose, taskCount }: NotificationPopoverProps) {
   const [filter, setFilter] = useState<string>('all');
   const chipsRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
+  const deleteNotification = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('activity_log').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      toast({ title: 'Notification removed' });
+    },
+  });
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ['notifications'],
     queryFn: async () => {
