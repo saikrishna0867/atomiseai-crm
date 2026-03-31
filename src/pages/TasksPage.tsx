@@ -25,6 +25,7 @@ export default function TasksPage() {
   const [view, setView] = useState<'list' | 'board'>('board');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [form, setForm] = useState({ title: '', description: '', contact_name: '', assigned_to: '', due_date: '', priority: 'Medium', status: 'Pending', lead_id: '' });
 
   useEffect(() => { document.title = 'Tasks | Atomise CRM'; }, []);
