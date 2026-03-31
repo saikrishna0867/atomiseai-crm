@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { webhooks } from '@/lib/webhooks';
@@ -73,7 +73,7 @@ function DealCard({ deal, onDelete }: { deal: any; onDelete: () => void }) {
   );
 }
 
-function StageColumn({ stage, deals, onAddDeal, onDeleteDeal }: { stage: string; deals: any[]; onAddDeal: () => void; onDeleteDeal: (id: string) => void }) {
+const StageColumn = forwardRef<HTMLDivElement, { stage: string; deals: any[]; onAddDeal: () => void; onDeleteDeal: (id: string) => void }>(function StageColumn({ stage, deals, onAddDeal, onDeleteDeal }, _ref) {
   const { setNodeRef, isOver } = useDroppable({ id: stage });
   const totalValue = deals.reduce((sum, d) => sum + (Number(d.deal_value) || 0), 0);
 
@@ -110,7 +110,7 @@ function StageColumn({ stage, deals, onAddDeal, onDeleteDeal }: { stage: string;
       </div>
     </div>
   );
-}
+});
 
 export default function PipelinePage() {
   const { toast } = useToast();

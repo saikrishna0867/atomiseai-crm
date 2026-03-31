@@ -1,8 +1,8 @@
-import { useEffect, useState, useContext, useCallback } from 'react';
+import React, { useEffect, useState, useContext, useCallback, forwardRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { AuthContext } from '@/hooks/auth-context';
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export const AuthProvider = forwardRef<HTMLDivElement, { children: React.ReactNode }>(function AuthProvider({ children }, _ref) {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
+});
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
