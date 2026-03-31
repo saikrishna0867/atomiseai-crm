@@ -190,7 +190,7 @@ export default function AppointmentsPage() {
           <div className="glass-card-purple overflow-hidden rounded-2xl">
             <table className="w-full text-sm">
               <thead><tr style={{ background: 'rgba(201,169,110,0.08)', borderBottom: '1px solid rgba(201,169,110,0.15)' }}>
-                {['Contact', 'Type', 'Date', 'Time', 'Rep', 'Link', 'Status'].map(h => (
+                {['Contact', 'Type', 'Date', 'Time', 'Rep', 'Link', 'Status', 'Actions'].map(h => (
                   <th key={h} className="text-left px-4 py-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{h}</th>
                 ))}
               </tr></thead>
@@ -204,6 +204,9 @@ export default function AppointmentsPage() {
                     <td className="px-4 py-3 text-muted-foreground text-xs">{a.rep_name}</td>
                     <td className="px-4 py-3">{a.meeting_link && <a href={a.meeting_link} target="_blank" className="text-xs hover:underline" style={{ color: '#c9a96e' }}>Join</a>}</td>
                     <td className="px-4 py-3"><StatusBadge type="status" value={a.status || 'Scheduled'} /></td>
+                    <td className="px-4 py-3">
+                      <button onClick={() => setDeleteTarget(a.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
