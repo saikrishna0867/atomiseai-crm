@@ -5,7 +5,6 @@ import { supabase } from '@/lib/supabase';
 import { Bell, UserPlus, ArrowRightLeft, Calendar, Mail, Sparkles, ClipboardList, X, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
-import { formatDistanceToNow } from 'date-fns';
 
 const EVENT_ICONS: Record<string, any> = {
   lead_assigned: UserPlus,
