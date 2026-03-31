@@ -15,11 +15,11 @@ export function TopHeader({ title, subtitle, userInitial, onMenuClick }: TopHead
   const [search, setSearch] = useState('');
   const [notifOpen, setNotifOpen] = useState(false);
 
-  const { data: taskCount = 0 } = useQuery({
-    queryKey: ['unread-tasks-count'],
+  const { data: notifCount = 0 } = useQuery({
+    queryKey: ['notification-count'],
     queryFn: async () => {
-      const { data } = await supabase.from('tasks').select('status');
-      return (data || []).filter(t => (t.status || '').toLowerCase() === 'pending').length;
+      const { count } = await supabase.from('activity_log').select('*', { count: 'exact', head: true });
+      return count || 0;
     },
     refetchInterval: 30000,
   });
@@ -64,13 +64,13 @@ export function TopHeader({ title, subtitle, userInitial, onMenuClick }: TopHead
           className="relative p-2 rounded-lg hover:bg-[rgba(201,169,110,0.08)] transition-colors"
         >
           <Bell className="w-5 h-5 text-muted-foreground" />
-          {taskCount > 0 && (
+          {notifCount > 0 && (
             <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-              {taskCount}
+              {notifCount}
             </span>
           )}
         </button>
-        <NotificationPopover open={notifOpen} onClose={() => setNotifOpen(false)} taskCount={taskCount} />
+        <NotificationPopover open={notifOpen} onClose={() => setNotifOpen(false)} taskCount={notifCount} />
       </div>
 
       {/* User Avatar */}
