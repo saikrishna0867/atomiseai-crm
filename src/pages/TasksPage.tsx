@@ -194,7 +194,7 @@ export default function TasksPage() {
                   </td>
                   <td className="px-4 py-3 text-muted-foreground text-xs">{t.assigned_to}</td>
                   <td className="px-4 py-3">
-                    <Select value={t.status} onValueChange={v => updateStatus.mutate({ id: t.id, status: v })}>
+                    <Select value={t.status?.charAt(0).toUpperCase() + t.status?.slice(1).toLowerCase()} onValueChange={v => updateStatus.mutate({ id: t.id, status: v })}>
                       <SelectTrigger className="w-32 h-7 text-xs glass-input"><SelectValue /></SelectTrigger>
                       <SelectContent className="bg-card border-border">{STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                     </Select>
