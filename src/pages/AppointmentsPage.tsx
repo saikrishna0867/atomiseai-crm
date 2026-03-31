@@ -207,7 +207,10 @@ export default function AppointmentsPage() {
                     <td className="px-4 py-3">{a.meeting_link && <a href={a.meeting_link} target="_blank" className="text-xs hover:underline" style={{ color: '#c9a96e' }}>Join</a>}</td>
                     <td className="px-4 py-3"><StatusBadge type="status" value={a.status || 'Scheduled'} /></td>
                     <td className="px-4 py-3">
-                      <button onClick={() => setDeleteTarget(a.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                      <div className="flex items-center gap-1">
+                        <button onClick={() => setViewAppt(a)} className="p-1.5 rounded-lg hover:bg-[rgba(201,169,110,0.1)] transition-colors" style={{ color: '#c9a96e' }}><Eye className="w-4 h-4" /></button>
+                        <button onClick={() => setDeleteTarget(a.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                      </div>
                     </td>
                   </tr>
                 ))}
