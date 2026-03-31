@@ -20,6 +20,7 @@ export default function CampaignsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [addOpen, setAddOpen] = useState(false);
+  const [viewCampaign, setViewCampaign] = useState<any>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [form, setForm] = useState({
     campaign_name: '', target_stage: 'Lead', email_subject: '', email_body: '', rep_name: '', rep_email: '',
