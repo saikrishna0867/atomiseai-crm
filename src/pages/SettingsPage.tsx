@@ -27,7 +27,7 @@ export default function SettingsPage() {
   const testN8n = async () => {
     setTestingN8n(true);
     try {
-      const res = await fetch('https://saikrishnasai1920.app.n8n.cloud/webhook/new-lead', {
+      const res = await fetch('https://saikrishna96.app.n8n.cloud/webhook/new-lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ test: true }),
@@ -120,7 +120,7 @@ export default function SettingsPage() {
               <div className="p-2.5 rounded-xl bg-accent-orange/10"><Zap className="w-5 h-5 text-accent-orange" /></div>
               <div>
                 <h3 className="text-sm font-medium text-foreground">n8n Automation</h3>
-                <p className="text-xs text-muted-foreground">saikrishnasai1920.app.n8n.cloud</p>
+                <p className="text-xs text-muted-foreground">saikrishna96.app.n8n.cloud</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
