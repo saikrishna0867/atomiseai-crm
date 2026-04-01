@@ -208,7 +208,7 @@ export default function AppointmentsPage() {
                 ))}
               </tr></thead>
               <tbody>
-                {appointments.map((a: any) => (
+                {filteredAppointments.map((a: any) => (
                   <tr key={a.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(201,169,110,0.04)]">
                     <td className="px-4 py-3 text-foreground">{a.contact_name}</td>
                     <td className="px-4 py-3 text-muted-foreground text-xs">{a.appointment_type}</td>
