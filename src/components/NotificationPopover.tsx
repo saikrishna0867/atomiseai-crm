@@ -48,12 +48,25 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ['notifications'],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data: logs } = await supabase
         .from('activity_log')
         .select('id, lead_id, event_type, description, performed_by, timestamp')
         .order('timestamp', { ascending: false })
         .limit(50);
-      return data || [];
+      if (!logs || logs.length === 0) return [];
+
+      // Fetch contact names for lead_ids
+      const leadIds = [...new Set(logs.map((l: any) => l.lead_id).filter(Boolean))];
+      const { data: contacts } = await supabase
+        .from('contacts')
+        .select('lead_id, name')
+        .in('lead_id', leadIds);
+      const contactMap = new Map((contacts || []).map((c: any) => [c.lead_id, c.name]));
+
+      return logs.map((l: any) => ({
+        ...l,
+        contact_name: contactMap.get(l.lead_id) || null,
+      }));
     },
     enabled: open,
     refetchInterval: open ? 15000 : false,
