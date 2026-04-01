@@ -42,6 +42,7 @@ export default function AppLayout() {
   }, [signOut, navigate]);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [globalSearch, setGlobalSearch] = useState('');
   const basePath = '/' + location.pathname.split('/')[1];
   const meta = pageMeta[basePath] || { title: 'Atomise CRM', subtitle: '' };
 
