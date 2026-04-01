@@ -69,11 +69,15 @@ export default function SettingsPage() {
   useEffect(() => { document.title = 'Settings | Atomise AI CRM'; }, []);
   useEffect(() => { setLocalCrmName(crmName); }, [crmName]);
 
-  // Persist team to localStorage
-  const saveTeam = (members: TeamMember[]) => {
-    setTeamMembers(members);
-    localStorage.setItem('atomise_team_members', JSON.stringify(members));
-  };
+  // Load team from Supabase
+  const loadTeam = useCallback(async () => {
+    setTeamLoading(true);
+    const { data } = await supabase.from('team_members').select('*').order('created_at', { ascending: true });
+    setTeamMembers(data || []);
+    setTeamLoading(false);
+  }, []);
+
+  useEffect(() => { loadTeam(); }, [loadTeam]);
 
   // General save
   const saveGeneral = async () => {
@@ -95,27 +99,34 @@ export default function SettingsPage() {
     }
     setInviting(true);
     try {
-      const newMember: TeamMember = {
-        id: crypto.randomUUID(),
+      const { error } = await supabase.from('team_members').insert({
         name: inviteName.trim(),
         email: inviteEmail.trim(),
         role: inviteRole,
-      };
-      saveTeam([...teamMembers, newMember]);
-      toast({ title: `${newMember.name} added to team ✅` });
+      });
+      if (error) throw error;
+      toast({ title: `${inviteName.trim()} added to team ✅` });
       setInviteOpen(false);
       setInviteName('');
       setInviteEmail('');
       setInviteRole('Sales Rep');
+      loadTeam();
+    } catch (err: any) {
+      toast({ title: 'Failed to add member', description: err?.message, variant: 'destructive' });
     } finally {
       setInviting(false);
     }
   };
 
   // Team remove
-  const removeMember = (member: TeamMember) => {
-    saveTeam(teamMembers.filter(m => m.id !== member.id));
+  const removeMember = async (member: TeamMember) => {
+    const { error } = await supabase.from('team_members').delete().eq('id', member.id);
+    if (error) {
+      toast({ title: 'Failed to remove member', variant: 'destructive' });
+      return;
+    }
     toast({ title: `${member.name} removed from team` });
+    loadTeam();
   };
 
   // Integration tests
