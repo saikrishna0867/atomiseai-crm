@@ -105,6 +105,16 @@ export default function DashboardPage() {
 
   if (loading) return <SkeletonDashboard />;
 
+  const q = search.trim().toLowerCase();
+  const filteredActivities = useMemo(() => {
+    if (!q) return activities;
+    return activities.filter(a =>
+      [a.event_type, a.description, a.performed_by]
+        .filter(Boolean)
+        .some(v => String(v).toLowerCase().includes(q))
+    );
+  }, [activities, q]);
+
   const PIE_COLORS = ['#34d399', '#f87171', '#c9a96e'];
   const totalDeals = dealStatusData.reduce((s, d) => s + d.value, 0);
 
