@@ -163,7 +163,8 @@ export default function CampaignsPage() {
                     </DropdownMenu>
                   </td>
                 </tr>
-              ))}
+              ));
+              })()}
             </tbody>
           </table>
         </div>
