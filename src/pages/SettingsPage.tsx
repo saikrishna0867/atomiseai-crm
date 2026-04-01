@@ -294,7 +294,7 @@ export default function SettingsPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <StatusDot status={n8nStatus === 'idle' ? 'connected' : n8nStatus} />
+              {renderStatus(n8nStatus === 'idle' ? 'connected' : n8nStatus)}
               <Button size="sm" variant="outline" className="text-foreground rounded-lg" style={{ borderColor: 'rgba(201,169,110,0.20)' }} onClick={testN8n} disabled={testingN8n}>
                 {testingN8n ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null} Test
               </Button>
@@ -310,7 +310,7 @@ export default function SettingsPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <StatusDot status={supabaseStatus === 'idle' ? 'connected' : supabaseStatus} />
+              {renderStatus(supabaseStatus === 'idle' ? 'connected' : supabaseStatus)}
               <Button size="sm" variant="outline" className="text-foreground rounded-lg" style={{ borderColor: 'rgba(201,169,110,0.20)' }} onClick={testSupabase} disabled={testingSupabase}>
                 {testingSupabase ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null} Test
               </Button>
