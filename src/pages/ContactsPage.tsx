@@ -46,6 +46,7 @@ export default function ContactsPage() {
   const [sourceFilter, setSourceFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [addOpen, setAddOpen] = useState(false);
+  const [editingContact, setEditingContact] = useState<any>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [emailWarning, setEmailWarning] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(false);
