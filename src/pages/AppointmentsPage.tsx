@@ -19,6 +19,7 @@ const DURATIONS = ['15', '30', '45', '60'];
 
 export default function AppointmentsPage() {
   const { toast } = useToast();
+  const { search: globalSearch = '' } = (useOutletContext<{ search?: string }>() || {});
   const queryClient = useQueryClient();
   const [view, setView] = useState<'calendar' | 'list'>('calendar');
   const [currentMonth, setCurrentMonth] = useState(new Date());

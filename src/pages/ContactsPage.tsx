@@ -196,8 +196,9 @@ export default function ContactsPage() {
     setAddOpen(true);
   };
 
+  const combinedSearch = (search || globalSearch || '').toLowerCase();
   const filtered = contacts.filter((c: any) => {
-    const matchSearch = !search || [c.name, c.email, c.company].some((f) => f?.toLowerCase().includes(search.toLowerCase()));
+    const matchSearch = !combinedSearch || [c.name, c.email, c.company, c.phone].some((f) => f?.toLowerCase().includes(combinedSearch));
     const matchStage = stageFilter === 'all' || c.pipeline_stage === stageFilter;
     const matchSource = sourceFilter === 'all' || c.source === sourceFilter;
     const matchPriority = priorityFilter === 'all' || c.priority === priorityFilter;

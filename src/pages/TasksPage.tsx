@@ -80,10 +80,12 @@ export default function TasksPage() {
     onError: (e: any) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
   });
 
+  const q = globalSearch.trim().toLowerCase();
   const filtered = tasks.filter((t: any) => {
     const tStatus = (t.status || '').toLowerCase();
     const tPriority = (t.priority || '').toLowerCase();
-    return (statusFilter === 'all' || tStatus === statusFilter.toLowerCase()) && (priorityFilter === 'all' || tPriority === priorityFilter.toLowerCase());
+    const matchSearch = !q || [t.title, t.description, t.contact_name, t.assigned_to].filter(Boolean).some(v => String(v).toLowerCase().includes(q));
+    return matchSearch && (statusFilter === 'all' || tStatus === statusFilter.toLowerCase()) && (priorityFilter === 'all' || tPriority === priorityFilter.toLowerCase());
   });
 
   const getDateStatus = (t: any) => {
