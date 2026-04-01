@@ -40,24 +40,20 @@ export default function CampaignsPage() {
   const launchMutation = useMutation({
     mutationFn: async () => {
       const campaignId = crypto.randomUUID();
-      const { error } = await supabase.from('campaigns').insert({
-        campaign_id: campaignId, campaign_name: form.campaign_name, target_stage: form.target_stage,
-        email_subject: form.email_subject, rep_name: form.rep_name, rep_email: form.rep_email, status: 'Sending', emails_sent: 0,
-      });
-      if (error) throw error;
 
-      await Promise.allSettled([
-        webhooks.runCampaign({
-          campaignId, campaignName: form.campaign_name, targetStage: form.target_stage,
-          emailSubject: form.email_subject, emailBody: form.email_body,
-          repName: form.rep_name, repEmail: form.rep_email,
-        }),
-        supabase.from('activity_log').insert({
-          lead_id: campaignId, event_type: 'campaign_launched',
-          description: `Campaign "${form.campaign_name}" launched targeting ${form.target_stage}`,
-          performed_by: form.rep_name,
-        }),
-      ]);
+      // Only call the webhook — n8n handles the DB insert to avoid duplicate key errors
+      await webhooks.runCampaign({
+        campaignId, campaignName: form.campaign_name, targetStage: form.target_stage,
+        emailSubject: form.email_subject, emailBody: form.email_body,
+        repName: form.rep_name, repEmail: form.rep_email,
+      });
+
+      // Log activity separately
+      await supabase.from('activity_log').insert({
+        lead_id: campaignId, event_type: 'campaign_launched',
+        description: `Campaign "${form.campaign_name}" launched targeting ${form.target_stage}`,
+        performed_by: form.rep_name,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
