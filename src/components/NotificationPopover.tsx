@@ -41,6 +41,7 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['notification-count'] });
       toast({ title: 'Notification removed' });
     },
   });
