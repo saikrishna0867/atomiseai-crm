@@ -116,6 +116,7 @@ const StageColumn = forwardRef<HTMLDivElement, { stage: string; deals: any[]; on
 
 export default function PipelinePage() {
   const { toast } = useToast();
+  const { search: globalSearch = '' } = (useOutletContext<{ search?: string }>() || {});
   const queryClient = useQueryClient();
   const [addOpen, setAddOpen] = useState(false);
   const [addStage, setAddStage] = useState('Lead');
