@@ -34,21 +34,8 @@ export default function AISummariesPage() {
   const { data: contacts = [] } = useQuery({
     queryKey: ['contacts-for-ai'],
     queryFn: async () => {
-      const { data } = await supabase.from('contacts').select('id, name, email, phone, lead_id, pipeline_stage, created_at');
-      if (!data) return [];
-      // Deduplicate using the same logic as ContactsPage
-      const unique = new Map<string, any>();
-      for (const c of data) {
-        const email = (c.email || '').trim().toLowerCase();
-        const name = (c.name || '').trim().toLowerCase();
-        const phone = (c.phone || '').trim().toLowerCase();
-        const key = email ? `email:${email}` : (name && phone ? `name-phone:${name}:${phone}` : `id:${c.id}`);
-        const existing = unique.get(key);
-        if (!existing || new Date(c.created_at ?? 0).getTime() >= new Date(existing.created_at ?? 0).getTime()) {
-          unique.set(key, c);
-        }
-      }
-      return Array.from(unique.values());
+      const { data } = await supabase.from('contacts').select('id, name, email, phone, lead_id, pipeline_stage, created_at').order('created_at', { ascending: false });
+      return data || [];
     },
   });
 
