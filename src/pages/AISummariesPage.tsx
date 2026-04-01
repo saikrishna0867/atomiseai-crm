@@ -21,6 +21,7 @@ const HEALTH_CONFIG: Record<string, { emoji: string; label: string; bg: string; 
 export default function AISummariesPage() {
   const { toast } = useToast();
   const { user, session } = useAuth();
+  const { search: globalSearch = '' } = (useOutletContext<{ search?: string }>() || {});
   const queryClient = useQueryClient();
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
