@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { Label } from '@/components/ui/label';
@@ -41,12 +41,9 @@ export default function SettingsPage() {
   const [localCrmName, setLocalCrmName] = useState(crmName);
   const [generalSaving, setGeneralSaving] = useState(false);
 
-  // Team (localStorage)
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(() => {
-    const saved = localStorage.getItem('atomise_team_members');
-    if (saved) { try { return JSON.parse(saved); } catch { /* fall through */ } }
-    return [];
-  });
+  // Team (Supabase)
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [teamLoading, setTeamLoading] = useState(true);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteName, setInviteName] = useState('');
   const [inviteEmail, setInviteEmail] = useState('');
@@ -72,11 +69,15 @@ export default function SettingsPage() {
   useEffect(() => { document.title = 'Settings | Atomise AI CRM'; }, []);
   useEffect(() => { setLocalCrmName(crmName); }, [crmName]);
 
-  // Persist team to localStorage
-  const saveTeam = (members: TeamMember[]) => {
-    setTeamMembers(members);
-    localStorage.setItem('atomise_team_members', JSON.stringify(members));
-  };
+  // Load team from Supabase
+  const loadTeam = useCallback(async () => {
+    setTeamLoading(true);
+    const { data } = await supabase.from('team_members').select('*').order('created_at', { ascending: true });
+    setTeamMembers(data || []);
+    setTeamLoading(false);
+  }, []);
+
+  useEffect(() => { loadTeam(); }, [loadTeam]);
 
   // General save
   const saveGeneral = async () => {
@@ -98,27 +99,34 @@ export default function SettingsPage() {
     }
     setInviting(true);
     try {
-      const newMember: TeamMember = {
-        id: crypto.randomUUID(),
+      const { error } = await supabase.from('team_members').insert({
         name: inviteName.trim(),
         email: inviteEmail.trim(),
         role: inviteRole,
-      };
-      saveTeam([...teamMembers, newMember]);
-      toast({ title: `${newMember.name} added to team ✅` });
+      });
+      if (error) throw error;
+      toast({ title: `${inviteName.trim()} added to team ✅` });
       setInviteOpen(false);
       setInviteName('');
       setInviteEmail('');
       setInviteRole('Sales Rep');
+      loadTeam();
+    } catch (err: any) {
+      toast({ title: 'Failed to add member', description: err?.message, variant: 'destructive' });
     } finally {
       setInviting(false);
     }
   };
 
   // Team remove
-  const removeMember = (member: TeamMember) => {
-    saveTeam(teamMembers.filter(m => m.id !== member.id));
+  const removeMember = async (member: TeamMember) => {
+    const { error } = await supabase.from('team_members').delete().eq('id', member.id);
+    if (error) {
+      toast({ title: 'Failed to remove member', variant: 'destructive' });
+      return;
+    }
     toast({ title: `${member.name} removed from team` });
+    loadTeam();
   };
 
   // Integration tests
@@ -212,7 +220,11 @@ export default function SettingsPage() {
             </Button>
           </div>
 
-          {teamMembers.length === 0 ? (
+          {teamLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : teamMembers.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <p className="text-sm">No team members yet. Click "Add Member" to get started.</p>
             </div>
