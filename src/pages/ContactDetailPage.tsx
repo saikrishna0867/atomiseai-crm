@@ -27,7 +27,7 @@ export default function ContactDetailPage() {
   const { data: contact, isLoading } = useQuery({
     queryKey: ['contact', leadId],
     queryFn: async () => {
-      const { data, error } = await supabase.from('contacts').select('*').eq('lead_id', leadId).single();
+      const { data, error } = await supabase.from('contacts').select('*').eq('lead_id', leadId).maybeSingle();
       if (error) throw error;
       return data;
     },
