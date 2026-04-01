@@ -17,6 +17,54 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMont
 const APPT_TYPES = ['Discovery Call', 'Demo', 'Follow-Up Call', 'Proposal Review', 'Onboarding'];
 const DURATIONS = ['15', '30', '45', '60'];
 
+const normalizeAppointmentValue = (value?: string | null) => value?.trim().toLowerCase() ?? '';
+
+const getAppointmentKey = (appointment: {
+  contact_name?: string | null;
+  appointment_type?: string | null;
+  appointment_date?: string | null;
+  appointment_time?: string | null;
+}) => [
+  normalizeAppointmentValue(appointment.contact_name),
+  normalizeAppointmentValue(appointment.appointment_type),
+  appointment.appointment_date ?? '',
+  normalizeAppointmentValue(appointment.appointment_time),
+].join('|');
+
+const dedupeAppointments = (items: any[]) => {
+  const unique = new Map<string, any>();
+  const duplicateIds: string[] = [];
+
+  for (const item of items) {
+    const key = getAppointmentKey(item);
+    const existing = unique.get(key);
+
+    if (!existing) {
+      unique.set(key, item);
+      continue;
+    }
+
+    const existingCreatedAt = new Date(existing.created_at ?? 0).getTime();
+    const currentCreatedAt = new Date(item.created_at ?? 0).getTime();
+
+    if (currentCreatedAt >= existingCreatedAt) {
+      if (existing.id) duplicateIds.push(existing.id);
+      unique.set(key, item);
+    } else if (item.id) {
+      duplicateIds.push(item.id);
+    }
+  }
+
+  return {
+    uniqueAppointments: Array.from(unique.values()).sort((a, b) => {
+      const dateCompare = String(a.appointment_date ?? '').localeCompare(String(b.appointment_date ?? ''));
+      if (dateCompare !== 0) return dateCompare;
+      return String(a.appointment_time ?? '').localeCompare(String(b.appointment_time ?? ''));
+    }),
+    duplicateIds,
+  };
+};
+
 export default function AppointmentsPage() {
   const { toast } = useToast();
   const { search: globalSearch = '' } = (useOutletContext<{ search?: string }>() || {});
@@ -42,16 +90,17 @@ export default function AppointmentsPage() {
     queryFn: async () => {
       const { data, error } = await supabase.from('appointments').select('*').order('appointment_date', { ascending: true });
       if (error) throw error;
-      // Deduplicate by contact_name + appointment_type + appointment_date + appointment_time
-      const unique = new Map<string, any>();
-      for (const a of (data || [])) {
-        const key = `${(a.contact_name || '').trim().toLowerCase()}|${(a.appointment_type || '').trim().toLowerCase()}|${a.appointment_date}|${(a.appointment_time || '').trim().toLowerCase()}`;
-        const existing = unique.get(key);
-        if (!existing || new Date(a.created_at ?? 0).getTime() >= new Date(existing.created_at ?? 0).getTime()) {
-          unique.set(key, a);
+
+      const { uniqueAppointments, duplicateIds } = dedupeAppointments(data || []);
+
+      if (duplicateIds.length > 0) {
+        const { error: cleanupError } = await supabase.from('appointments').delete().in('id', duplicateIds);
+        if (cleanupError) {
+          console.error('[Appointments cleanup]', cleanupError);
         }
       }
-      return Array.from(unique.values());
+
+      return uniqueAppointments;
     },
   });
 
@@ -74,6 +123,31 @@ export default function AppointmentsPage() {
         appointment_time: formattedTime, appointment_type: form.appointment_type,
         meeting_link: form.meeting_link, status: 'Scheduled',
       };
+
+      const duplicateKey = getAppointmentKey(record);
+      const { data: existingRows, error: existingError } = await supabase
+        .from('appointments')
+        .select('id, created_at, contact_name, appointment_type, appointment_date, appointment_time')
+        .eq('appointment_date', record.appointment_date)
+        .eq('appointment_type', record.appointment_type)
+        .eq('appointment_time', record.appointment_time);
+
+      if (existingError) throw existingError;
+
+      const matchingRows = (existingRows || []).filter((item: any) => getAppointmentKey(item) === duplicateKey);
+      const { uniqueAppointments: existingAppointments, duplicateIds } = dedupeAppointments(matchingRows);
+
+      if (duplicateIds.length > 0) {
+        const { error: cleanupError } = await supabase.from('appointments').delete().in('id', duplicateIds);
+        if (cleanupError) {
+          console.error('[Appointments cleanup before save]', cleanupError);
+        }
+      }
+
+      if (existingAppointments.length > 0) {
+        throw new Error('This appointment already exists for this contact, date, and time.');
+      }
+
       const { error } = await supabase.from('appointments').insert(record);
       if (error) throw error;
 
