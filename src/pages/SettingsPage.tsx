@@ -72,22 +72,11 @@ export default function SettingsPage() {
   useEffect(() => { document.title = 'Settings | Atomise AI CRM'; }, []);
   useEffect(() => { setLocalCrmName(crmName); }, [crmName]);
 
-  // Load team members from Supabase
-  const loadTeam = useCallback(async () => {
-    setTeamLoading(true);
-    try {
-      const { data, error } = await supabase.from('team_members').select('*').order('created_at', { ascending: true });
-      if (error) throw error;
-      setTeamMembers(data || []);
-    } catch {
-      // If table doesn't exist, show empty state
-      setTeamMembers([]);
-    } finally {
-      setTeamLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { loadTeam(); }, [loadTeam]);
+  // Persist team to localStorage
+  const saveTeam = (members: TeamMember[]) => {
+    setTeamMembers(members);
+    localStorage.setItem('atomise_team_members', JSON.stringify(members));
+  };
 
   // General save
   const saveGeneral = async () => {
