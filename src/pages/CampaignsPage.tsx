@@ -136,7 +136,12 @@ export default function CampaignsPage() {
               ))}
             </tr></thead>
             <tbody>
-              {campaigns.map((c: any) => (
+              {(() => {
+                const cq = globalSearch.trim().toLowerCase();
+                const filteredCampaigns = cq ? campaigns.filter((c: any) =>
+                  [c.campaign_name, c.target_stage, c.status, c.launched_by].filter(Boolean).some(v => String(v).toLowerCase().includes(cq))
+                ) : campaigns;
+                return filteredCampaigns.map((c: any) => (
                 <tr key={c.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(201,169,110,0.04)]">
                   <td className="px-4 py-3 font-medium text-foreground">{c.campaign_name}</td>
                   <td className="px-4 py-3"><StatusBadge type="stage" value={c.target_stage} /></td>
