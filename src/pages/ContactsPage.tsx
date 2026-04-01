@@ -37,6 +37,44 @@ const PRIORITY_DOT: Record<string, string> = {
   'Low': '#34d399'
 };
 
+const normalizeContactValue = (value?: string | null) => value?.trim().toLowerCase() ?? '';
+
+const getDuplicateContactKey = (contact: { id?: string; email?: string | null; name?: string | null; phone?: string | null }) => {
+  const email = normalizeContactValue(contact.email);
+  if (email) return `email:${email}`;
+
+  const name = normalizeContactValue(contact.name);
+  const phone = normalizeContactValue(contact.phone);
+  if (name && phone) return `name-phone:${name}:${phone}`;
+
+  return `id:${contact.id ?? crypto.randomUUID()}`;
+};
+
+const dedupeContacts = (items: any[]) => {
+  const unique = new Map<string, any>();
+
+  for (const item of items) {
+    const key = getDuplicateContactKey(item);
+    const existing = unique.get(key);
+
+    if (!existing) {
+      unique.set(key, item);
+      continue;
+    }
+
+    const existingCreatedAt = new Date(existing.created_at ?? 0).getTime();
+    const currentCreatedAt = new Date(item.created_at ?? 0).getTime();
+
+    if (currentCreatedAt >= existingCreatedAt) {
+      unique.set(key, item);
+    }
+  }
+
+  return Array.from(unique.values()).sort(
+    (a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime(),
+  );
+};
+
 export default function ContactsPage() {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -63,7 +101,7 @@ export default function ContactsPage() {
     queryFn: async () => {
       const { data, error } = await supabase.from('contacts').select('*').order('created_at', { ascending: false });
       if (error) throw error;
-      return data;
+      return dedupeContacts(data || []);
     }
   });
 
@@ -71,22 +109,34 @@ export default function ContactsPage() {
     mutationFn: async () => {
       const leadId = `LEAD-${Date.now()}`;
       const { tags, ...rest } = form;
-      const record = { ...rest, lead_id: leadId };
-      const { data: inserted, error } = await supabase.from('contacts').insert(record).select().single();
-      if (error) throw error;
+      const record = {
+        ...rest,
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        company: form.company.trim(),
+        notes: form.notes.trim(),
+        lead_id: leadId,
+      };
+
+      await webhooks.newLead({
+        leadId,
+        name: record.name,
+        email: record.email,
+        phone: record.phone,
+        company: record.company,
+        source: record.source,
+        assignedRep: record.assigned_rep,
+        assignedRepEmail: record.assigned_rep_email,
+        pipelineStage: record.pipeline_stage,
+        notes: record.notes,
+      });
 
       await Promise.allSettled([
-        webhooks.newLead({
-          leadId,
-          name: form.name, email: form.email, phone: form.phone, company: form.company,
-          source: form.source, assignedRep: form.assigned_rep, assignedRepEmail: form.assigned_rep_email,
-          pipelineStage: form.pipeline_stage, notes: form.notes,
-          skipDbInsert: true
-        }),
         webhooks.startDrip({
-          leadId, contactName: form.name, contactEmail: form.email,
-          assignedRep: form.assigned_rep, assignedRepEmail: form.assigned_rep_email,
-          source: form.source, company: form.company
+          leadId, contactName: record.name, contactEmail: record.email,
+          assignedRep: record.assigned_rep, assignedRepEmail: record.assigned_rep_email,
+          source: record.source, company: record.company
         }),
         supabase.from('activity_log').insert({
           lead_id: leadId, event_type: 'lead_assigned',
