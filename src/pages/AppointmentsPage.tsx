@@ -42,7 +42,16 @@ export default function AppointmentsPage() {
     queryFn: async () => {
       const { data, error } = await supabase.from('appointments').select('*').order('appointment_date', { ascending: true });
       if (error) throw error;
-      return data;
+      // Deduplicate by contact_name + appointment_type + appointment_date + appointment_time
+      const unique = new Map<string, any>();
+      for (const a of (data || [])) {
+        const key = `${(a.contact_name || '').trim().toLowerCase()}|${(a.appointment_type || '').trim().toLowerCase()}|${a.appointment_date}|${(a.appointment_time || '').trim().toLowerCase()}`;
+        const existing = unique.get(key);
+        if (!existing || new Date(a.created_at ?? 0).getTime() >= new Date(existing.created_at ?? 0).getTime()) {
+          unique.set(key, a);
+        }
+      }
+      return Array.from(unique.values());
     },
   });
 
