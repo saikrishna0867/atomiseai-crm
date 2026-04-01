@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { Bell, UserPlus, ArrowRightLeft, Calendar, Mail, Sparkles, ClipboardList, X, Trash2 } from 'lucide-react';
+import { Bell, UserPlus, ArrowRightLeft, Calendar, Mail, Sparkles, ClipboardList, X, Trash2, User, Briefcase } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 
