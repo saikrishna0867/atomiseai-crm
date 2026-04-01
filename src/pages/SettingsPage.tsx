@@ -27,7 +27,7 @@ export default function SettingsPage() {
   const testN8n = async () => {
     setTestingN8n(true);
     try {
-      const res = await fetch('https://saikrishnasai1920.app.n8n.cloud/webhook/new-lead', {
+      const res = await fetch('https://saikrishna96.app.n8n.cloud/webhook/new-lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ test: true }),
