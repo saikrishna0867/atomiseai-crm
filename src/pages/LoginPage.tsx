@@ -58,7 +58,7 @@ export default function LoginPage() {
 
         <div className="relative z-10 text-center space-y-6 px-8">
           <img src="/atomise-logo.png" alt="Automise AI" className="w-24 h-24 mx-auto object-contain" />
-          <h1 className="font-display text-4xl font-bold text-white">AUTOMISE AI</h1>
+          <h1 className="font-display text-4xl font-bold text-white">ATOMISE AI</h1>
           <p className="text-xl font-display" style={{ color: '#d4b483' }}>Automating Tomorrow, Today</p>
           <div className="space-y-3 mt-8">
             {[
