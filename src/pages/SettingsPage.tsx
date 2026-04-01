@@ -212,11 +212,7 @@ export default function SettingsPage() {
             </Button>
           </div>
 
-          {teamLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-            </div>
-          ) : teamMembers.length === 0 ? (
+          {teamMembers.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <p className="text-sm">No team members yet. Click "Add Member" to get started.</p>
             </div>
