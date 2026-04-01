@@ -41,9 +41,12 @@ export default function SettingsPage() {
   const [localCrmName, setLocalCrmName] = useState(crmName);
   const [generalSaving, setGeneralSaving] = useState(false);
 
-  // Team
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [teamLoading, setTeamLoading] = useState(true);
+  // Team (localStorage)
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(() => {
+    const saved = localStorage.getItem('atomise_team_members');
+    if (saved) { try { return JSON.parse(saved); } catch { /* fall through */ } }
+    return [];
+  });
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteName, setInviteName] = useState('');
   const [inviteEmail, setInviteEmail] = useState('');
