@@ -240,7 +240,14 @@ export default function PipelinePage() {
             <StageColumn
               key={stage}
               stage={stage}
-              deals={deals.filter((d: any) => d.stage === stage)}
+              deals={(() => {
+                const pq = globalSearch.trim().toLowerCase();
+                const stageDeals = deals.filter((d: any) => d.stage === stage);
+                if (!pq) return stageDeals;
+                return stageDeals.filter((d: any) =>
+                  [d.contact_name, d.company, d.assigned_rep, d.contact_email].filter(Boolean).some(v => String(v).toLowerCase().includes(pq))
+                );
+              })()}
               onAddDeal={() => { setAddStage(stage); setAddOpen(true); }}
               onDeleteDeal={(id) => setDeleteTarget(id)}
             />
