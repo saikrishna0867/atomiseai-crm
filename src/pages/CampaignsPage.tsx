@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { webhooks } from '@/lib/webhooks';
@@ -12,12 +12,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useToast } from '@/hooks/use-toast';
 import { Mail, Plus, Rocket, Eye, MoreHorizontal, Trash2, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
+import { useOutletContext } from 'react-router-dom';
 
 const TARGET_STAGES = ['Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won', 'All'];
 const TOKENS = ['{{firstName}}', '{{company}}', '{{repName}}', '{{leadId}}'];
 
 export default function CampaignsPage() {
   const { toast } = useToast();
+  const { search: globalSearch = '' } = (useOutletContext<{ search?: string }>() || {});
   const queryClient = useQueryClient();
   const [addOpen, setAddOpen] = useState(false);
   const [viewCampaign, setViewCampaign] = useState<any>(null);
@@ -134,7 +136,12 @@ export default function CampaignsPage() {
               ))}
             </tr></thead>
             <tbody>
-              {campaigns.map((c: any) => (
+              {(() => {
+                const cq = globalSearch.trim().toLowerCase();
+                const filteredCampaigns = cq ? campaigns.filter((c: any) =>
+                  [c.campaign_name, c.target_stage, c.status, c.launched_by].filter(Boolean).some(v => String(v).toLowerCase().includes(cq))
+                ) : campaigns;
+                return filteredCampaigns.map((c: any) => (
                 <tr key={c.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(201,169,110,0.04)]">
                   <td className="px-4 py-3 font-medium text-foreground">{c.campaign_name}</td>
                   <td className="px-4 py-3"><StatusBadge type="stage" value={c.target_stage} /></td>
@@ -156,7 +163,8 @@ export default function CampaignsPage() {
                     </DropdownMenu>
                   </td>
                 </tr>
-              ))}
+              ));
+              })()}
             </tbody>
           </table>
         </div>

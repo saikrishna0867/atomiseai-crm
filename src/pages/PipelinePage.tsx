@@ -1,4 +1,4 @@
-import { useState, useEffect, forwardRef } from 'react';
+import { useState, useEffect, forwardRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { webhooks } from '@/lib/webhooks';
@@ -12,6 +12,7 @@ import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { Columns3, Plus, Trash2, MoreHorizontal, Building2 } from 'lucide-react';
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, useSensor, useSensors, useDroppable, useDraggable } from '@dnd-kit/core';
 import { format } from 'date-fns';
+import { useOutletContext } from 'react-router-dom';
 
 const STAGES = ['Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'];
 
@@ -115,6 +116,7 @@ const StageColumn = forwardRef<HTMLDivElement, { stage: string; deals: any[]; on
 
 export default function PipelinePage() {
   const { toast } = useToast();
+  const { search: globalSearch = '' } = (useOutletContext<{ search?: string }>() || {});
   const queryClient = useQueryClient();
   const [addOpen, setAddOpen] = useState(false);
   const [addStage, setAddStage] = useState('Lead');
@@ -238,7 +240,14 @@ export default function PipelinePage() {
             <StageColumn
               key={stage}
               stage={stage}
-              deals={deals.filter((d: any) => d.stage === stage)}
+              deals={(() => {
+                const pq = globalSearch.trim().toLowerCase();
+                const stageDeals = deals.filter((d: any) => d.stage === stage);
+                if (!pq) return stageDeals;
+                return stageDeals.filter((d: any) =>
+                  [d.contact_name, d.company, d.assigned_rep, d.contact_email].filter(Boolean).some(v => String(v).toLowerCase().includes(pq))
+                );
+              })()}
               onAddDeal={() => { setAddStage(stage); setAddOpen(true); }}
               onDeleteDeal={(id) => setDeleteTarget(id)}
             />

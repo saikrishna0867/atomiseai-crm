@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Users, Plus, Search, Trash2, Eye, Edit, MoreHorizontal, Loader2, Droplets, Phone } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -79,7 +79,8 @@ export default function ContactsPage() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [search, setSearch] = useState('');
+  const { search: globalSearch = '' } = (useOutletContext<{ search?: string }>() || {});
+  const [search, setSearch] = useState(globalSearch);
   const [stageFilter, setStageFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
@@ -195,8 +196,9 @@ export default function ContactsPage() {
     setAddOpen(true);
   };
 
+  const combinedSearch = (search || globalSearch || '').toLowerCase();
   const filtered = contacts.filter((c: any) => {
-    const matchSearch = !search || [c.name, c.email, c.company].some((f) => f?.toLowerCase().includes(search.toLowerCase()));
+    const matchSearch = !combinedSearch || [c.name, c.email, c.company, c.phone].some((f) => f?.toLowerCase().includes(combinedSearch));
     const matchStage = stageFilter === 'all' || c.pipeline_stage === stageFilter;
     const matchSource = sourceFilter === 'all' || c.source === sourceFilter;
     const matchPriority = priorityFilter === 'all' || c.priority === priorityFilter;

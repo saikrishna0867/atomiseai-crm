@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { Sparkles, Loader2, Search } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 
 const HEALTH_CONFIG: Record<string, { emoji: string; label: string; bg: string; text: string; border: string; dot: string }> = {
@@ -20,6 +21,7 @@ const HEALTH_CONFIG: Record<string, { emoji: string; label: string; bg: string; 
 export default function AISummariesPage() {
   const { toast } = useToast();
   const { user, session } = useAuth();
+  const { search: globalSearch = '' } = (useOutletContext<{ search?: string }>() || {});
   const queryClient = useQueryClient();
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -114,7 +116,8 @@ export default function AISummariesPage() {
     return 0;
   });
 
-  const filtered = sorted.filter(c => !searchQ || c.name?.toLowerCase().includes(searchQ.toLowerCase()));
+  const combinedAiSearch = (searchQ || globalSearch || '').toLowerCase();
+  const filtered = sorted.filter(c => !combinedAiSearch || c.name?.toLowerCase().includes(combinedAiSearch));
 
   const selectedContact = contacts.find((c: any) => c.lead_id === selectedLeadId);
   const healthValue = summary?.deal_health || (summary?.sentiment === 'Positive' ? 'Hot' : summary?.sentiment === 'Neutral' ? 'Warm' : summary?.sentiment === 'Needs Attention' ? 'Cold' : 'Unknown');

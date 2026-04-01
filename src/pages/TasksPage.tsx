@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { EmptyState } from '@/components/EmptyState';
@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { CheckSquare, Plus, AlertCircle, LayoutList, Columns3, Trash2 } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { format, isPast, parseISO } from 'date-fns';
 
@@ -20,6 +21,7 @@ const PRIORITY_BORDER: Record<string, string> = {
 
 export default function TasksPage() {
   const { toast } = useToast();
+  const { search: globalSearch = '' } = (useOutletContext<{ search?: string }>() || {});
   const queryClient = useQueryClient();
   const [addOpen, setAddOpen] = useState(false);
   const [view, setView] = useState<'list' | 'board'>('board');
@@ -78,10 +80,12 @@ export default function TasksPage() {
     onError: (e: any) => toast({ title: 'Error', description: e.message, variant: 'destructive' }),
   });
 
+  const q = globalSearch.trim().toLowerCase();
   const filtered = tasks.filter((t: any) => {
     const tStatus = (t.status || '').toLowerCase();
     const tPriority = (t.priority || '').toLowerCase();
-    return (statusFilter === 'all' || tStatus === statusFilter.toLowerCase()) && (priorityFilter === 'all' || tPriority === priorityFilter.toLowerCase());
+    const matchSearch = !q || [t.title, t.description, t.contact_name, t.assigned_to].filter(Boolean).some(v => String(v).toLowerCase().includes(q));
+    return matchSearch && (statusFilter === 'all' || tStatus === statusFilter.toLowerCase()) && (priorityFilter === 'all' || tPriority === priorityFilter.toLowerCase());
   });
 
   const getDateStatus = (t: any) => {

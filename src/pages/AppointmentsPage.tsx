@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { webhooks } from '@/lib/webhooks';
@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { CalendarDays, Plus, List, Calendar as CalIcon, Trash2, Eye } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths } from 'date-fns';
 
@@ -18,6 +19,7 @@ const DURATIONS = ['15', '30', '45', '60'];
 
 export default function AppointmentsPage() {
   const { toast } = useToast();
+  const { search: globalSearch = '' } = (useOutletContext<{ search?: string }>() || {});
   const queryClient = useQueryClient();
   const [view, setView] = useState<'calendar' | 'list'>('calendar');
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -107,13 +109,22 @@ export default function AppointmentsPage() {
     if (c) setForm(p => ({ ...p, lead_id: leadId, contact_name: c.name, contact_email: c.email }));
   };
 
+  const aq = globalSearch.trim().toLowerCase();
+  const filteredAppointments = useMemo(() => {
+    if (!aq) return appointments;
+    return appointments.filter((a: any) =>
+      [a.contact_name, a.appointment_type, a.rep_name, a.contact_email, a.status]
+        .filter(Boolean).some(v => String(v).toLowerCase().includes(aq))
+    );
+  }, [appointments, aq]);
+
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
   const startDay = monthStart.getDay();
   const paddedDays = Array(startDay).fill(null).concat(daysInMonth);
 
-  const getApptForDate = (date: Date) => appointments.filter((a: any) => a.appointment_date && isSameDay(new Date(a.appointment_date), date));
+  const getApptForDate = (date: Date) => filteredAppointments.filter((a: any) => a.appointment_date && isSameDay(new Date(a.appointment_date), date));
   const selectedAppts = selectedDate ? getApptForDate(selectedDate) : [];
 
   if (isLoading) return <div className="p-6"><div className="skeleton-shimmer h-96 rounded-2xl" /></div>;
@@ -197,7 +208,7 @@ export default function AppointmentsPage() {
                 ))}
               </tr></thead>
               <tbody>
-                {appointments.map((a: any) => (
+                {filteredAppointments.map((a: any) => (
                   <tr key={a.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(201,169,110,0.04)]">
                     <td className="px-4 py-3 text-foreground">{a.contact_name}</td>
                     <td className="px-4 py-3 text-muted-foreground text-xs">{a.appointment_type}</td>
