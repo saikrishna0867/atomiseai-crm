@@ -9,10 +9,11 @@ interface TopHeaderProps {
   subtitle: string;
   userInitial: string;
   onMenuClick?: () => void;
+  search?: string;
+  onSearchChange?: (value: string) => void;
 }
 
-export function TopHeader({ title, subtitle, userInitial, onMenuClick }: TopHeaderProps) {
-  const [search, setSearch] = useState('');
+export function TopHeader({ title, subtitle, userInitial, onMenuClick, search = '', onSearchChange }: TopHeaderProps) {
   const [notifOpen, setNotifOpen] = useState(false);
 
   const { data: notifCount = 0 } = useQuery({
