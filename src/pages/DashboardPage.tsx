@@ -302,13 +302,23 @@ export default function DashboardPage() {
                   </span>
                 </div>
                 <p className="text-xs md:text-sm mt-0.5 py-[2px] md:py-[3px] font-light text-white line-clamp-2 sm:truncate">{a.description}</p>
-              </div>
-              <div className="text-right shrink-0">
-                <p className="text-xs text-muted-foreground">{a.performed_by}</p>
-                <p className="text-[11px] text-muted-foreground/60">
-                  {a.timestamp ? formatDistanceToNow(new Date(a.timestamp), { addSuffix: true }) : ''}
-                </p>
-              </div>
+                <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                  {a.contact_name && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] md:text-[10px] font-medium" style={{ background: 'rgba(96,165,250,0.12)', color: '#60a5fa' }}>
+                      <User className="w-2.5 h-2.5" />
+                      {a.contact_name}
+                    </span>
+                  )}
+                  {a.performed_by && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] md:text-[10px] font-medium" style={{ background: 'rgba(201,169,110,0.12)', color: '#c9a96e' }}>
+                      <Briefcase className="w-2.5 h-2.5" />
+                      {a.performed_by}
+                    </span>
+                  )}
+                  <span className="text-[10px] md:text-[11px] text-muted-foreground/60">
+                    {a.timestamp ? formatDistanceToNow(new Date(a.timestamp), { addSuffix: true }) : ''}
+                  </span>
+                </div>
             </div>
           ))}
         </div>
