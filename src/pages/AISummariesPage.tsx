@@ -248,29 +248,58 @@ export default function AISummariesPage() {
               <div className="space-y-3">
                 {(() => {
                   const raw = summary.summary_text || summary.summary || '';
-                  // Split by numbered sections like "1. LEAD OVERVIEW:" or "2. KEY INSIGHTS:"
-                  const sections = raw.split(/(?=\d+\.\s+[A-Z][A-Z\s]+:)/g).filter((s: string) => s.trim());
-                  if (sections.length <= 1) {
-                    // Fallback: no numbered sections, show as-is
+                  
+                  // Try numbered format: "1. LEAD OVERVIEW:"
+                  let sections = raw.split(/(?=\d+\.\s+[A-Z][A-Z\s]+:)/g).filter((s: string) => s.trim());
+                  let parseMode: 'numbered' | 'markdown' | 'none' = sections.length > 1 ? 'numbered' : 'none';
+                  
+                  // Try markdown bold format: "**LEAD OVERVIEW:**" or "**KEY INSIGHTS:**"
+                  if (parseMode === 'none') {
+                    sections = raw.split(/(?=\*\*[A-Z][A-Z\s]+:\*\*)/g).filter((s: string) => s.trim());
+                    if (sections.length > 1) parseMode = 'markdown';
+                  }
+                  
+                  if (parseMode === 'none') {
                     return (
                       <div className="border-l-[3px] pl-4 py-3 rounded-r-lg" style={{ borderColor: '#c9a96e', background: 'rgba(201,169,110,0.04)' }}>
                         <p className="text-sm leading-[1.7] text-foreground/90">{raw}</p>
                       </div>
                     );
                   }
+                  
                   const icons: Record<string, string> = { 'LEAD OVERVIEW': '📋', 'KEY INSIGHTS': '💡', 'RECOMMENDED NEXT ACTION': '🎯', 'DEAL HEALTH': '❤️‍🩹', 'NEXT ACTION': '🎯', 'SUMMARY': '📝' };
+                  
                   return sections.map((section: string, i: number) => {
-                    const match = section.match(/^\d+\.\s+([A-Z][A-Z\s]+):\s*(.*)/s);
-                    if (!match) return (
-                      <div key={i} className="border-l-[3px] pl-4 py-3 rounded-r-lg" style={{ borderColor: '#c9a96e', background: 'rgba(201,169,110,0.04)' }}>
-                        <p className="text-sm leading-[1.7] text-foreground/90">{section.trim()}</p>
-                      </div>
-                    );
-                    const title = match[1].trim();
-                    const body = match[2].trim();
+                    let title = '';
+                    let body = '';
+                    
+                    if (parseMode === 'numbered') {
+                      const match = section.match(/^\d+\.\s+([A-Z][A-Z\s]+):\s*(.*)/s);
+                      if (!match) {
+                        return (
+                          <div key={i} className="border-l-[3px] pl-4 py-3 rounded-r-lg" style={{ borderColor: '#c9a96e', background: 'rgba(201,169,110,0.04)' }}>
+                            <p className="text-sm leading-[1.7] text-foreground/90">{section.trim()}</p>
+                          </div>
+                        );
+                      }
+                      title = match[1].trim();
+                      body = match[2].trim();
+                    } else {
+                      const match = section.match(/\*\*([A-Z][A-Z\s]+):\*\*\s*(.*)/s);
+                      if (!match) {
+                        return (
+                          <div key={i} className="border-l-[3px] pl-4 py-3 rounded-r-lg" style={{ borderColor: '#c9a96e', background: 'rgba(201,169,110,0.04)' }}>
+                            <p className="text-sm leading-[1.7] text-foreground/90">{section.trim()}</p>
+                          </div>
+                        );
+                      }
+                      title = match[1].trim();
+                      body = match[2].trim();
+                    }
+                    
                     const icon = icons[title] || '📌';
-                    // Split bullet points (lines starting with – or -)
                     const bullets = body.split(/\s*[–-]\s+/).filter((b: string) => b.trim());
+                    
                     return (
                       <div key={i} className="rounded-xl p-4" style={{ background: 'rgba(201,169,110,0.04)', border: '1px solid rgba(201,169,110,0.12)' }}>
                         <p className="text-xs font-semibold uppercase tracking-[0.08em] mb-2 flex items-center gap-2" style={{ color: '#c9a96e' }}>
