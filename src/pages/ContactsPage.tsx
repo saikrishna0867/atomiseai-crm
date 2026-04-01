@@ -101,6 +101,23 @@ export default function ContactsPage() {
     onError: (e: any) => {console.error('[Contacts]', e);toast({ title: 'Error', description: e.message, variant: 'destructive' });}
   });
 
+  const updateMutation = useMutation({
+    mutationFn: async () => {
+      if (!editingContact) return;
+      const { tags, ...rest } = form;
+      const { error } = await supabase.from('contacts').update(rest).eq('id', editingContact.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      setEditingContact(null);
+      setAddOpen(false);
+      resetForm();
+      toast({ title: 'Contact updated successfully ✅' });
+    },
+    onError: (e: any) => { toast({ title: 'Error', description: e.message, variant: 'destructive' }); }
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from('contacts').delete().eq('id', id);
@@ -112,6 +129,19 @@ export default function ContactsPage() {
       toast({ title: 'Contact deleted' });
     }
   });
+
+  const resetForm = () => setForm({ name: '', email: '', phone: '', company: '', source: 'Website Form', pipeline_stage: 'Lead', assigned_rep: '', assigned_rep_email: '', notes: '', tags: '', priority: 'Medium' });
+
+  const openEdit = (c: any) => {
+    setEditingContact(c);
+    setForm({
+      name: c.name || '', email: c.email || '', phone: c.phone || '', company: c.company || '',
+      source: c.source || 'Website Form', pipeline_stage: c.pipeline_stage || 'Lead',
+      assigned_rep: c.assigned_rep || '', assigned_rep_email: c.assigned_rep_email || '',
+      notes: c.notes || '', tags: '', priority: c.priority || 'Medium'
+    });
+    setAddOpen(true);
+  };
 
   const filtered = contacts.filter((c: any) => {
     const matchSearch = !search || [c.name, c.email, c.company].some((f) => f?.toLowerCase().includes(search.toLowerCase()));
