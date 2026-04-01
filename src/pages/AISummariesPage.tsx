@@ -27,7 +27,7 @@ export default function AISummariesPage() {
   const [summary, setSummary] = useState<any>(null);
   const [loadingSummary, setLoadingSummary] = useState(false);
 
-  useEffect(() => { document.title = 'AI Summaries | Automise AI CRM'; }, []);
+  useEffect(() => { document.title = 'AI Summaries | Atomise AI CRM'; }, []);
 
   const { data: contacts = [] } = useQuery({
     queryKey: ['contacts-for-ai'],

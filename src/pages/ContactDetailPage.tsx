@@ -34,7 +34,7 @@ export default function ContactDetailPage() {
   });
 
   useEffect(() => {
-    if (contact?.name) document.title = `${contact.name} | Automise AI CRM`;
+    if (contact?.name) document.title = `${contact.name} | Atomise AI CRM`;
   }, [contact]);
 
   const { data: activities = [] } = useQuery({

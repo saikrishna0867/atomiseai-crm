@@ -26,7 +26,7 @@ export default function CampaignsPage() {
     campaign_name: '', target_stage: 'Lead', email_subject: '', email_body: '', rep_name: '', rep_email: '',
   });
 
-  useEffect(() => { document.title = 'Campaigns | Automise AI CRM'; }, []);
+  useEffect(() => { document.title = 'Campaigns | Atomise AI CRM'; }, []);
 
   const { data: campaigns = [], isLoading } = useQuery({
     queryKey: ['campaigns'],
