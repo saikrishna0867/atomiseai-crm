@@ -79,7 +79,8 @@ export default function ContactsPage() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [search, setSearch] = useState('');
+  const { search: globalSearch = '' } = (useOutletContext<{ search?: string }>() || {});
+  const [search, setSearch] = useState(globalSearch);
   const [stageFilter, setStageFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
