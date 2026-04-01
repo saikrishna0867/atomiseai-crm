@@ -319,6 +319,7 @@ export default function DashboardPage() {
                     {a.timestamp ? formatDistanceToNow(new Date(a.timestamp), { addSuffix: true }) : ''}
                   </span>
                 </div>
+              </div>
             </div>
           ))}
         </div>
