@@ -77,9 +77,11 @@ export default function ContactsPage() {
 
       await Promise.allSettled([
         webhooks.newLead({
+          leadId,
           name: form.name, email: form.email, phone: form.phone, company: form.company,
           source: form.source, assignedRep: form.assigned_rep, assignedRepEmail: form.assigned_rep_email,
-          pipelineStage: form.pipeline_stage, notes: form.notes
+          pipelineStage: form.pipeline_stage, notes: form.notes,
+          skipDbInsert: true
         }),
         webhooks.startDrip({
           leadId, contactName: form.name, contactEmail: form.email,
