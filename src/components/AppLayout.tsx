@@ -44,6 +44,10 @@ export default function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [globalSearch, setGlobalSearch] = useState('');
   const basePath = '/' + location.pathname.split('/')[1];
+
+  // Clear search when navigating between pages
+  useEffect(() => { setGlobalSearch(''); }, [basePath]);
+
   const meta = pageMeta[basePath] || { title: 'Atomise CRM', subtitle: '' };
 
   const initial = 'S';
