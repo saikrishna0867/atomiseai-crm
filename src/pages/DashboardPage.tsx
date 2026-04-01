@@ -61,7 +61,7 @@ export default function DashboardPage() {
       const lost = deals.filter(d => d.stage === 'Closed Lost').length;
       const totalDeals = deals.length;
       const pipelineValue = deals.filter(d => d.stage !== 'Closed Lost').reduce((sum, d) => sum + (Number(d.deal_value) || 0), 0);
-      const openTasks = tasks.filter(t => (t.status || '').toLowerCase() === 'pending').length;
+      const openTasks = tasks.filter(t => (t.status || '').toLowerCase() !== 'completed').length;
 
       setStats({
         contacts: contacts.length,
