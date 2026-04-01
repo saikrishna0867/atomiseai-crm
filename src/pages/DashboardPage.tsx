@@ -53,20 +53,7 @@ export default function DashboardPage() {
         supabase.from('activity_log').select('id, lead_id, event_type, description, performed_by, timestamp').order('timestamp', { ascending: false }).limit(10),
       ]);
 
-      // Deduplicate contacts using same logic as ContactsPage
-      const rawContacts = contactsRes.data || [];
-      const contactMap = new Map<string, any>();
-      for (const c of rawContacts) {
-        const email = (c.email || '').trim().toLowerCase();
-        const name = (c.name || '').trim().toLowerCase();
-        const phone = (c.phone || '').trim().toLowerCase();
-        const key = email ? `email:${email}` : (name && phone ? `name-phone:${name}:${phone}` : `id:${c.id}`);
-        const existing = contactMap.get(key);
-        if (!existing || new Date(c.created_at ?? 0).getTime() >= new Date(existing.created_at ?? 0).getTime()) {
-          contactMap.set(key, c);
-        }
-      }
-      const contacts = Array.from(contactMap.values());
+      const contacts = contactsRes.data || [];
       const deals = dealsRes.data || [];
       const tasks = tasksRes.data || [];
 
