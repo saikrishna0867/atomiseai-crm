@@ -245,7 +245,22 @@ export default function ContactsPage() {
                         <DropdownMenuContent className="bg-card border-border">
                           <DropdownMenuItem onClick={() => navigate(`/contacts/${c.lead_id || c.id}`)} className="gap-2"><Eye className="w-3.5 h-3.5" /> View Contact</DropdownMenuItem>
                           <DropdownMenuItem onClick={() => openEdit(c)} className="gap-2"><Edit className="w-3.5 h-3.5" /> Edit</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => toast({ title: 'Drip started ✅' })} className="gap-2"><Droplets className="w-3.5 h-3.5" /> Start Drip</DropdownMenuItem>
+                          <DropdownMenuItem onClick={async () => {
+                            try {
+                              await webhooks.startDrip({
+                                leadId: c.lead_id || c.id,
+                                contactName: c.name,
+                                contactEmail: c.email,
+                                assignedRep: c.assigned_rep,
+                                assignedRepEmail: c.assigned_rep_email,
+                                source: c.source,
+                                company: c.company
+                              });
+                              toast({ title: 'Drip sequence started ✅' });
+                            } catch {
+                              // error toast handled by webhook util
+                            }
+                          }} className="gap-2"><Droplets className="w-3.5 h-3.5" /> Start Drip</DropdownMenuItem>
                           <DropdownMenuItem onClick={() => setDeleteId(c.id)} className="gap-2 text-destructive"><Trash2 className="w-3.5 h-3.5" /> Delete</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
