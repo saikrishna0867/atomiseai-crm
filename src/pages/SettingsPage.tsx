@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { Label } from '@/components/ui/label';
@@ -41,9 +41,12 @@ export default function SettingsPage() {
   const [localCrmName, setLocalCrmName] = useState(crmName);
   const [generalSaving, setGeneralSaving] = useState(false);
 
-  // Team
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [teamLoading, setTeamLoading] = useState(true);
+  // Team (localStorage)
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(() => {
+    const saved = localStorage.getItem('atomise_team_members');
+    if (saved) { try { return JSON.parse(saved); } catch { /* fall through */ } }
+    return [];
+  });
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteName, setInviteName] = useState('');
   const [inviteEmail, setInviteEmail] = useState('');
@@ -69,22 +72,11 @@ export default function SettingsPage() {
   useEffect(() => { document.title = 'Settings | Atomise AI CRM'; }, []);
   useEffect(() => { setLocalCrmName(crmName); }, [crmName]);
 
-  // Load team members from Supabase
-  const loadTeam = useCallback(async () => {
-    setTeamLoading(true);
-    try {
-      const { data, error } = await supabase.from('team_members').select('*').order('created_at', { ascending: true });
-      if (error) throw error;
-      setTeamMembers(data || []);
-    } catch {
-      // If table doesn't exist, show empty state
-      setTeamMembers([]);
-    } finally {
-      setTeamLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { loadTeam(); }, [loadTeam]);
+  // Persist team to localStorage
+  const saveTeam = (members: TeamMember[]) => {
+    setTeamMembers(members);
+    localStorage.setItem('atomise_team_members', JSON.stringify(members));
+  };
 
   // General save
   const saveGeneral = async () => {
@@ -106,35 +98,27 @@ export default function SettingsPage() {
     }
     setInviting(true);
     try {
-      const { error } = await supabase.from('team_members').insert({
+      const newMember: TeamMember = {
+        id: crypto.randomUUID(),
         name: inviteName.trim(),
         email: inviteEmail.trim(),
         role: inviteRole,
-      });
-      if (error) throw error;
-      toast({ title: `${inviteName.trim()} added to team ✅` });
+      };
+      saveTeam([...teamMembers, newMember]);
+      toast({ title: `${newMember.name} added to team ✅` });
       setInviteOpen(false);
       setInviteName('');
       setInviteEmail('');
       setInviteRole('Sales Rep');
-      loadTeam();
-    } catch (err: any) {
-      toast({ title: 'Failed to add member', description: err?.message, variant: 'destructive' });
     } finally {
       setInviting(false);
     }
   };
 
   // Team remove
-  const removeMember = async (member: TeamMember) => {
-    try {
-      const { error } = await supabase.from('team_members').delete().eq('id', member.id);
-      if (error) throw error;
-      toast({ title: `${member.name} removed from team` });
-      loadTeam();
-    } catch (err: any) {
-      toast({ title: 'Failed to remove member', description: err?.message, variant: 'destructive' });
-    }
+  const removeMember = (member: TeamMember) => {
+    saveTeam(teamMembers.filter(m => m.id !== member.id));
+    toast({ title: `${member.name} removed from team` });
   };
 
   // Integration tests
@@ -187,7 +171,7 @@ export default function SettingsPage() {
     }, 300);
   };
 
-  const StatusDot = ({ status }: { status: string }) => {
+  const renderStatus = (status: string) => {
     if (status === 'connected') return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-accent-green/10 text-accent-green border border-accent-green/20"><CheckCircle className="w-3 h-3" /> Connected</span>;
     if (status === 'error') return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-destructive/10 text-destructive border border-destructive/20"><XCircle className="w-3 h-3" /> Error</span>;
     return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-accent-green/10 text-accent-green border border-accent-green/20">Connected</span>;
@@ -228,11 +212,7 @@ export default function SettingsPage() {
             </Button>
           </div>
 
-          {teamLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-            </div>
-          ) : teamMembers.length === 0 ? (
+          {teamMembers.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <p className="text-sm">No team members yet. Click "Add Member" to get started.</p>
             </div>
@@ -314,7 +294,7 @@ export default function SettingsPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <StatusDot status={n8nStatus === 'idle' ? 'connected' : n8nStatus} />
+              {renderStatus(n8nStatus === 'idle' ? 'connected' : n8nStatus)}
               <Button size="sm" variant="outline" className="text-foreground rounded-lg" style={{ borderColor: 'rgba(201,169,110,0.20)' }} onClick={testN8n} disabled={testingN8n}>
                 {testingN8n ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null} Test
               </Button>
@@ -330,7 +310,7 @@ export default function SettingsPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <StatusDot status={supabaseStatus === 'idle' ? 'connected' : supabaseStatus} />
+              {renderStatus(supabaseStatus === 'idle' ? 'connected' : supabaseStatus)}
               <Button size="sm" variant="outline" className="text-foreground rounded-lg" style={{ borderColor: 'rgba(201,169,110,0.20)' }} onClick={testSupabase} disabled={testingSupabase}>
                 {testingSupabase ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null} Test
               </Button>
