@@ -19,6 +19,7 @@ const TOKENS = ['{{firstName}}', '{{company}}', '{{repName}}', '{{leadId}}'];
 
 export default function CampaignsPage() {
   const { toast } = useToast();
+  const { search: globalSearch = '' } = (useOutletContext<{ search?: string }>() || {});
   const queryClient = useQueryClient();
   const [addOpen, setAddOpen] = useState(false);
   const [viewCampaign, setViewCampaign] = useState<any>(null);
