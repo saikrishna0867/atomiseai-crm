@@ -53,8 +53,8 @@ export default function CampaignsPage() {
       // Log activity separately
       await supabase.from('activity_log').insert({
         lead_id: campaignId, event_type: 'campaign_launched',
-        description: `Campaign "${form.campaign_name}" launched targeting ${form.target_stage}`,
-        performed_by: form.rep_name,
+        description: `Campaign "${form.campaign_name}" targeting ${form.target_stage} launched by ${form.rep_name || 'Admin'}`,
+        performed_by: form.rep_name || 'Admin',
       });
     },
     onSuccess: () => {

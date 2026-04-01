@@ -213,8 +213,8 @@ export default function PipelinePage() {
         }),
         supabase.from('activity_log').insert({
           lead_id: deal.lead_id, event_type: 'stage_change',
-          description: `Deal moved from ${oldStage} to ${newStage}`,
-          performed_by: deal.assigned_rep, timestamp: new Date().toISOString(),
+          description: `"${deal.contact_name}" moved from ${oldStage} to ${newStage} by ${deal.assigned_rep || 'Admin'}`,
+          performed_by: deal.assigned_rep || 'Admin', timestamp: new Date().toISOString(),
         }),
       ]);
 
