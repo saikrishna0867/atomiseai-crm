@@ -57,7 +57,7 @@ export default function LoginPage() {
         <div className="absolute w-[200px] h-[200px] rounded-full bottom-[15%] right-[15%]" style={{ background: 'rgba(201,169,110,0.06)', filter: 'blur(60px)', animation: 'float 6s ease-in-out infinite reverse' }} />
 
         <div className="relative z-10 text-center space-y-6 px-8">
-          <img src="/atomise-logo.png" alt="Atomise AI" className="w-24 h-24 mx-auto object-contain" />
+          <img src="/atomise-logo.png" alt="Atomise AI" className="mx-auto object-contain" style={{ width: 140, height: 140, borderRadius: 12 }} />
           <h1 className="font-display text-4xl font-bold text-white">ATOMISE AI</h1>
           <p className="text-xl font-display" style={{ color: '#d4b483' }}>Automating Tomorrow, Today</p>
           <div className="space-y-3 mt-8">
