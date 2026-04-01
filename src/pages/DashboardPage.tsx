@@ -101,7 +101,15 @@ export default function DashboardPage() {
         { name: 'In Progress', value: inProgress },
       ]);
 
-      setActivities(activityRes.data || []);
+      // Enrich activities with contact names
+      const actLogs = activityRes.data || [];
+      const leadIds = [...new Set(actLogs.map((a: any) => a.lead_id).filter(Boolean))];
+      let actContactMap = new Map<string, string>();
+      if (leadIds.length > 0) {
+        const { data: actContacts } = await supabase.from('contacts').select('lead_id, name').in('lead_id', leadIds);
+        actContactMap = new Map((actContacts || []).map((c: any) => [c.lead_id, c.name]));
+      }
+      setActivities(actLogs.map((a: any) => ({ ...a, contact_name: actContactMap.get(a.lead_id) || null })));
 
     } catch (err) {
       console.error('Dashboard fetch error:', err);
