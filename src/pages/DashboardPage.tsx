@@ -41,7 +41,7 @@ export default function DashboardPage() {
   const [dealStatusData, setDealStatusData] = useState<any[]>([]);
   const [activities, setActivities] = useState<any[]>([]);
 
-  useEffect(() => { document.title = 'Dashboard | Automise AI CRM'; }, []);
+  useEffect(() => { document.title = 'Automise AI CRM | Automating Tomorrow, Today'; }, []);
 
   const fetchData = async () => {
     try {
@@ -74,8 +74,8 @@ export default function DashboardPage() {
       const allStages = ['Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'];
       const stageCounts: Record<string, number> = {};
       allStages.forEach(s => { stageCounts[s] = 0; });
-      deals.forEach(d => {
-        const s = d.stage || 'Lead';
+      contacts.forEach(c => {
+        const s = (c as any).pipeline_stage || 'Lead';
         if (stageCounts[s] !== undefined) stageCounts[s]++;
       });
       setStageData(allStages.map(name => ({ name, value: stageCounts[name] })));

@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { EmptyState } from '@/components/EmptyState';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { Columns3, Plus, Trash2, MoreHorizontal, Building2 } from 'lucide-react';
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, useSensor, useSensors, useDroppable, useDraggable } from '@dnd-kit/core';
 import { format } from 'date-fns';
@@ -117,6 +118,7 @@ export default function PipelinePage() {
   const queryClient = useQueryClient();
   const [addOpen, setAddOpen] = useState(false);
   const [addStage, setAddStage] = useState('Lead');
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [form, setForm] = useState({ contact_name: '', contact_email: '', company: '', deal_value: '', assigned_rep: '', assigned_rep_email: '', notes: '' });
 
   useEffect(() => { document.title = 'Pipeline | Automise AI CRM'; }, []);
@@ -238,7 +240,7 @@ export default function PipelinePage() {
               stage={stage}
               deals={deals.filter((d: any) => d.stage === stage)}
               onAddDeal={() => { setAddStage(stage); setAddOpen(true); }}
-              onDeleteDeal={(id) => deleteMutation.mutate(id)}
+              onDeleteDeal={(id) => setDeleteTarget(id)}
             />
           ))}
         </div>
@@ -282,6 +284,16 @@ export default function PipelinePage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        title="Delete Deal"
+        description="Are you sure you want to delete this deal? This action cannot be undone."
+        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget)}
+        loading={deleteMutation.isPending}
+        confirmLabel="Delete"
+      />
     </div>
   );
 }

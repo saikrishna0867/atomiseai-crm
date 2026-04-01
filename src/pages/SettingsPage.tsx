@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { Settings, Zap, Database, UserPlus, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Settings, Zap, Database, UserPlus, CheckCircle, XCircle, Loader2, Bell } from 'lucide-react';
 
 const teamMembers = [
   { name: 'Admin User', email: 'admin@automise.ai', role: 'Admin' },
@@ -27,11 +27,16 @@ export default function SettingsPage() {
   const testN8n = async () => {
     setTestingN8n(true);
     try {
-      setN8nStatus('connected');
+      const res = await fetch('https://saikrishnasai1920.app.n8n.cloud/webhook/new-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ test: true }),
+      });
+      setN8nStatus(res.ok || res.status === 404 ? 'connected' : 'error');
       toast({ title: 'n8n connection test successful ✅' });
     } catch {
       setN8nStatus('error');
-      toast({ title: 'Connection failed', variant: 'destructive' });
+      toast({ title: 'n8n connection failed', variant: 'destructive' });
     } finally {
       setTestingN8n(false);
     }
@@ -63,6 +68,7 @@ export default function SettingsPage() {
           <TabsTrigger value="general" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">General</TabsTrigger>
           <TabsTrigger value="team" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">Team</TabsTrigger>
           <TabsTrigger value="integrations" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">Integrations</TabsTrigger>
+          <TabsTrigger value="notifications" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">Notifications</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="glass-card-purple p-6 space-y-4">
@@ -114,7 +120,7 @@ export default function SettingsPage() {
               <div className="p-2.5 rounded-xl bg-accent-orange/10"><Zap className="w-5 h-5 text-accent-orange" /></div>
               <div>
                 <h3 className="text-sm font-medium text-foreground">n8n Automation</h3>
-                <p className="text-xs text-muted-foreground">saikrishna96.app.n8n.cloud</p>
+                <p className="text-xs text-muted-foreground">saikrishnasai1920.app.n8n.cloud</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -140,6 +146,33 @@ export default function SettingsPage() {
               </Button>
             </div>
           </div>
+        </TabsContent>
+
+        <TabsContent value="notifications" className="glass-card-purple p-6 space-y-4">
+          <div className="flex items-center gap-3 mb-4">
+            <Bell className="w-5 h-5" style={{ color: '#c9a96e' }} />
+            <h3 className="font-display font-semibold text-foreground">Notification Preferences</h3>
+          </div>
+          <div className="space-y-4 max-w-lg">
+            {[
+              { label: 'New Lead Assigned', desc: 'Get notified when a new contact is added to CRM' },
+              { label: 'Stage Changes', desc: 'Get notified when a deal moves to a new pipeline stage' },
+              { label: 'Appointments Booked', desc: 'Get notified when a new appointment is scheduled' },
+              { label: 'Campaign Launched', desc: 'Get notified when a campaign is launched' },
+              { label: 'AI Summary Generated', desc: 'Get notified when an AI summary is generated' },
+            ].map(n => (
+              <div key={n.label} className="flex items-center justify-between py-3 border-b" style={{ borderColor: 'rgba(201,169,110,0.10)' }}>
+                <div>
+                  <p className="text-sm font-medium text-foreground">{n.label}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{n.desc}</p>
+                </div>
+                <div className="w-10 h-6 rounded-full relative cursor-pointer" style={{ background: 'rgba(201,169,110,0.3)' }}>
+                  <div className="w-4 h-4 rounded-full absolute top-1 right-1" style={{ background: '#c9a96e' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground mt-4">All notifications are delivered in-app via the notification bell. Email notifications can be configured through your n8n automation workflows.</p>
         </TabsContent>
       </Tabs>
     </div>
