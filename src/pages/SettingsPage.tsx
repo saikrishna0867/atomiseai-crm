@@ -171,7 +171,7 @@ export default function SettingsPage() {
     }, 300);
   };
 
-  const StatusDot = ({ status }: { status: string }) => {
+  const renderStatus = (status: string) => {
     if (status === 'connected') return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-accent-green/10 text-accent-green border border-accent-green/20"><CheckCircle className="w-3 h-3" /> Connected</span>;
     if (status === 'error') return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-destructive/10 text-destructive border border-destructive/20"><XCircle className="w-3 h-3" /> Error</span>;
     return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-accent-green/10 text-accent-green border border-accent-green/20">Connected</span>;
