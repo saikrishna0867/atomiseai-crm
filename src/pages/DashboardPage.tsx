@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { KpiCard } from '@/components/KpiCard';
 import { Users, DollarSign, Trophy, TrendingDown, TrendingUp, ListTodo, Plus, CalendarDays } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -35,6 +35,7 @@ function SkeletonDashboard() {
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const { search = '' } = (useOutletContext<{ search?: string }>() || {});
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ contacts: 0, pipelineValue: 0, won: 0, lost: 0, convRate: 0, openTasks: 0 });
   const [stageData, setStageData] = useState<any[]>([]);
@@ -88,6 +89,7 @@ export default function DashboardPage() {
       ]);
 
       setActivities(activityRes.data || []);
+
     } catch (err) {
       console.error('Dashboard fetch error:', err);
     } finally {
@@ -100,6 +102,16 @@ export default function DashboardPage() {
     const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  const q = search.trim().toLowerCase();
+  const filteredActivities = useMemo(() => {
+    if (!q) return activities;
+    return activities.filter(a =>
+      [a.event_type, a.description, a.performed_by]
+        .filter(Boolean)
+        .some(v => String(v).toLowerCase().includes(q))
+    );
+  }, [activities, q]);
 
   if (loading) return <SkeletonDashboard />;
 
@@ -247,9 +259,9 @@ export default function DashboardPage() {
       <div className="glass-card-purple p-4 md:p-6 animate-slide-in" style={{ animationDelay: '600ms' }}>
         <h3 className="font-display font-semibold text-foreground mb-3 md:mb-4 text-sm md:text-base">Recent Activity</h3>
         <div className="space-y-1">
-          {activities.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No recent activity</p>
-          ) : activities.map((a) => (
+          {filteredActivities.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{q ? 'No matching activity' : 'No recent activity'}</p>
+          ) : filteredActivities.map((a) => (
             <div key={a.id} className="flex items-start sm:items-center gap-2.5 md:gap-3 py-2.5 md:py-3 px-2 md:px-3 rounded-lg hover:bg-[rgba(201,169,110,0.04)] transition-colors my-1 md:my-[11px]">
               <div
                 className="w-2.5 md:w-3 h-2.5 md:h-3 rounded-full shrink-0 mt-1.5 sm:mt-0"

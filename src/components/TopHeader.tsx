@@ -9,10 +9,11 @@ interface TopHeaderProps {
   subtitle: string;
   userInitial: string;
   onMenuClick?: () => void;
+  search?: string;
+  onSearchChange?: (value: string) => void;
 }
 
-export function TopHeader({ title, subtitle, userInitial, onMenuClick }: TopHeaderProps) {
-  const [search, setSearch] = useState('');
+export function TopHeader({ title, subtitle, userInitial, onMenuClick, search = '', onSearchChange }: TopHeaderProps) {
   const [notifOpen, setNotifOpen] = useState(false);
 
   const { data: notifCount = 0 } = useQuery({
@@ -51,7 +52,7 @@ export function TopHeader({ title, subtitle, userInitial, onMenuClick }: TopHead
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
         <input
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => onSearchChange?.(e.target.value)}
           placeholder="Search..."
           className="glass-input w-full !pl-10 pr-3 text-sm rounded-[10px]"
         />

@@ -42,6 +42,7 @@ export default function AppLayout() {
   }, [signOut, navigate]);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [globalSearch, setGlobalSearch] = useState('');
   const basePath = '/' + location.pathname.split('/')[1];
   const meta = pageMeta[basePath] || { title: 'Atomise CRM', subtitle: '' };
 
@@ -166,9 +167,9 @@ export default function AppLayout() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <TopHeader title={meta.title} subtitle={meta.subtitle} userInitial={initial} onMenuClick={() => setMobileOpen(true)} />
+        <TopHeader title={meta.title} subtitle={meta.subtitle} userInitial={initial} onMenuClick={() => setMobileOpen(true)} search={globalSearch} onSearchChange={setGlobalSearch} />
         <main className="flex-1 overflow-auto">
-          <Outlet />
+          <Outlet context={{ search: globalSearch }} />
         </main>
       </div>
     </div>
