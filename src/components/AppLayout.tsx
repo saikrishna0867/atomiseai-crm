@@ -167,9 +167,9 @@ export default function AppLayout() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <TopHeader title={meta.title} subtitle={meta.subtitle} userInitial={initial} onMenuClick={() => setMobileOpen(true)} />
+        <TopHeader title={meta.title} subtitle={meta.subtitle} userInitial={initial} onMenuClick={() => setMobileOpen(true)} search={globalSearch} onSearchChange={setGlobalSearch} />
         <main className="flex-1 overflow-auto">
-          <Outlet />
+          <Outlet context={{ search: globalSearch }} />
         </main>
       </div>
     </div>

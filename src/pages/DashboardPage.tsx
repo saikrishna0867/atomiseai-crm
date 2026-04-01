@@ -89,6 +89,7 @@ export default function DashboardPage() {
       ]);
 
       setActivities(activityRes.data || []);
+
     } catch (err) {
       console.error('Dashboard fetch error:', err);
     } finally {
