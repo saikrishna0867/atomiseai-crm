@@ -46,6 +46,7 @@ export default function ContactsPage() {
   const [sourceFilter, setSourceFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [addOpen, setAddOpen] = useState(false);
+  const [editingContact, setEditingContact] = useState<any>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [emailWarning, setEmailWarning] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(false);
@@ -94,10 +95,27 @@ export default function ContactsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
       setAddOpen(false);
-      setForm({ name: '', email: '', phone: '', company: '', source: 'Website Form', pipeline_stage: 'Lead', assigned_rep: '', assigned_rep_email: '', notes: '', tags: '', priority: 'Medium' });
+      resetForm();
       toast({ title: '✅ Contact added! Automation triggered — drip sequence started.' });
     },
     onError: (e: any) => {console.error('[Contacts]', e);toast({ title: 'Error', description: e.message, variant: 'destructive' });}
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async () => {
+      if (!editingContact) return;
+      const { tags, ...rest } = form;
+      const { error } = await supabase.from('contacts').update(rest).eq('id', editingContact.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      setEditingContact(null);
+      setAddOpen(false);
+      resetForm();
+      toast({ title: 'Contact updated successfully ✅' });
+    },
+    onError: (e: any) => { toast({ title: 'Error', description: e.message, variant: 'destructive' }); }
   });
 
   const deleteMutation = useMutation({
@@ -111,6 +129,19 @@ export default function ContactsPage() {
       toast({ title: 'Contact deleted' });
     }
   });
+
+  const resetForm = () => setForm({ name: '', email: '', phone: '', company: '', source: 'Website Form', pipeline_stage: 'Lead', assigned_rep: '', assigned_rep_email: '', notes: '', tags: '', priority: 'Medium' });
+
+  const openEdit = (c: any) => {
+    setEditingContact(c);
+    setForm({
+      name: c.name || '', email: c.email || '', phone: c.phone || '', company: c.company || '',
+      source: c.source || 'Website Form', pipeline_stage: c.pipeline_stage || 'Lead',
+      assigned_rep: c.assigned_rep || '', assigned_rep_email: c.assigned_rep_email || '',
+      notes: c.notes || '', tags: '', priority: c.priority || 'Medium'
+    });
+    setAddOpen(true);
+  };
 
   const filtered = contacts.filter((c: any) => {
     const matchSearch = !search || [c.name, c.email, c.company].some((f) => f?.toLowerCase().includes(search.toLowerCase()));
@@ -213,7 +244,7 @@ export default function ContactsPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="bg-card border-border">
                           <DropdownMenuItem onClick={() => navigate(`/contacts/${c.lead_id || c.id}`)} className="gap-2"><Eye className="w-3.5 h-3.5" /> View Contact</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => navigate(`/contacts/${c.lead_id || c.id}?edit=true`)} className="gap-2"><Edit className="w-3.5 h-3.5" /> Edit</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => openEdit(c)} className="gap-2"><Edit className="w-3.5 h-3.5" /> Edit</DropdownMenuItem>
                           <DropdownMenuItem onClick={() => toast({ title: 'Drip started ✅' })} className="gap-2"><Droplets className="w-3.5 h-3.5" /> Start Drip</DropdownMenuItem>
                           <DropdownMenuItem onClick={() => setDeleteId(c.id)} className="gap-2 text-destructive"><Trash2 className="w-3.5 h-3.5" /> Delete</DropdownMenuItem>
                         </DropdownMenuContent>
@@ -227,7 +258,7 @@ export default function ContactsPage() {
         </div>
       }
 
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+      <Dialog open={addOpen} onOpenChange={(o) => { setAddOpen(o); if (!o) { setEditingContact(null); resetForm(); } }}>
         <DialogContent className="p-0 border-0 bg-transparent shadow-none max-w-[560px]">
           <div
             className="rounded-[20px] overflow-hidden max-h-[90vh] overflow-y-auto"
@@ -239,19 +270,27 @@ export default function ContactsPage() {
             
             <div className="p-6 border-b" style={{ borderColor: 'rgba(201,169,110,0.12)' }}>
               <DialogHeader>
-                <DialogTitle className="font-display text-xl font-bold text-foreground">Add New Contact</DialogTitle>
+                <DialogTitle className="font-display text-xl font-bold text-foreground">
+                  {editingContact ? 'Edit Contact' : 'Add New Contact'}
+                </DialogTitle>
               </DialogHeader>
-              <p className="text-[13px] text-muted-foreground mt-1">Fill in the details below — automation will trigger automatically</p>
+              <p className="text-[13px] text-muted-foreground mt-1">
+                {editingContact ? 'Update the contact details below' : 'Fill in the details below — automation will trigger automatically'}
+              </p>
             </div>
             <form onSubmit={async (e) => {
               e.preventDefault();
-              const existing = contacts.find((c: any) => c.email?.toLowerCase() === form.email.toLowerCase());
-              if (existing && !pendingSubmit) {
-                setEmailWarning(true);
-                return;
+              if (editingContact) {
+                updateMutation.mutate();
+              } else {
+                const existing = contacts.find((c: any) => c.email?.toLowerCase() === form.email.toLowerCase());
+                if (existing && !pendingSubmit) {
+                  setEmailWarning(true);
+                  return;
+                }
+                setPendingSubmit(false);
+                addMutation.mutate();
               }
-              setPendingSubmit(false);
-              addMutation.mutate();
             }} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
@@ -289,32 +328,37 @@ export default function ContactsPage() {
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground font-medium">Assigned Rep <span className="text-destructive">*</span></Label>
-                  <input value={form.assigned_rep} onChange={(e) => setForm((p) => ({ ...p, assigned_rep: e.target.value }))} required className="glass-input w-full" />
+                  <Label className="text-xs text-muted-foreground font-medium">Priority</Label>
+                  <Select value={form.priority} onValueChange={(v) => setForm((p) => ({ ...p, priority: v }))}>
+                    <SelectTrigger className="glass-input"><SelectValue /></SelectTrigger>
+                    <SelectContent className="bg-card border-border">{PRIORITIES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                  </Select>
                 </div>
               </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground font-medium">Assigned Rep Email <span className="text-destructive">*</span></Label>
-                <input type="email" value={form.assigned_rep_email} onChange={(e) => setForm((p) => ({ ...p, assigned_rep_email: e.target.value }))} required className="glass-input w-full" />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground font-medium">Tags (comma-separated)</Label>
-                <input value={form.tags} onChange={(e) => setForm((p) => ({ ...p, tags: e.target.value }))} className="glass-input w-full" />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground font-medium">Assigned Rep {!editingContact && <span className="text-destructive">*</span>}</Label>
+                  <input value={form.assigned_rep} onChange={(e) => setForm((p) => ({ ...p, assigned_rep: e.target.value }))} required={!editingContact} className="glass-input w-full" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground font-medium">Rep Email {!editingContact && <span className="text-destructive">*</span>}</Label>
+                  <input type="email" value={form.assigned_rep_email} onChange={(e) => setForm((p) => ({ ...p, assigned_rep_email: e.target.value }))} required={!editingContact} className="glass-input w-full" />
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground font-medium">Notes</Label>
                 <textarea value={form.notes} onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))} rows={3} className="glass-input w-full resize-none" />
               </div>
               <div className="flex gap-3 pt-2">
-                <Button type="button" variant="ghost" onClick={() => setAddOpen(false)} className="text-muted-foreground">Cancel</Button>
+                <Button type="button" variant="ghost" onClick={() => { setAddOpen(false); setEditingContact(null); resetForm(); }} className="text-muted-foreground">Cancel</Button>
                 <Button
                   type="submit"
                   className="flex-1 font-display text-[15px] rounded-xl h-12 transition-all duration-200"
                   style={{ background: '#c9a96e', color: '#07091e', boxShadow: '0 4px 20px rgba(201,169,110,0.4)' }}
-                  disabled={addMutation.isPending}>
-                  {addMutation.isPending ?
-                    <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving & triggering automation...</> :
-                    'Add Contact + Trigger Automation ⚡'
+                  disabled={addMutation.isPending || updateMutation.isPending}>
+                  {(addMutation.isPending || updateMutation.isPending) ?
+                    <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</> :
+                    editingContact ? 'Update Contact' : 'Add Contact + Trigger Automation ⚡'
                   }
                 </Button>
               </div>
