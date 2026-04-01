@@ -98,35 +98,27 @@ export default function SettingsPage() {
     }
     setInviting(true);
     try {
-      const { error } = await supabase.from('team_members').insert({
+      const newMember: TeamMember = {
+        id: crypto.randomUUID(),
         name: inviteName.trim(),
         email: inviteEmail.trim(),
         role: inviteRole,
-      });
-      if (error) throw error;
-      toast({ title: `${inviteName.trim()} added to team ✅` });
+      };
+      saveTeam([...teamMembers, newMember]);
+      toast({ title: `${newMember.name} added to team ✅` });
       setInviteOpen(false);
       setInviteName('');
       setInviteEmail('');
       setInviteRole('Sales Rep');
-      loadTeam();
-    } catch (err: any) {
-      toast({ title: 'Failed to add member', description: err?.message, variant: 'destructive' });
     } finally {
       setInviting(false);
     }
   };
 
   // Team remove
-  const removeMember = async (member: TeamMember) => {
-    try {
-      const { error } = await supabase.from('team_members').delete().eq('id', member.id);
-      if (error) throw error;
-      toast({ title: `${member.name} removed from team` });
-      loadTeam();
-    } catch (err: any) {
-      toast({ title: 'Failed to remove member', description: err?.message, variant: 'destructive' });
-    }
+  const removeMember = (member: TeamMember) => {
+    saveTeam(teamMembers.filter(m => m.id !== member.id));
+    toast({ title: `${member.name} removed from team` });
   };
 
   // Integration tests
