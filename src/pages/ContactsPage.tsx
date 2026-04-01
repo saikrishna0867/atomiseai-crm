@@ -72,14 +72,16 @@ export default function ContactsPage() {
       const leadId = `LEAD-${Date.now()}`;
       const { tags, ...rest } = form;
       const record = { ...rest, lead_id: leadId };
-      const { error } = await supabase.from('contacts').insert(record);
+      const { data: inserted, error } = await supabase.from('contacts').insert(record).select().single();
       if (error) throw error;
 
       await Promise.allSettled([
         webhooks.newLead({
+          leadId,
           name: form.name, email: form.email, phone: form.phone, company: form.company,
           source: form.source, assignedRep: form.assigned_rep, assignedRepEmail: form.assigned_rep_email,
-          pipelineStage: form.pipeline_stage, notes: form.notes
+          pipelineStage: form.pipeline_stage, notes: form.notes,
+          skipDbInsert: true
         }),
         webhooks.startDrip({
           leadId, contactName: form.name, contactEmail: form.email,
