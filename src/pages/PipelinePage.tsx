@@ -240,7 +240,7 @@ export default function PipelinePage() {
               stage={stage}
               deals={deals.filter((d: any) => d.stage === stage)}
               onAddDeal={() => { setAddStage(stage); setAddOpen(true); }}
-              onDeleteDeal={(id) => deleteMutation.mutate(id)}
+              onDeleteDeal={(id) => setDeleteTarget(id)}
             />
           ))}
         </div>
