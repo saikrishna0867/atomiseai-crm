@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { Sparkles, Loader2, Search } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 
 const HEALTH_CONFIG: Record<string, { emoji: string; label: string; bg: string; text: string; border: string; dot: string }> = {
