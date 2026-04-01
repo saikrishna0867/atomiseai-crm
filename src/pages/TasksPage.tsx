@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { CheckSquare, Plus, AlertCircle, LayoutList, Columns3, Trash2 } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { format, isPast, parseISO } from 'date-fns';
 
