@@ -95,7 +95,7 @@ export default function ContactsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
       setAddOpen(false);
-      setForm({ name: '', email: '', phone: '', company: '', source: 'Website Form', pipeline_stage: 'Lead', assigned_rep: '', assigned_rep_email: '', notes: '', tags: '', priority: 'Medium' });
+      resetForm();
       toast({ title: '✅ Contact added! Automation triggered — drip sequence started.' });
     },
     onError: (e: any) => {console.error('[Contacts]', e);toast({ title: 'Error', description: e.message, variant: 'destructive' });}
