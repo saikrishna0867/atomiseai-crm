@@ -35,6 +35,7 @@ function SkeletonDashboard() {
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const { search = '' } = (useOutletContext<{ search?: string }>() || {});
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ contacts: 0, pipelineValue: 0, won: 0, lost: 0, convRate: 0, openTasks: 0 });
   const [stageData, setStageData] = useState<any[]>([]);
