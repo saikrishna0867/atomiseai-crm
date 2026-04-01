@@ -47,13 +47,26 @@ export default function DashboardPage() {
   const fetchData = async () => {
     try {
       const [contactsRes, dealsRes, tasksRes, activityRes] = await Promise.all([
-        supabase.from('contacts').select('pipeline_stage'),
+        supabase.from('contacts').select('pipeline_stage, email, name, phone, id, created_at'),
         supabase.from('pipeline_deals').select('deal_value, stage'),
         supabase.from('tasks').select('status'),
         supabase.from('activity_log').select('id, lead_id, event_type, description, performed_by, timestamp').order('timestamp', { ascending: false }).limit(10),
       ]);
 
-      const contacts = contactsRes.data || [];
+      // Deduplicate contacts using same logic as ContactsPage
+      const rawContacts = contactsRes.data || [];
+      const contactMap = new Map<string, any>();
+      for (const c of rawContacts) {
+        const email = (c.email || '').trim().toLowerCase();
+        const name = (c.name || '').trim().toLowerCase();
+        const phone = (c.phone || '').trim().toLowerCase();
+        const key = email ? `email:${email}` : (name && phone ? `name-phone:${name}:${phone}` : `id:${c.id}`);
+        const existing = contactMap.get(key);
+        if (!existing || new Date(c.created_at ?? 0).getTime() >= new Date(existing.created_at ?? 0).getTime()) {
+          contactMap.set(key, c);
+        }
+      }
+      const contacts = Array.from(contactMap.values());
       const deals = dealsRes.data || [];
       const tasks = tasksRes.data || [];
 
