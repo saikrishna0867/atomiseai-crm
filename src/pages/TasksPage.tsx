@@ -21,6 +21,7 @@ const PRIORITY_BORDER: Record<string, string> = {
 
 export default function TasksPage() {
   const { toast } = useToast();
+  const { search: globalSearch = '' } = (useOutletContext<{ search?: string }>() || {});
   const queryClient = useQueryClient();
   const [addOpen, setAddOpen] = useState(false);
   const [view, setView] = useState<'list' | 'board'>('board');
