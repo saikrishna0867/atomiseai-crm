@@ -259,9 +259,9 @@ export default function DashboardPage() {
       <div className="glass-card-purple p-4 md:p-6 animate-slide-in" style={{ animationDelay: '600ms' }}>
         <h3 className="font-display font-semibold text-foreground mb-3 md:mb-4 text-sm md:text-base">Recent Activity</h3>
         <div className="space-y-1">
-          {activities.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No recent activity</p>
-          ) : activities.map((a) => (
+          {filteredActivities.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{q ? 'No matching activity' : 'No recent activity'}</p>
+          ) : filteredActivities.map((a) => (
             <div key={a.id} className="flex items-start sm:items-center gap-2.5 md:gap-3 py-2.5 md:py-3 px-2 md:px-3 rounded-lg hover:bg-[rgba(201,169,110,0.04)] transition-colors my-1 md:my-[11px]">
               <div
                 className="w-2.5 md:w-3 h-2.5 md:h-3 rounded-full shrink-0 mt-1.5 sm:mt-0"
