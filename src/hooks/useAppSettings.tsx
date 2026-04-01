@@ -6,12 +6,12 @@ interface AppSettingsContextType {
 }
 
 const AppSettingsContext = createContext<AppSettingsContextType>({
-  crmName: 'Automise AI CRM',
+  crmName: 'Atomise AI CRM',
   setCrmName: () => {},
 });
 
 export function AppSettingsProvider({ children }: { children: ReactNode }) {
-  const [crmName, setCrmName] = useState(() => localStorage.getItem('crm_name') || 'Automise AI CRM');
+  const [crmName, setCrmName] = useState(() => localStorage.getItem('crm_name') || 'Atomise AI CRM');
 
   const updateCrmName = (name: string) => {
     setCrmName(name);

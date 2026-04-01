@@ -26,7 +26,7 @@ export default function AppointmentsPage() {
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [viewAppt, setViewAppt] = useState<any>(null);
 
-  useEffect(() => { document.title = 'Appointments | Automise AI CRM'; }, []);
+  useEffect(() => { document.title = 'Appointments | Atomise AI CRM'; }, []);
 
   const [form, setForm] = useState({
     contact_name: '', contact_email: '', lead_id: '', appointment_type: 'Discovery Call',

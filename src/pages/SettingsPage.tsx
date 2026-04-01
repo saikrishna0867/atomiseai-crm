@@ -15,14 +15,14 @@ const teamMembers = [
 
 export default function SettingsPage() {
   const { toast } = useToast();
-  const [companyName, setCompanyName] = useState('Automise AI');
+  const [companyName, setCompanyName] = useState('Atomise AI');
   const { crmName, setCrmName } = useAppSettings();
   const [testingN8n, setTestingN8n] = useState(false);
   const [testingSupabase, setTestingSupabase] = useState(false);
   const [n8nStatus, setN8nStatus] = useState<'idle' | 'connected' | 'error'>('idle');
   const [supabaseStatus, setSupabaseStatus] = useState<'idle' | 'connected' | 'error'>('idle');
 
-  useEffect(() => { document.title = 'Settings | Automise AI CRM'; }, []);
+  useEffect(() => { document.title = 'Settings | Atomise AI CRM'; }, []);
 
   const testN8n = async () => {
     setTestingN8n(true);

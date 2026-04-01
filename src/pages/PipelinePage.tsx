@@ -121,7 +121,7 @@ export default function PipelinePage() {
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [form, setForm] = useState({ contact_name: '', contact_email: '', company: '', deal_value: '', assigned_rep: '', assigned_rep_email: '', notes: '' });
 
-  useEffect(() => { document.title = 'Pipeline | Automise AI CRM'; }, []);
+  useEffect(() => { document.title = 'Pipeline | Atomise AI CRM'; }, []);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
