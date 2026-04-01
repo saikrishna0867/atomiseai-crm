@@ -78,8 +78,8 @@ export default function AppointmentsPage() {
         }),
         supabase.from('activity_log').insert({
           lead_id: form.lead_id, event_type: 'appointment_booked',
-          description: `Appointment scheduled for ${form.appointment_date}`,
-          performed_by: form.rep_name,
+          description: `Appointment for "${form.contact_name}" scheduled on ${form.appointment_date} by ${form.rep_name || 'Admin'}`,
+          performed_by: form.rep_name || 'Admin',
         }),
       ]);
     },

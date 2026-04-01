@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { Bell, UserPlus, ArrowRightLeft, Calendar, Mail, Sparkles, ClipboardList, X, Trash2 } from 'lucide-react';
+import { Bell, UserPlus, ArrowRightLeft, Calendar, Mail, Sparkles, ClipboardList, X, Trash2, User, Briefcase } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 
@@ -48,12 +48,25 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ['notifications'],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data: logs } = await supabase
         .from('activity_log')
         .select('id, lead_id, event_type, description, performed_by, timestamp')
         .order('timestamp', { ascending: false })
         .limit(50);
-      return data || [];
+      if (!logs || logs.length === 0) return [];
+
+      // Fetch contact names for lead_ids
+      const leadIds = [...new Set(logs.map((l: any) => l.lead_id).filter(Boolean))];
+      const { data: contacts } = await supabase
+        .from('contacts')
+        .select('lead_id, name')
+        .in('lead_id', leadIds);
+      const contactMap = new Map((contacts || []).map((c: any) => [c.lead_id, c.name]));
+
+      return logs.map((l: any) => ({
+        ...l,
+        contact_name: contactMap.get(l.lead_id) || null,
+      }));
     },
     enabled: open,
     refetchInterval: open ? 15000 : false,
@@ -153,16 +166,22 @@ export function NotificationPopover({ open, onClose, taskCount }: NotificationPo
                       </div>
                       <div className="flex-1 min-w-0 pt-px">
                         <p className="text-[12px] sm:text-[13px] text-foreground leading-[1.4] line-clamp-2">{n.description}</p>
-                        <div className="flex items-center gap-1.5 mt-0.5 sm:mt-1">
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                          {n.contact_name && (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-medium" style={{ background: 'rgba(96,165,250,0.12)', color: '#60a5fa' }}>
+                              <User className="w-2.5 h-2.5" />
+                              {n.contact_name}
+                            </span>
+                          )}
+                          {n.performed_by && (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-medium" style={{ background: 'rgba(201,169,110,0.12)', color: '#c9a96e' }}>
+                              <Briefcase className="w-2.5 h-2.5" />
+                              {n.performed_by}
+                            </span>
+                          )}
                           <span className="text-[10px] sm:text-[11px] text-muted-foreground leading-none">
                             {n.timestamp ? formatDistanceToNow(new Date(n.timestamp), { addSuffix: true }) : ''}
                           </span>
-                          {n.performed_by && (
-                            <>
-                              <span className="text-muted-foreground/25 text-[10px]">·</span>
-                              <span className="text-[10px] sm:text-[11px] text-muted-foreground/70 truncate max-w-[100px] sm:max-w-[140px]">{n.performed_by}</span>
-                            </>
-                          )}
                         </div>
                       </div>
                       <button

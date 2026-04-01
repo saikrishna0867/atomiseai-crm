@@ -141,7 +141,8 @@ export default function ContactsPage() {
         }),
         supabase.from('activity_log').insert({
           lead_id: leadId, event_type: 'lead_assigned',
-          description: 'Contact added to CRM', performed_by: 'System (n8n)'
+          description: `New contact "${record.name}" added to CRM by ${record.assigned_rep || 'Admin'}`,
+          performed_by: record.assigned_rep || 'Admin'
         })
       ]);
     },
