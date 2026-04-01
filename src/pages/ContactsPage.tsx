@@ -72,7 +72,7 @@ export default function ContactsPage() {
       const leadId = `LEAD-${Date.now()}`;
       const { tags, ...rest } = form;
       const record = { ...rest, lead_id: leadId };
-      const { error } = await supabase.from('contacts').insert(record);
+      const { data: inserted, error } = await supabase.from('contacts').insert(record).select().single();
       if (error) throw error;
 
       await Promise.allSettled([
